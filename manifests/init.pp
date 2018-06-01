@@ -4,8 +4,8 @@ class cd4pe (
   Integer $mysql_port,
   String  $mysql_user,
   String  $mysql_pass,
-  String  $dump_uri,
   String  $pfi_secret_key,
+  String  $dump_uri = "dump://localhost:7000",
   String  $version = "latest",
 ) {
   include docker
