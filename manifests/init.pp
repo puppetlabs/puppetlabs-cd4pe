@@ -3,7 +3,7 @@ class cd4pe (
   String  $mysql_db,
   Integer $mysql_port,
   String  $mysql_user,
-  String  $mysql_pass
+  String  $mysql_pass,
   String  $dump_uri,
   String  $pfi_secret_key,
   String  $version = "latest",
@@ -18,9 +18,9 @@ class cd4pe (
 
   docker::run { 'cd4pe':
     image   => 'puppet/continuous-delivery-for-puppet-enterprise',
-    volumes => {
+    volumes => [
       "/var/lib/mysql",
-    },
+    ],
     ports   => [
       "8080:8080",
       "8000:8000",
