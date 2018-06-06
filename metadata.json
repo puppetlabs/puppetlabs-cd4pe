@@ -6,7 +6,9 @@
   "license": "Apache-2.0",
   "source": "",
   "dependencies": [
-    { "name": "puppetlabs/docker", "version_requirement": ">= 1.1.0" }
+    { "name": "puppetlabs/docker", "version_requirement": ">= 1.1.0" },
+    { "name": "puppetlabs/stdlib", "version_requirement": ">= 4.25.1" },
+    { "name": "WhatsARanjit/node_manager", "version_requirement": ">= 0.7.1" }
   ],
   "operatingsystem_support": [
     {
