@@ -1,0 +1,38 @@
+{
+  "name": "puppetlabs-catalog_diff_api",
+  "version": "0.0.1",
+  "author": "Puppet Labs",
+  "summary": "Puppet Server endpoint for catalog diffs.",
+  "license": "Apache-2.0",
+  "dependencies": [
+    {
+      "name": "puppetlabs-stdlib",
+      "version_requirement": ">= 4.19.0 < 5.0.0"
+    },
+    {
+      "name": "puppetlabs-inifile",
+      "version_requirement": ">= 2.0.0 < 3.0.0"
+    },
+    {
+      "name": "puppetlabs-puppet_authorization",
+      "version_requirement": ">= 0.4.0 < 1.0.0"
+    }
+  ],
+  "requirements": [
+    {"name": "puppet", "version_requirement": ">= 4.0.0 < 5.5.0"}
+  ],
+  "operatingsystem_support": [
+    {
+      "operatingsystem":"RedHat",
+      "operatingsystemrelease":["6", "7"]
+    },
+    {
+      "operatingsystem": "Ubuntu",
+      "operatingsystemrelease": ["16.04", "18.04"]
+    },
+    {
+      "operatingsystem": "SLES",
+      "operatingsystemrelease": ["12"]
+    }
+  ]
+}
