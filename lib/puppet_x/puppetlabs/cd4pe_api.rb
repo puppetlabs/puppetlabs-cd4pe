@@ -1,7 +1,7 @@
 # Forward declarations of Ruby modules used for namespacing
 module PuppetX
   module Puppetlabs
-    module DiffApi
+    module CD4PEApi
     end
   end
 end

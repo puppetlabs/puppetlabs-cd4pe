@@ -1,4 +1,4 @@
-require 'puppet_x/puppetlabs/catalog_diff_api'
+require 'puppet_x/puppetlabs/cd4pe_api'
 
 # NOTE: This class is only usable when called from a JRuby instance managed
 # by Puppet Server.
@@ -6,18 +6,18 @@ require 'java'
 require 'singleton'
 
 require 'puppet/server/network/http/handler'
-require 'puppet_x/puppetlabs/catalog_diff_api/diff_handler'
+require 'puppet_x/puppetlabs/cd4pe_api/compile_handler'
 
-class PuppetX::Puppetlabs::DiffApi::JRubyHandler
+class PuppetX::Puppetlabs::CD4PEApi::JRubyHandler
   include Puppet::Server::Network::HTTP::Handler
   include Singleton
 
 
   def initialize
-    route_path = %r{^#{Puppet::Network::HTTP::MASTER_URL_PREFIX}/v3/diff-catalog/[^/]+$}
+    route_path = %r{^#{Puppet::Network::HTTP::MASTER_URL_PREFIX}/v3/cd4pe/compile/[^/]+$}
 
     diff_handler = Puppet::Network::HTTP::Route.path(route_path).
-      get(PuppetX::Puppetlabs::DiffApi::DiffHandler.new)
+      get(PuppetX::Puppetlabs::CD4PEApi::CompileHandler.new)
 
     register([diff_handler])
   end

@@ -1,9 +1,10 @@
 {
-  "name": "puppetlabs-catalog_diff_api",
+  "name": "puppetlabs-cd4pe",
   "version": "0.0.1",
   "author": "Puppet Labs",
   "summary": "Puppet Server endpoint for catalog diffs.",
   "license": "Apache-2.0",
+  "source": "",
   "dependencies": [
     {
       "name": "puppetlabs-stdlib",
@@ -17,9 +18,6 @@
       "name": "puppetlabs-puppet_authorization",
       "version_requirement": ">= 0.4.0 < 1.0.0"
     }
-  ],
-  "requirements": [
-    {"name": "puppet", "version_requirement": ">= 4.0.0 < 5.5.0"}
   ],
   "operatingsystem_support": [
     {

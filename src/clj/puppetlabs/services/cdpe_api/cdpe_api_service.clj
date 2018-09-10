@@ -1,18 +1,18 @@
-(ns puppetlabs.services.catalog-diff-api.catalog-diff-api-service
-  "Defines the diff-api-service for Trapperkeeper"
+(ns puppetlabs.services.cdpe-api.cdpe-api-service
+  "Defines the cdpe-api-service for Trapperkeeper"
   (:require
    [clojure.edn :as edn]
    [clojure.string :as string]
    [clojure.tools.logging :as log]
-   [puppetlabs.services.catalog-diff-api.catalog-diff-api-core :as core]
+   [puppetlabs.services.cdpe-api.cdpe-api-core :as core]
    [puppetlabs.trapperkeeper.core :refer [defservice]]
    [puppetlabs.trapperkeeper.services :as services]
    [puppetlabs.trapperkeeper.services.status.status-core :as status-core]))
 
 
 (def version
-  "The diff_api module version, from project.clj"
-  (status-core/get-artifact-version "puppetlabs" "catalog-diff-api"))
+  "The cdpe_api module version, from project.clj"
+  (status-core/get-artifact-version "puppetlabs" "cdpe-api"))
 
 (def puppetserver-version
   "Retrieve Puppet Server version in use.
@@ -29,11 +29,11 @@
       (log/errorf "Couldn't determine Puppet Server version %s" e)
       nil)))
 
-(defprotocol CatalogDiffApiService)
+(defprotocol CdpeApiService)
 
 
 (defn compatible-puppetserver-version?
-  "Determine whether Puppet Server is compatible with diff_api.
+  "Determine whether Puppet Server is compatible with cdpe_api
 
   This function returns a simple boolean value."
   []
@@ -44,8 +44,8 @@
       ;; TODO: Test against Puppet Server 6.
       (< puppetserver-version 6.0))))
 
-(defservice catalog-diff-api-service
-  CatalogDiffApiService
+(defservice cdpe-api-service
+  CdpeApiService
   [[:StatusService register-status]
    [:WebserverService add-ring-handler]
 
@@ -61,7 +61,7 @@
     ;; Puppet Server.
     (if (compatible-puppetserver-version?)
       (do
-        (log/info "Initializing CatalogDiffApiService")
+        (log/info "Initializing CdpeApiService")
         (let [puppet-config (get-config)
               auth-handler (get-auth-handler)
               jruby-service (services/get-service this :JRubyPuppetService)
@@ -71,12 +71,12 @@
                                                                auth-handler)
               ring-handler (core/create-request-handler jruby-handler)]
 
-          (register-status "catalog-diff-api-service" version 1
+          (register-status "cdpe--api-service" version 1
                            (core/create-status-callback context))
 
           (assoc context :request-handler ring-handler)))
       (do
-        (log/warnf "The catalog_diff_api plugin is not compatible with Puppet Server version %s and should be removed from this node. Skipping service initialization."
+        (log/warnf "The cdpe_api plugin is not compatible with Puppet Server version %s and should be removed from this node. Skipping service initialization."
                     puppetserver-version)
         context)))
 
@@ -85,9 +85,6 @@
     ;; FIXME: Use the WebroutingService to lookup which path the MasterService
     ;; is mounted at.
     (when-let [handler (:request-handler context)]
-      (log/info "Starting CatalogDiffApiService")
-      ;; /catalog-diff might make more sense, but could be unintentionally
-      ;; exposed via auth.conf handlers that match against /catalog*
-      (add-ring-handler handler "/puppet/v3/diff-catalog"))
-
+      (log/info "Starting CdpeApiService")
+      (add-ring-handler handler "/puppet/v3/cd4pe/compile"))
     context))

@@ -1,4 +1,4 @@
-(ns puppetlabs.services.catalog-diff-api.catalog-diff-api-service-test
+(ns puppetlabs.services.cdpe-api.cdpe-api-service-test
   (:require
     [clojure.test :refer :all]
     [clojure.java.io :as io]
@@ -22,7 +22,7 @@
 
     ;; Provided by puppetlabs/puppetserver with the "test" classifier.
     [puppetlabs.services.jruby.jruby-puppet-testutils :as jruby-testutils]
-    [puppetlabs.services.catalog-diff-api.catalog-diff-api-service :as diff-api]))
+    [puppetlabs.services.cdpe-api-service.cdpe-api-service :as cdpe-api]))
 
 
 ;; Test Configuration
@@ -35,18 +35,18 @@
       io/resource
       .getPath))
 
-(def bootstrap-config (test-resource "catalog-diff-api/bootstrap.cfg"))
-(def app-config (test-resource "catalog-diff-api/config.conf"))
-(def logback-config (test-resource "catalog-diff-api/logback-test.xml"))
-(def puppet-confdir (test-resource "catalog-diff-api/fixtures/puppet"))
+(def bootstrap-config (test-resource "cdpe-api/bootstrap.cfg"))
+(def app-config (test-resource "cdpe-api/config.conf"))
+(def logback-config (test-resource "cdpe-api/logback-test.xml"))
+(def puppet-confdir (test-resource "cdpe-api/fixtures/puppet"))
 
 (def listen-address "localhost")
 (def listen-port 18140)
 (def base-url (str "https://" listen-address ":" listen-port))
 
-(def ssl-cert (test-resource "catalog-diff-api/ssl/catalog-diff-api.test.cert.pem"))
-(def ssl-key (test-resource "catalog-diff-api/ssl/catalog-diff-api.test.key.pem"))
-(def ca-cert (test-resource "catalog-diff-api/ssl/ca.cert.pem"))
+(def ssl-cert (test-resource "cdpe-api/ssl/cdpe-api.test.cert.pem"))
+(def ssl-key (test-resource "cdpe-api/ssl/cdpe-api.test.key.pem"))
+(def ca-cert (test-resource "cdpe-api/ssl/ca.cert.pem"))
 
 (def app-services
   (tk-bootstrap/parse-bootstrap-config! bootstrap-config))
@@ -95,19 +95,19 @@
 
 ;; Test Cases
 
-(deftest ^:integration catalog-diff-api-service
-  (printf "Testing against Puppet Server version: %s%n" diff-api/puppetserver-version)
+(deftest ^:integration cdpe-api-service
+  (printf "Testing against Puppet Server version: %s%n" cdpe-api/puppetserver-version)
 
   (tst-bootstrap/with-app-with-config app app-services base-config
-    (testing "puppetserver-diff-api plugin is enabled appropriately"
+    (testing "puppetserver-cdpe-api plugin is enabled appropriately"
       (let [response (GET "/status/v1/services?level=debug")
             body (-> response :body json/parse-string)
             ;; When run against an incompatible Puppet Server version, we
             ;; expect the TK status service to return a response that does
             ;; not reference the facts-upload service, i.e. nil, which
             ;; indicates the service was not mounted.
-            expected-version (if (diff-api/compatible-puppetserver-version?)
-                                 diff-api/version
+            expected-version (if (cdpe-api/compatible-puppetserver-version?)
+                                 cdpe-api/version
                                  nil)]
         (is (= 200 (:status response)))
-        (is (= expected-version (get-in body ["catalog-diff-api-service" "service_version"])))))))
+        (is (= expected-version (get-in body ["cdpe-api-service" "service_version"])))))))

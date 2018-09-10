@@ -1,9 +1,9 @@
-(def puppetserver-version
-  "Version of Puppet Server to develop and test against. Defaults to 5.x."
-  (get (System/getenv) "PUPPETSERVER_VERSION" "5.3.4"))
+(def pe-puppetserver-version
+  "Version of PE Puppet Server to develop and test against. Defaults to 5.x."
+  (get (System/getenv) "PE_PUPPETSERVER_VERSION" "2018.1.0.71"))
 
-(defproject puppetlabs/catalog-diff-api "0.0.1"
-  :description "Puppet Server endpoint for catalog diffs"
+(defproject puppetlabs/cdpe-api "0.0.1"
+  :description "Puppet Server endpoint for CD4PE."
   :license {:name "Apache License 2.0"
             :url "http://www.apache.org/licenses/LICENSE-2.0.html"}
 
@@ -33,7 +33,7 @@
                  [puppetlabs/trapperkeeper-status]
                  [puppetlabs/trapperkeeper-webserver-jetty9]
 
-                 [puppetlabs/puppetserver ~puppetserver-version]]
+                 [puppetlabs/pe-puppetserver ~pe-puppetserver-version]]
 
   :profiles {:dev {:source-paths ["dev"]
                    :repl-options {:init-ns tk-devtools}
@@ -58,12 +58,12 @@
 
                                   [puppetlabs/puppetserver ~puppetserver-version :classifier "test" :scope "test"]]}
 
-             :puppet-module {:jar-name "catalog-diff-api.jar"}}
+             :puppet-module {:jar-name "cdpe-api.jar"}}
 
   :test-selectors {:integration :integration}
 
   :aliases {"tk" ["trampoline" "run"
-                  "--bootstrap-config" "dev-resources/puppetserver-diff-api/bootstrap.cfg"
-                  "--config" "dev-resources/puppetserver-diff-api/config.conf"]}
+                  "--bootstrap-config" "dev-resources/cdpe-api/bootstrap.cfg"
+                  "--config" "dev-resources/cdpe-api/config.conf"]}
 
   :main puppetlabs.trapperkeeper.main)

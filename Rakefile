@@ -19,7 +19,7 @@ PUPPETSERVER_PROJECT = File.join(PUPPETSERVER_SUBMODULE, 'project.clj')
 # every time rake is invoked --- which is expensive.
 PUPPETSERVER_JAR = File.join(PUPPETSERVER_SUBMODULE, 'target')
 
-PLUGIN_JAR = File.join('target', 'catalog-diff-api.jar')
+PLUGIN_JAR = File.join('target', 'cdpe-api.jar')
 PLUGIN_JAR_SRCS = Rake::FileList['project.clj',
                                  'src/**/*.clj',
                                  'src/**/*.rb',
@@ -32,7 +32,7 @@ MODULE_PKG_SRCS = Rake::FileList['metadata.json',
                                  'README.md',
                                  'manifests/**/*.pp',
                                  'lib/**/*.rb',
-                                 'files/catalog-diff-api.jar']
+                                 'files/cdpe-api.jar']
 
 namespace :puppetserver do
   desc "Ensure Puppet Server submodule is at ref: #{PUPPETSERVER_VERSION}"
@@ -190,8 +190,8 @@ end
 
 directory 'files/'
 
-file 'files/catalog-diff-api.jar' => ['files/', PLUGIN_JAR] do
-  cp PLUGIN_JAR, 'files/catalog-diff-api.jar'
+file 'files/cdpe-api.jar' => ['files/', PLUGIN_JAR] do
+  cp PLUGIN_JAR, 'files/cdpe-api.jar'
 end
 
 file MODULE_PKG => MODULE_PKG_SRCS do

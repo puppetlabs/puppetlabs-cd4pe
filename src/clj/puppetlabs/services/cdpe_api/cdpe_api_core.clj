@@ -1,4 +1,4 @@
-(ns puppetlabs.services.catalog-diff-api.catalog-diff-api-core
+(ns puppetlabs.services.cdpe-api.cdpe-api-core
   (:require
    [clojure.tools.logging :as log]
    [clojure.java.io :as io]
@@ -28,8 +28,8 @@
          ;; TODO: Report key performance metrics here.
          :status {}})))
 
-(defn compute-diff
-  "Computes the diff of two catalogs. Request is a Ring request map that has
+(defn compile-catalog
+  "Compiles a catalog for a node. Request is a Ring request map that has
   been transformed for consumption by JRuby and handler is a JRuby object that
   implements the RequestHandler Java API."
   [jruby-instance ruby-request]
@@ -37,8 +37,8 @@
   ;; returning nil instead of a PuppetX::Puppetlabs::DiffApi::JRubyHandler
   ;; object.
   (let [ruby-handler (.runScriptlet jruby-instance
-                                    "require 'puppet_x/puppetlabs/catalog_diff_api/jruby_handler'
-                                    PuppetX::Puppetlabs::DiffApi::JRubyHandler.instance")]
+                                    "require 'puppet_x/puppetlabs/cd4pe_api/jruby_handler'
+                                    PuppetX::Puppetlabs::CD4PEApi::JRubyHandler.instance")]
     ;; Dispatch to JRubyHandler.handle()
     (.callMethodWithArgArray jruby-instance
                              ruby-handler
@@ -46,9 +46,7 @@
                              (into-array Object [ruby-request])
                              JRubyPuppetResponse)))
 
-
 ;; Re-implementation of jruby-handler and jruby-middleware functions.
-
 (defn wrap-with-jruby-instance
   "A re-implementation of jruby-middleware/wrap-with-jruby-instance that
   exposes the scripting container in addition to the JRubyPuppet interface."
@@ -74,7 +72,7 @@
          (jruby-handler/as-jruby-request config)
          walk/stringify-keys
          jruby-handler/make-request-mutable
-         (compute-diff (:jruby-container request))
+         (compile-catalog (:jruby-container request))
          jruby-handler/response->map)))
 
 (defn create-jruby-handler
@@ -108,14 +106,13 @@
 
 
 ;; Core HTTP route handling functions.
-
 (defn create-request-routes
-  "Builds a Comidi routing tree that responds to GET requests for catalog diffs."
+  "Builds a Comidi routing tree that responds to GET requests for cdpe to compile a catalog."
   [jruby-handler]
   (comidi/routes
     (comidi/context "/puppet/v3"
      (comidi/routes
-      (comidi/GET ["/diff-catalog/" [#".*" :rest]] request
+      (comidi/GET ["/cd4pe/compile/" [#".*" :rest]] request
                   (jruby-handler request))))))
 
 (defn create-request-handler
