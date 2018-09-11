@@ -40,9 +40,9 @@
   (if (nil? puppetserver-version)
     false
     (and
-      (>= puppetserver-version 5.3)
+      (>= puppetserver-version 5.1)
       ;; TODO: Test against Puppet Server 6.
-      (< puppetserver-version 6.0))))
+      (< puppetserver-version 6.1))))
 
 (defservice cdpe-api-service
   CdpeApiService

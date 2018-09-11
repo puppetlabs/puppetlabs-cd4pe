@@ -1,6 +1,6 @@
-(def pe-puppetserver-version
-  "Version of PE Puppet Server to develop and test against. Defaults to 5.x."
-  (get (System/getenv) "PE_PUPPETSERVER_VERSION" "2018.1.0.71"))
+(def puppetserver-version
+  "Version of Puppet Server to develop and test against. Defaults to 5.x."
+  (get (System/getenv) "PUPPETSERVER_VERSION" "5.1.6"))
 
 (defproject puppetlabs/cdpe-api "0.0.1"
   :description "Puppet Server endpoint for CD4PE."
@@ -33,7 +33,7 @@
                  [puppetlabs/trapperkeeper-status]
                  [puppetlabs/trapperkeeper-webserver-jetty9]
 
-                 [puppetlabs/pe-puppetserver ~pe-puppetserver-version]]
+                 [puppetlabs/puppetserver ~puppetserver-version]]
 
   :profiles {:dev {:source-paths ["dev"]
                    :repl-options {:init-ns tk-devtools}

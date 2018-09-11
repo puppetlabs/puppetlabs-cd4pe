@@ -104,7 +104,6 @@
                                      puppet-version
                                      use-legacy-auth?)))
 
-
 ;; Core HTTP route handling functions.
 (defn create-request-routes
   "Builds a Comidi routing tree that responds to GET requests for cdpe to compile a catalog."
