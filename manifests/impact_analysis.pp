@@ -14,54 +14,21 @@ class cd4pe::impact_analysis (
     } else {
       $_ensure = $ensure
     }
-
-    if $_ensure == 'present' {
-      # PE needs a services.d directory added to the bootstrap path that can be
-      # used to slot in additional services.
-      Pe_ini_setting <| title == 'puppetserver initconf bootstrap_config' |> {
-        value => '/etc/puppetlabs/puppetserver/bootstrap.cfg,/etc/puppetlabs/puppetserver/services.d/'
+      puppet_enterprise::trapperkeeper::bootstrap_cfg { 'cdpe-api-service':
+        namespace => 'puppetlabs.services.cdpe-api.cdpe-api-service',
+        container => 'puppetserver',
+        ensure => $_ensure,
       }
-
-      # NOTE: An exec is used here instead of a file resource to avoid a
-      # potential duplicate resource issue if this sort of extension module
-      # gets repeated for a different use case.
-      exec {'ensure puppetserver services.d directory existance':
-        command => 'mkdir -m 0755 -p /etc/puppetlabs/puppetserver/services.d',
-        creates => '/etc/puppetlabs/puppetserver/services.d',
-        umask   => '0022',
-        path    => '/bin:/usr/bin',
-        user    => 'root',
-      }
-
-      $_service_file_deps = [Exec['ensure puppetserver services.d directory existance']]
-    } else {
-      $_service_file_deps = []
-    }
-
-    $_puppetserver_service = Exec['pe-puppetserver service full restart']
   } else {
-    # FOSS configuration
-
-    # FIXME: Fail if Puppet Server 5.3 isn't in use.
-    $_ensure = $ensure
-    $_puppetserver_service = Service['puppetserver']
-    $_service_file_deps = []
+    fail("cd4pe::impact_analysis only works with Puppet Enterprise")
   }
 
-  $_file_ensure = $_ensure ? {
-    'present' => file,
-    'absent'  => absent,
-  }
+   $_puppetserver_service = Exec['pe-puppetserver service full restart']
 
-  file {'/etc/puppetlabs/puppetserver/services.d/cdpe_api.cfg':
-    ensure  => $_file_ensure,
-    owner   => 'root',
-    group   => 'root',
-    mode    => '0644',
-    content => "puppetlabs.services.cdpe-api.cdpe-api-service/cdpe-api-service\n",
-    require => $_service_file_deps,
-    notify  => $_puppetserver_service,
-  }
+   $_file_ensure = $_ensure ? {
+     'present' => file,
+     'absent'  => absent,
+   }
 
   file {'/opt/puppetlabs/server/data/puppetserver/jars/cdpe-api.jar':
     ensure => $_file_ensure,
