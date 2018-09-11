@@ -7,8 +7,8 @@ class cd4pe::impact_analysis (
 ) {
   if fact('pe_server_version') =~ String {
     # PE configuration
-    if (versioncmp(fact('pe_server_version'), '2018.1.0') < 0) or
-       (versioncmp(fact('pe_server_version'), '2018.2.0') >= 0) {
+    if (versioncmp(fact('pe_server_version'), '2017.3.0') < 0) or
+       (versioncmp(fact('pe_server_version'), '2019.1.0') >= 0) {
       warning("The cd4pe::impact_analysis class only supports PE 2018.1 and should be removed from: ${trusted['certname']}")
       $_ensure = absent
     } else {
