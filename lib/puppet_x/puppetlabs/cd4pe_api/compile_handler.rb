@@ -61,7 +61,11 @@ class PuppetX::Puppetlabs::CD4PEApi::CompileHandler
 
 
     options[:back_channel][:logs].each do |log|
-      ret[:logs] << log.to_data_hash
+      begin
+        ret[:logs] << log.to_data_hash
+      rescue
+        ret[:logs] << log
+      end
     end
 
     response.respond_with(200, 'application/json', ret.to_json)
@@ -74,6 +78,7 @@ class PuppetX::Puppetlabs::CD4PEApi::CompileHandler
 
     Puppet::FileServing::Content.indirection.terminus_class = :file_server
     Puppet::FileServing::Metadata.indirection.terminus_class = :file_server
+    Puppet::Resource::Catalog.indirection.cache_class = false
 
     Puppet::FileBucket::File.indirection.terminus_class = :file
     Puppet::Node::Facts.indirection.terminus_class = :puppetdb

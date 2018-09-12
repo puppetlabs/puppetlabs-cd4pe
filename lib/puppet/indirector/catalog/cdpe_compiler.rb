@@ -151,6 +151,7 @@ class Puppet::Resource::Catalog::CdpeCompiler < Puppet::Indirector::Code
           node.environment = node.environment.name
         else
           node.environment = env
+          node.parameters['environment'] = node.environment.name
         end
 
         Puppet::Util::Profiler.profile(node.name, [:cdpe_compiler, :compile_preview, node.environment, node.name]) do
