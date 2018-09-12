@@ -15,6 +15,7 @@ class PuppetX::Puppetlabs::CD4PEApi::CompileHandler
     file = Puppet::FileBucket::File.indirection.terminus_class
     fact_term = Puppet::Node::Facts.indirection.terminus_class
     fact_cache = Puppet::Node::Facts.indirection.cache_class
+    reports = Puppet[:report]
 
     # Ensure that the baseline and preview catalogs are not stored via the
     # catalog indirection (may go to puppet-db)
@@ -32,6 +33,7 @@ class PuppetX::Puppetlabs::CD4PEApi::CompileHandler
 
     begin
       Puppet[:catalog_terminus] = :cdpe_compiler
+      Puppet[:report] = false
       Puppet::Resource::Catalog.indirection.terminus_class = :cdpe_compiler
       node = request[:params][:rest]
       environment = request[:params][:environment]
@@ -54,6 +56,7 @@ class PuppetX::Puppetlabs::CD4PEApi::CompileHandler
       Puppet::FileBucket::File.indirection.terminus_class = file
       Puppet::Resource::Catalog.indirection.terminus_class = t_class
       Puppet::Node::Facts.indirection.terminus_class = fact_term
+      Puppet[:report] = reports
     end
 
 
