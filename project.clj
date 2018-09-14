@@ -35,6 +35,9 @@
 
                  [puppetlabs/puppetserver ~puppetserver-version]]
 
+   :repositories [["releases" "https://artifactory.delivery.puppetlabs.net/artifactory/clojure-releases__local/"]
+                 ["snapshots" "https://artifactory.delivery.puppetlabs.net/artifactory/clojure-snapshots__local/"]]
+
   :profiles {:dev {:source-paths ["dev"]
                    :repl-options {:init-ns tk-devtools}
                    :resource-paths ["dev-resources"]

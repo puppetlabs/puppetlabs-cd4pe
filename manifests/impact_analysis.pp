@@ -45,10 +45,15 @@ class cd4pe::impact_analysis (
     match_request_path   => '/puppet/v3/cd4pe/compile',
     match_request_type   => 'path',
     match_request_method => 'get',
-    #    allow                => $whitelisted_certnames,
-    allow_unauthenticated => true,
+    allow                => $whitelisted_certnames,
+    #allow_unauthenticated => true,
     sort_order           => 601,
     path                 => '/etc/puppetlabs/puppetserver/conf.d/auth.conf',
     notify               => $_puppetserver_service,
   }
+
+  Pe_puppet_authorization::Rule <| title == 'puppetlabs environment' |> {
+    allow +> $whitelisted_certnames,
+  }
+
 }
