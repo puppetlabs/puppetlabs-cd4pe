@@ -23,7 +23,6 @@ class PuppetX::Puppetlabs::CD4PEApi::CompileHandler
     Puppet::Node::Facts.indirection.cache_class = false
 
     setup_terminuses
-    setup_ssl
     setup_node_cache
 
     ret = {
@@ -82,21 +81,6 @@ class PuppetX::Puppetlabs::CD4PEApi::CompileHandler
 
     Puppet::FileBucket::File.indirection.terminus_class = :file
     Puppet::Node::Facts.indirection.terminus_class = :puppetdb
-  end
-
-  def setup_ssl
-    # Configure all of the SSL stuff.
-    if Puppet::SSL::CertificateAuthority.ca?
-      Puppet::SSL::Host.ca_location = :local
-      Puppet.settings.use :ca
-      Puppet::SSL::CertificateAuthority.instance
-    else
-      Puppet::SSL::Host.ca_location = :none
-    end
-    # These lines are not on stable (seems like a copy was made from master)
-    #
-    # Puppet::SSL::Oids.register_puppet_oids
-    # Puppet::SSL::Oids.load_custom_oid_file(Puppet[:trusted_oid_mapping_file])
   end
 
   # Sets up a special node cache "write only yaml" that collects and stores node data in yaml
