@@ -1,26 +1,29 @@
 # Slots the cppe_api extension JAR into a Puppet Server install. Use
 # this class by adding it to the "PE Masters" group or otherwise applying it to
-# a node running PE or Open Source Puppet Server.
+# a node running PE
 class cd4pe::impact_analysis (
+  Array[String] $whitelisted_certnames,
   Enum['present', 'absent'] $ensure = 'present',
-  Array[String] $whitelisted_certnames = [$trusted['certname']],
 ) {
+
   if fact('pe_server_version') =~ String {
     # PE configuration
     if (versioncmp(fact('pe_server_version'), '2017.3.0') < 0) or
        (versioncmp(fact('pe_server_version'), '2019.1.0') >= 0) {
-      warning("The cd4pe::impact_analysis class only supports PE 2018.1 and should be removed from: ${trusted['certname']}")
+      warning("The cd4pe::impact_analysis class only supports PE 2017.3 through 2019.1 and should be removed from: ${trusted['certname']}")
       $_ensure = absent
     } else {
       $_ensure = $ensure
     }
-      puppet_enterprise::trapperkeeper::bootstrap_cfg { 'cdpe-api-service':
-        namespace => 'puppetlabs.services.cdpe-api.cdpe-api-service',
-        container => 'puppetserver',
-        ensure => $_ensure,
-      }
   } else {
-    fail("cd4pe::impact_analysis only works with Puppet Enterprise")
+      $_ensure = $ensure
+  }
+
+  puppet_enterprise::trapperkeeper::bootstrap_cfg { 'cdpe-api-service':
+    namespace => 'puppetlabs.services.cdpe-api.cdpe-api-service',
+    container => 'puppetserver',
+    ensure    => $_ensure,
+    require   => Package['Pe-puppetserver']
   }
 
    $_puppetserver_service = Exec['pe-puppetserver service full restart']
@@ -46,7 +49,6 @@ class cd4pe::impact_analysis (
     match_request_type   => 'path',
     match_request_method => 'get',
     allow                => $whitelisted_certnames,
-    #allow_unauthenticated => true,
     sort_order           => 601,
     path                 => '/etc/puppetlabs/puppetserver/conf.d/auth.conf',
     notify               => $_puppetserver_service,
