@@ -23,7 +23,7 @@ class cd4pe::impact_analysis (
     namespace => 'puppetlabs.services.cdpe-api.cdpe-api-service',
     container => 'puppetserver',
     ensure    => $_ensure,
-    require   => Package['Pe-puppetserver']
+    require   => Package['pe-puppetserver']
   }
 
    $_puppetserver_service = Exec['pe-puppetserver service full restart']
