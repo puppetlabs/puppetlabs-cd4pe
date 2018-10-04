@@ -34,13 +34,14 @@ class cd4pe::impact_analysis (
    }
 
   file {'/opt/puppetlabs/server/data/puppetserver/jars/cdpe-api.jar':
-    ensure => $_file_ensure,
-    owner  => 'root',
-    group  => 'root',
-    mode   => '0644',
-    source => 'puppet:///modules/cd4pe/cdpe-api.jar',
-    backup => false,
-    notify => $_puppetserver_service,
+    ensure  => $_file_ensure,
+    owner   => 'root',
+    group   => 'root',
+    mode    => '0644',
+    source  => 'puppet:///modules/cd4pe/cdpe-api.jar',
+    backup  => false,
+    notify  => $_puppetserver_service,
+    require => Package['pe-puppetserver']
   }
 
   puppet_authorization::rule {'CDPE API access':
@@ -52,6 +53,7 @@ class cd4pe::impact_analysis (
     sort_order           => 601,
     path                 => '/etc/puppetlabs/puppetserver/conf.d/auth.conf',
     notify               => $_puppetserver_service,
+    require              => Package['pe-puppetserver']
   }
 
   Pe_puppet_authorization::Rule <| title == 'puppetlabs environment' |> {
