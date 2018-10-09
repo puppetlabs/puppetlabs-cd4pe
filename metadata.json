@@ -1,10 +1,10 @@
 {
   "name": "puppetlabs-cd4pe",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "author": "Puppet Labs",
-  "summary": "Puppet Server endpoint for catalog diffs.",
+  "summary": "Module for CD4PE 2.0",
   "license": "Apache-2.0",
-  "source": "",
+  "source": "https://forge.puppetlabs.com/puppetlabs/cd4pe",
   "dependencies": [
     {
       "name": "puppetlabs-stdlib",
