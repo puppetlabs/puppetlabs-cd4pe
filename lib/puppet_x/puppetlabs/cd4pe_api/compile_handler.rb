@@ -17,7 +17,6 @@ class PuppetX::Puppetlabs::CD4PEApi::CompileHandler
     fact_cache = Puppet::Node::Facts.indirection.cache_class
     reports = Puppet[:report]
     node_terminus = Puppet::Node.indirection.terminus_class
-    node_terminus_setting = Puppet[:node_terminus]
 
     # Ensure that the baseline and preview catalogs are not stored via the
     # catalog indirection (may go to puppet-db)
@@ -35,7 +34,6 @@ class PuppetX::Puppetlabs::CD4PEApi::CompileHandler
     begin
       Puppet[:catalog_terminus] = :cdpe_compiler
       Puppet[:report] = false
-      Puppet[:node_terminus] = :cdpe
       Puppet::Node.indirection.terminus_class = :cdpe
       Puppet::Resource::Catalog.indirection.terminus_class = :cdpe_compiler
       node = request[:params][:rest]
@@ -53,7 +51,6 @@ class PuppetX::Puppetlabs::CD4PEApi::CompileHandler
       ret[:catalog] = nil
     ensure
       Puppet[:catalog_terminus] = terminus
-      Puppet[:node_terminus] = node_terminus_setting
       Puppet::Node.indirection.terminus_class = node_terminus
       Puppet::Resource::Catalog.indirection.cache_class = node_cache
       Puppet::FileServing::Content.indirection.terminus_class = content
