@@ -11,3 +11,4 @@ pom.xml.asc
 /.bundle
 /.lein-*
 /.nrepl-port
+.vendor
