@@ -154,6 +154,9 @@ class Puppet::Resource::Catalog::CdpeCompiler < Puppet::Indirector::Code
           node.parameters['environment'] = node.environment.name
         end
 
+        # Add any external data to the node.
+        add_node_data(node)
+
         Puppet::Util::Profiler.profile(node.name, [:cdpe_compiler, :compile_preview, node.environment, node.name]) do
           # Switch the node's environment (it finds and instantiates the Environment)
 
@@ -200,11 +203,6 @@ class Puppet::Resource::Catalog::CdpeCompiler < Puppet::Indirector::Code
         raise Puppet::Error, message, detail.backtrace
       end
 
-
-      # Add any external data to the node.
-      if node
-        add_node_data(node)
-      end
       node
     end
   end
