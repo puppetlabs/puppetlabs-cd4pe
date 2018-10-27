@@ -129,7 +129,7 @@ class Puppet::Resource::Catalog::CdpeCompiler < Puppet::Indirector::Code
   # Add any extra data necessary to the node.
   def add_node_data(node)
     # Merge in our server-side facts, so they can be used during compilation.
-    node.merge(@server_facts)
+    node.add_server_facts(@server_facts)
   end
 
   # Compile baseline and preview catalogs
