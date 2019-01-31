@@ -1,0 +1,50 @@
+{
+  "description": "Applys the root configuration for CD4PE",
+  "parameters": {
+    "resolvable_hostname": {
+      "type": "Optional[String[1]]",
+      "description": ""
+    },
+    "root_email": {
+      "type": "String",
+      "description": ""
+    },
+    "root_password": {
+      "type": "String",
+      "description": ""
+    },
+    "web_ui_endpoint": {
+      "type": "Optional[String[1]]",
+      "description": ""
+    },
+    "backend_service_endpoint": {
+      "type": "Optional[String[1]]",
+      "description": ""
+    },
+    "agent_service_endpoint": {
+      "type": "Optional[String[1]]",
+      "description": ""
+    },
+    "storage_provider": {
+      "type": "Optional[String[1]]",
+      "description": ""
+    },
+    "storage_endpoint": {
+      "type": "Optional[String[1]]",
+      "description": ""
+    },
+    "storage_disk_root": {
+      "type": "Optional[String[1]]",
+      "description": ""
+    },
+    "storage_bucket": {
+      "type": "Optional[String[1]]",
+      "description": ""
+    },
+    "storage_prefix": {
+      "type": "Optional[String[1]]",
+      "description": ""
+    }
+  },
+  "input_method": "stdin"
+}
