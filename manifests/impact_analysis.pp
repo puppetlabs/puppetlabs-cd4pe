@@ -33,12 +33,18 @@ class cd4pe::impact_analysis (
      'absent'  => absent,
    }
 
+  if (versioncmp(fact('pe_server_version'), '2019.0.2') >= 0) {
+    $jar_source_name = 'cdpe-api-aot.jar'
+  } else {
+    $jar_source_name = 'cdpe-api.jar'
+  }
+
   file {'/opt/puppetlabs/server/data/puppetserver/jars/cdpe-api.jar':
     ensure  => $_file_ensure,
     owner   => 'root',
     group   => 'root',
     mode    => '0644',
-    source  => 'puppet:///modules/cd4pe/cdpe-api.jar',
+    source  => "puppet:///modules/cd4pe/${jar_source_name}",
     backup  => false,
     notify  => $_puppetserver_service,
     require => Package['pe-puppetserver']
