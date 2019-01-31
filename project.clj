@@ -61,7 +61,13 @@
 
                                   [puppetlabs/puppetserver ~puppetserver-version :classifier "test" :scope "test"]]}
 
-             :puppet-module {:jar-name "cdpe-api.jar"}}
+             :puppet-module-aot {:jar-name "cdpe-api-aot.jar",
+                            :aot [puppetlabs.trapperkeeper.main
+                                  puppetlabs.services.cdpe-api.cdpe-api-service
+                                  ]
+                                  :jar-exclusions [#"ssl_utils"]
+                             }
+             :puppet-module {:jar-name "cdpe-api.jar", }}
 
   :test-selectors {:integration :integration}
 
