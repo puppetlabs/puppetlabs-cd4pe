@@ -1,46 +1,59 @@
 {
-  "description": "Applys the root configuration for CD4PE",
+  "description": "Applys the root configuration for CD4PE. Full documentation at http://docs-internal.puppet.com/docs/continuous-delivery/2.x-dev/install_module.html#task-7157",
   "parameters": {
     "resolvable_hostname": {
       "type": "Optional[String[1]]",
-      "description": ""
+      "description": "A resolvable internet address where the Continuous Delivery for PE server can be reached. Required only if the agent certificate is not the machine's resolvable internet address."
     },
     "root_email": {
       "type": "String",
-      "description": ""
+      "description": "The email address to associate with the root account."
     },
     "root_password": {
       "type": "String",
-      "description": ""
+      "description": "The password to associate with the root account."
     },
     "web_ui_endpoint": {
       "type": "Optional[String[1]]",
-      "description": ""
+      "description": "The endpoint where the web UI can be reached, in the form http://<resolvable_hostname>:<port>.	Required if you set the web_ui_port parameter in the cd4pe class during installation."
     },
     "backend_service_endpoint": {
       "type": "Optional[String[1]]",
-      "description": ""
+      "description": "The endpoint where the back end service can be reached, in the form http://<resolvable_hostname>:<port>.	Required if you set the backend_service_port parameter in the cd4pe class during installation."
     },
     "agent_service_endpoint": {
       "type": "Optional[String[1]]",
-      "description": ""
+      "description": "The endpoint where the agent service can be reached, in the form http://<resolvable_hostname>:<port>.	Required if you set the agent_service_port parameter in the cd4pe class during installation."
     },
     "storage_provider": {
       "type": "Optional[String[1]]",
-      "description": ""
+      "description": "Which object store provider to use. Must be one of: DISK, ARTIFACTORY or S3. Defaults to DISK."
     },
     "storage_endpoint": {
       "type": "Optional[String[1]]",
-      "description": ""
+      "description": "The URL of the storage provider. Required if using Amazon S3 or Artifactory for object storage."
     },
     "storage_bucket": {
       "type": "Optional[String[1]]",
-      "description": ""
+      "description": "The name of the bucket used for object storage. Required if using Amazon S3 or Artifactory for object storage."
     },
     "storage_prefix": {
       "type": "Optional[String[1]]",
-      "description": ""
+      "description": "For Amazon S3: the subdirectory of the bucket to use. For Artifactory: the top level of the Artifactory instance."
+    },
+    "s3_access_key": {
+      "type": "Optional[String[1]]",
+      "description": "The AWS access key that has access to the bucket. Required if using Amazon S3."
+    },
+    "s3_secret_key": {
+      "type": "Optional[String[1]]",
+      "description": "The AWS secret key that has access to the bucket. Required if using Amazon S3."
+    },
+    "artifactory_access_token": {
+      "type": "Optional[String[1]]",
+      "description": "API token for your Artifactory instance. Required if using Artifactory."
     }
+
   },
   "input_method": "stdin"
 }
