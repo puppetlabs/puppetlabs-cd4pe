@@ -15,15 +15,15 @@
     },
     "web_ui_endpoint": {
       "type": "Optional[String[1]]",
-      "description": "The endpoint where the web UI can be reached, in the form http://<resolvable_hostname>:<port>.	Required if you set the web_ui_port parameter in the cd4pe class during installation."
+      "description": "The endpoint where the web UI can be reached, in the form http://<resolvable_hostname>:<port>. Required if you set the web_ui_port parameter in the cd4pe class during installation."
     },
     "backend_service_endpoint": {
       "type": "Optional[String[1]]",
-      "description": "The endpoint where the back end service can be reached, in the form http://<resolvable_hostname>:<port>.	Required if you set the backend_service_port parameter in the cd4pe class during installation."
+      "description": "The endpoint where the back end service can be reached, in the form http://<resolvable_hostname>:<port>. Required if you set the backend_service_port parameter in the cd4pe class during installation."
     },
     "agent_service_endpoint": {
       "type": "Optional[String[1]]",
-      "description": "The endpoint where the agent service can be reached, in the form http://<resolvable_hostname>:<port>.	Required if you set the agent_service_port parameter in the cd4pe class during installation."
+      "description": "The endpoint where the agent service can be reached, in the form http://<resolvable_hostname>:<port>. Required if you set the agent_service_port parameter in the cd4pe class during installation."
     },
     "storage_provider": {
       "type": "Optional[String[1]]",
@@ -53,7 +53,6 @@
       "type": "Optional[String[1]]",
       "description": "API token for your Artifactory instance. Required if using Artifactory."
     }
-
   },
   "input_method": "stdin"
 }
