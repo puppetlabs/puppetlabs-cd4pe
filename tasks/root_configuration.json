@@ -33,10 +33,6 @@
       "type": "Optional[String[1]]",
       "description": ""
     },
-    "storage_disk_root": {
-      "type": "Optional[String[1]]",
-      "description": ""
-    },
     "storage_bucket": {
       "type": "Optional[String[1]]",
       "description": ""

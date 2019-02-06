@@ -24,7 +24,6 @@ backend_service_endpoint = params['backend_service_endpoint'] || "#{hostname}:80
 agent_service_endpoint   = params['agent_service_endpoint'] || "#{hostname}:7000"
 provider                 = params['storage_provider'] || :DISK
 endpoint                 = params['storage_endpoint']
-disk_root                = params['storage_disk_root'] || '/disk'
 bucket                   = params['storage_bucket'] || 'cd4pe'
 prefix                   = params['storage_prefix']
 access_key               = params['s3_access_key']
@@ -33,7 +32,7 @@ secret_key             ||= params['artifactory_access_token']
 
 begin
   client = PuppetX::Puppetlabs::CD4PEClient.new(web_ui_endpoint, username, password)
-  res = client.save_storage_settings(provider, endpoint, disk_root, bucket, prefix, access_key, secret_key)
+  res = client.save_storage_settings(provider, endpoint, bucket, prefix, access_key, secret_key)
   if res.code != '200'
     raise Puppet::Error "Error while saving storage settings: #{res.body}"
   end

@@ -23,7 +23,6 @@ Puppet::Type.type(:cd4pe_root_config).provide(:ruby) do
           agent_service_endpoint: existing_config[:agentServiceEndpoint],
           storage_provider: existing_config[:storageMethod],
           storage_endpoint: existing_config[:storageEndpoint] || '',
-          storage_disk_root: existing_config[:storageDiskRoot] || '',
           storage_bucket: existing_config[:storageBucket],
           storage_prefix: existing_config[:storagePathPrefix] || '',
           s3_access_key: existing_config[:storageCredentialsKey] || '',
@@ -113,7 +112,6 @@ Puppet::Type.type(:cd4pe_root_config).provide(:ruby) do
   def save_storage_settings(resource)
     provider = resource[:storage_provider]
     endpoint = resource[:storage_endpoint]
-    disk_root = resource[:storage_disk_root]
     bucket = resource[:storage_bucket]
     prefix = resource[:storage_prefix]
     access_key = resource[:s3_access_key]
@@ -121,7 +119,7 @@ Puppet::Type.type(:cd4pe_root_config).provide(:ruby) do
     secret_key ||= resource[:artifactory_access_token]
 
     self.class.api_client.save_storage_settings(
-      provider, endpoint, disk_root, bucket, prefix, access_key, secret_key)
+      provider, endpoint, bucket, prefix, access_key, secret_key)
   end
 
   def save_endpoint_settings(resource)
