@@ -132,6 +132,7 @@ class cd4pe (
     image                 => "${cd4pe_image}:${cd4pe_version}",
     extra_parameters      => $extra_params,
     ports                 => $cd4pe_ports,
+    pull_on_start         => true,
     volumes               => ['cd4pe-object-store:/disk'],
     env_file              => [
       $app_env_path,
