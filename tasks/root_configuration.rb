@@ -40,10 +40,10 @@ begin
   res = client.save_endpoint_settings(web_ui_endpoint, backend_service_endpoint, agent_service_endpoint)
 
   if res.code != '200'
-    raise Puppet::Error "Error while saving storage settings: #{res.body}"
+    raise Puppet::Error "Error while saving endpoint settings: #{res.body}"
   end
 
-  puts "Configuration complete! Navigate to #{web_ui_endpoint} to upload your CD4PE license and create your first user account"
+  puts "Configuration complete! Navigate to #{web_ui_endpoint} to upload your CD4PE license and create your first user account."
 
 
   exit 0
