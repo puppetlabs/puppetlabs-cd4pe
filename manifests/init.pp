@@ -1,18 +1,19 @@
 class cd4pe (
+  Integer $agent_service_port                    = 7000,
+  Boolean $analytics                             = true,
+  Integer $backend_service_port                  = 8000,
+  Array[String] $cd4pe_docker_extra_params       = [],
   String $cd4pe_image                            = 'puppet/continuous-delivery-for-puppet-enterprise',
   Variant[Enum['latest'], String] $cd4pe_version = 'latest',
-  Array[String] $cd4pe_docker_extra_params       = [],
-  String $resolvable_hostname                    = "http://${trusted['certname']}",
-  Boolean $manage_database                       = true,
-  String $db_name                                = 'cd4pe',
   String $db_host                                = 'cd4pe_mysql',
-  Integer $db_port                               = 3306,
-  String $db_user                                = 'cd4pe',
+  String $db_name                                = 'cd4pe',
   Optional[Sensitive[String[1]]] $db_pass        = undef,
+  Integer $db_port                               = 3306,
   String $db_prefix                              = '',
+  String $db_user                                = 'cd4pe',
+  Boolean $manage_database                       = true,
+  String $resolvable_hostname                    = "http://${trusted['certname']}",
   Integer $web_ui_port                           = 8080,
-  Integer $backend_service_port                  = 8000,
-  Integer $agent_service_port                    = 7000,
 ){
   # Restrict to linux only?
   include ::docker
@@ -48,8 +49,9 @@ class cd4pe (
   }
 
   $app_data = {
-    db_host => $db_host,
-    db_port => $db_port,
+    analytics => $analytics,
+    db_host   => $db_host,
+    db_port   => $db_port,
     db_prefix => $db_prefix
   } + $db_data
 
