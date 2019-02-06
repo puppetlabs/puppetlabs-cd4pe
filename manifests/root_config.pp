@@ -12,7 +12,7 @@ class cd4pe::root_config(
   Optional[String[1]] $s3_access_key                       = undef,
   Optional[Sensitive[String[1]]] $s3_secret_key            = undef,
   Optional[Sensitive[String[1]]] $artifactory_access_token = undef,
-) {
+) inherits cd4pe {
 
   cd4pe_root_config { $web_ui_endpoint:
     root_email               => $root_email,
