@@ -79,13 +79,6 @@ Puppet::Type.newtype(:cd4pe_root_config) do
     end
   end
 
-  newproperty(:storage_disk_root) do
-    desc ''
-    validate do |value|
-      fail '' unless value.is_a?(String)
-    end
-  end
-
   newproperty(:storage_bucket) do
     desc ''
     validate do |value|

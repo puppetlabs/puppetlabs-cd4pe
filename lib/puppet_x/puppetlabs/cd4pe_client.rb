@@ -95,14 +95,14 @@ module PuppetX
         make_request(:post, ROOT_ENDPOINT_SETTINGS, payload.to_json)
       end
 
-      def save_storage_settings(provider, endpoint, disk_root, bucket, prefix, access_key=nil, secret_key=nil)
+      def save_storage_settings(provider, endpoint, bucket, prefix, access_key=nil, secret_key=nil)
         payload = {
           op: 'SaveStorageSettings',
           content: {
             setting: {
               osType: provider,
               osEndpoint: endpoint,
-              osDiskRoot: disk_root,
+              osDiskRoot: '/disk',
               osBucket: bucket,
               osPrefix: prefix,
               osCredKey: access_key,
