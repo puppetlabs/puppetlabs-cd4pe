@@ -22,3 +22,11 @@
 /convert_report.txt
 /update_report.txt
 .DS_Store
+/checkouts/
+/dev-resources
+/src/
+/target/
+/test/
+/dev/
+.vendor
+project.clj
