@@ -81,6 +81,14 @@ module PuppetX
         make_request(:post, '/root-account', payload.to_json)
       end
 
+      def save_license(license)
+        payload = {
+          op: 'RootSavePfiLicense',
+          content: license
+        }
+        make_request(:post, ROOT_AJAX_ENDPOINT, payload.to_json)
+      end
+
       def save_endpoint_settings(webui, backend, agent)
         payload = {
           op: 'SaveEndpointSettings',
