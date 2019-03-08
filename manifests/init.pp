@@ -112,16 +112,20 @@ class cd4pe (
   }
 
 
-  $master_server = $::settings::server
-  $master_ip     = $serverip
-
   $cd4pe_ports = [
     "${web_ui_port}:${web_ui_port}",
     "${backend_service_port}:${backend_service_port}",
     "${agent_service_port}:${agent_service_port}",
   ]
 
-  $extra_params = ["--add-host ${master_server}:${master_ip}"] + $cd4pe_docker_extra_params
+  $master_server = $::settings::server
+  $master_ip     = getvar('serverip')
+
+  if $master_ip {
+    $extra_params = ["--add-host ${master_server}:${master_ip}"] + $cd4pe_docker_extra_params
+  } else {
+    $extra_params = $cd4pe_docker_extra_params
+  }
 
   $container_require = $manage_database ? {
     true => [Docker::Run[$db_host], File[$secret_key_path]],
