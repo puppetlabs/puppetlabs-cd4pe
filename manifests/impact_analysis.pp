@@ -33,7 +33,7 @@ class cd4pe::impact_analysis (
      'absent'  => absent,
    }
 
-  if (versioncmp(fact('pe_server_version'), '2019.0.2') >= 0) {
+  if (versioncmp(pe_build_version(), '2019.0.2') >= 0) {
     $jar_source_name = 'cdpe-api-aot.jar'
   } else {
     $jar_source_name = 'cdpe-api.jar'
