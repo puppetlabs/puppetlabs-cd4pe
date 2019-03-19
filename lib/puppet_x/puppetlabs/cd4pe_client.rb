@@ -95,7 +95,10 @@ module PuppetX
         make_request(:post, ROOT_ENDPOINT_SETTINGS, payload.to_json)
       end
 
-      def save_storage_settings(provider, endpoint, bucket, prefix, access_key=nil, secret_key=nil)
+      def save_storage_settings(provider, endpoint, bucket, prefix, access_key=nil, secret_key='')
+        # CDPE-1195 - CD4PE attempts to encrypt the secret even if using DISK storage. Send an
+        # empty string for now if the caller passed in nil
+        secret_key = '' if secret_key.nil?
         payload = {
           op: 'SaveStorageSettings',
           content: {

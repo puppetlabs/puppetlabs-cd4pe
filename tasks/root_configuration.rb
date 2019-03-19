@@ -29,6 +29,7 @@ prefix                   = params['storage_prefix']
 access_key               = params['s3_access_key']
 secret_key               = params['s3_secret_key']
 secret_key             ||= params['artifactory_access_token']
+secret_key             ||= ''
 
 begin
   client = PuppetX::Puppetlabs::CD4PEClient.new(web_ui_endpoint, username, password)
