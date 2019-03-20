@@ -113,9 +113,9 @@ class cd4pe (
 
 
   $cd4pe_ports = [
-    "${web_ui_port}:${web_ui_port}",
-    "${backend_service_port}:${backend_service_port}",
-    "${agent_service_port}:${agent_service_port}",
+    "${web_ui_port}:8080",
+    "${backend_service_port}:8000",
+    "${agent_service_port}:7000",
   ]
 
   $master_server = $::settings::server
