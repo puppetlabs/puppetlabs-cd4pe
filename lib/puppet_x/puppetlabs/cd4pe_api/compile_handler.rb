@@ -34,7 +34,7 @@ class PuppetX::Puppetlabs::CD4PEApi::CompileHandler
     begin
       Puppet[:catalog_terminus] = :cdpe_compiler
       Puppet[:report] = false
-      Puppet::Node.indirection.terminus_class = :cdpe
+      Puppet::Node.indirection.terminus_class = :cdpe if node_terminus == :classifier
       Puppet::Resource::Catalog.indirection.terminus_class = :cdpe_compiler
       node = request[:params][:rest]
       environment = request[:params][:environment]
