@@ -3,7 +3,7 @@ require 'puppet/property/boolean'
 
 Puppet::Type.newtype(:cd4pe_root_config) do
   @doc = %q{
-  Full documentation available at http://docs-internal.puppet.com/docs/continuous-delivery/2.x-dev/install_module.html#task-7157
+  Full documentation available at https://puppet.com/docs/continuous-delivery/latest/install_module.html#task-7157
   }
   ensurable
 
