@@ -30,6 +30,10 @@ access_key               = params['s3_access_key']
 secret_key               = params['s3_secret_key']
 secret_key             ||= params['artifactory_access_token']
 secret_key             ||= ''
+ssl_enabled              = params['ssl_enabled']
+server_certificate       = params['server_certificate']
+authority_certificate    = params['authority_certificate']
+server_private_key       = params['server_private_key']
 
 begin
   client = PuppetX::Puppetlabs::CD4PEClient.new(web_ui_endpoint, username, password)
@@ -42,6 +46,14 @@ begin
 
   if res.code != '200'
     raise Puppet::Error "Error while saving endpoint settings: #{res.body}"
+  end
+
+  if ssl_enabled != nil && server_certificate != nil && authority_certificate != nil && server_private_key != nil
+    res = client.save_ssl_settings(authority_certificate, server_certificate, server_private_key, ssl_enabled);
+
+    if res.code != '200'
+      raise Puppet::Error "Error while saving ssl settings: #{res.body}"
+    end
   end
 
   puts "Configuration complete! Navigate to #{web_ui_endpoint} to upload your CD4PE license and create your first user account."

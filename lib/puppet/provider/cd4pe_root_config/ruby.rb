@@ -26,6 +26,10 @@ Puppet::Type.type(:cd4pe_root_config).provide(:ruby) do
           storage_bucket: existing_config[:storageBucket],
           storage_prefix: existing_config[:storagePathPrefix] || '',
           s3_access_key: existing_config[:storageCredentialsKey] || '',
+          ssl_enabled: existing_config[:sslEnabled] || false,
+          server_certificate: existing_config[:serverCertificate] || '',
+          authority_certificate: existing_config[:authorityCertificate] || '',
+          server_private_key: existing_config[:serverPrivateKey] || '',
         }
       end
       providers << new(resource_hash)
@@ -68,8 +72,10 @@ Puppet::Type.type(:cd4pe_root_config).provide(:ruby) do
     endpoint_success = resp.code == '200'
     resp = save_storage_settings(resource)
     storage_success = resp.code == '200'
+    resp = save_ssl_settings(@resource)
+    ssl_success = resp.code == '200'
 
-    if endpoint_success && storage_success
+    if endpoint_success && storage_success && ssl_success
       @resource.original_parameters.each_key do |k|
         if k == :ensure
           @property_hash[:ensure] = :present
@@ -78,7 +84,7 @@ Puppet::Type.type(:cd4pe_root_config).provide(:ruby) do
         end
       end
     end
-    endpoint_success && storage_success
+    endpoint_success && storage_success && ssl_success
   end
 
   def destroy
@@ -95,8 +101,10 @@ Puppet::Type.type(:cd4pe_root_config).provide(:ruby) do
     endpoint_success = resp.code == '200'
     resp = save_storage_settings(resource)
     storage_success = resp.code == '200'
+    resp = save_ssl_settings(@resource)
+    ssl_success = resp.code == '200'
 
-    if endpoint_success && storage_success
+    if endpoint_success && storage_success && ssl_success
       @resource.original_parameters.each_key do |k|
         if k == :ensure
           @property_hash[:ensure] = :present
@@ -105,7 +113,7 @@ Puppet::Type.type(:cd4pe_root_config).provide(:ruby) do
         end
       end
     end
-    endpoint_success && storage_success
+    endpoint_success && storage_success && ssl_success
   end
 
   private
@@ -128,6 +136,15 @@ Puppet::Type.type(:cd4pe_root_config).provide(:ruby) do
     agent_service_endpoint = resource[:agent_service_endpoint]
     self.class.api_client.save_endpoint_settings(
       web_ui_endpoint, backend_service_endpoint, agent_service_endpoint)
+  end
+
+  def save_ssl_settings(resource)
+    ssl_enabled = resource[:ssl_enabled]
+    server_certificate = resource[:server_certificate]
+    authority_certificate = resource[:authority_certificate]
+    server_private_key = resource[:server_private_key]
+    self.class.api_client.save_ssl_settings(
+      authority_certificate, server_certificate, server_private_key, ssl_enabled)
   end
 
   def self.api_client

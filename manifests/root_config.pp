@@ -12,6 +12,10 @@ class cd4pe::root_config(
   Optional[String[1]] $s3_access_key                       = undef,
   Optional[Sensitive[String[1]]] $s3_secret_key            = undef,
   Optional[Sensitive[String[1]]] $artifactory_access_token = undef,
+  Optional[Boolean[1]] $enable_ssl                         = undef,
+  Optional[String[1]] $server_certificate                  = undef,
+  Optional[String[1]] $authority_certificate               = undef,
+  Optional[Sensitive[String[1]]] $server_private_key       = undef,
 ) inherits cd4pe {
 
   cd4pe_root_config { $web_ui_endpoint:
@@ -26,6 +30,10 @@ class cd4pe::root_config(
     storage_prefix           => $storage_prefix,
     s3_access_key            => $s3_access_key,
     s3_secret_key            => $s3_secret_key,
-    artifactory_access_token => $artifactory_access_token
+    artifactory_access_token => $artifactory_access_token,
+    enable_ssl               => $enable_ssl,
+    server_certificate       => $server_certificate,
+    authority_certificate    => $authority_certificate,
+    server_private_key       => $server_private_key,
   }
 }

@@ -177,6 +177,21 @@ module PuppetX
       def service_url
         "#{@config[:scheme]}://#{@config[:server]}:#{@config[:port]}"
       end
+
+      def save_ssl_settings(authority_certificate, server_certificate, server_private_key, ssl_enabled)
+        payload = {
+          op: 'SaveSslSettings',
+          content: {
+            setting: {
+              authorityCertificate: authority_certificate,
+              serverCertificate: server_certificate,
+              serverPrivateKey: server_private_key,
+              sslEnabled: ssl_enabled,
+            }
+          }
+        }
+        make_request(:post, ROOT_AJAX_ENDPOINT, payload.to_json)
+      end
     end
   end
 end

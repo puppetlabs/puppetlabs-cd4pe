@@ -117,6 +117,34 @@ Puppet::Type.newtype(:cd4pe_root_config) do
       true
     end
   end
+
+  newproperty(:ssl_enabled, :boolean => false, :parent => Puppet::Property::Boolean) do
+    desc 'Boolean to enable or disable SSL'
+  end
+
+  newproperty(:server_certificate) do
+    desc 'Server Certificate for your SSL configuration.'
+    validate do |value|
+      fail 'server_certificate must be a String.' unless value.is_a?(String)
+    end
+  end
+
+  newproperty(:authority_certificate) do
+    desc 'Authority Certificate for your SSL configuration.'
+    validate do |value|
+      fail 'authority_certificate must be a String.' unless value.is_a?(String)
+    end
+  end
+
+  newproperty(:server_private_key) do
+    desc 'Server Private Key for your SSL configuration.'
+    validate do |value|
+      fail 'server_private_key must be a String.' unless value.is_a?(String)
+    end
+    def insync?(is)
+      true
+    end
+  end
 end
 
 def compare_uris(is, should)
