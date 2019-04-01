@@ -52,6 +52,22 @@
     "artifactory_access_token": {
       "type": "Optional[String[1]]",
       "description": "API token for your Artifactory instance. Required if using Artifactory."
+    },
+    "ssl_enabled": {
+      "type": "Optional[Boolean[1]]",
+      "description": "Boolean to enable or disable SSL."
+    },
+    "server_certificate": {
+      "type": "Optional[String[1]]",
+      "description": "Server Certificate for your SSL configuration. Required if SSL is enabled."
+    },
+    "authority_certificate": {
+      "type": "Optional[String[1]]",
+      "description": "Authority Certificate for your SSL configuration. Required if SSL is enabled."
+    },
+    "server_private_key": {
+      "type": "Optional[Sensitive[String[1]]]",
+      "description": "Server Private Key for your SSL configuration. Required if SSL is enabled."
     }
   },
   "input_method": "stdin"
