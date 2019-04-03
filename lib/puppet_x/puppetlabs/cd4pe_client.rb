@@ -124,6 +124,21 @@ module PuppetX
         make_request(:post, ROOT_STORAGE_SETTINGS, payload.to_json)
       end
 
+      def save_ssl_settings(ssl_authority_certificate, ssl_server_certificate, ssl_server_private_key, ssl_enabled)
+        payload = {
+          op: 'SaveSslSettings',
+          content: {
+            setting: {
+              authorityCertificate: ssl_authority_certificate,
+              serverCertificate: ssl_server_certificate,
+              serverPrivateKey: ssl_server_private_key,
+              sslEnabled: ssl_enabled,
+            }
+          }
+        }
+        make_request(:post, ROOT_AJAX_ENDPOINT, payload.to_json)
+      end
+
       private
 
       def make_request(type, api_url, payload="")
@@ -176,21 +191,6 @@ module PuppetX
       # Helper method for returning a user friendly url for the CD4PE instance being used.
       def service_url
         "#{@config[:scheme]}://#{@config[:server]}:#{@config[:port]}"
-      end
-
-      def save_ssl_settings(authority_certificate, server_certificate, server_private_key, ssl_enabled)
-        payload = {
-          op: 'SaveSslSettings',
-          content: {
-            setting: {
-              authorityCertificate: authority_certificate,
-              serverCertificate: server_certificate,
-              serverPrivateKey: server_private_key,
-              sslEnabled: ssl_enabled,
-            }
-          }
-        }
-        make_request(:post, ROOT_AJAX_ENDPOINT, payload.to_json)
       end
     end
   end

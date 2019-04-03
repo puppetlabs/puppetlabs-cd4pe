@@ -19,21 +19,21 @@ uri = URI.parse(hostname)
 hostname = "http://#{hostname}" if uri.scheme == nil
 
 
-web_ui_endpoint          = params['web_ui_endpoint'] || "#{hostname}:8080"
-backend_service_endpoint = params['backend_service_endpoint'] || "#{hostname}:8000"
-agent_service_endpoint   = params['agent_service_endpoint'] || "#{hostname}:7000"
-provider                 = params['storage_provider'] || :DISK
-endpoint                 = params['storage_endpoint']
-bucket                   = params['storage_bucket'] || 'cd4pe'
-prefix                   = params['storage_prefix']
-access_key               = params['s3_access_key']
-secret_key               = params['s3_secret_key']
-secret_key             ||= params['artifactory_access_token']
-secret_key             ||= ''
-ssl_enabled              = params['ssl_enabled']
-server_certificate       = params['server_certificate']
-authority_certificate    = params['authority_certificate']
-server_private_key       = params['server_private_key']
+web_ui_endpoint           = params['web_ui_endpoint'] || "#{hostname}:8080"
+backend_service_endpoint  = params['backend_service_endpoint'] || "#{hostname}:8000"
+agent_service_endpoint    = params['agent_service_endpoint'] || "#{hostname}:7000"
+provider                  = params['storage_provider'] || :DISK
+endpoint                  = params['storage_endpoint']
+bucket                    = params['storage_bucket'] || 'cd4pe'
+prefix                    = params['storage_prefix']
+access_key                = params['s3_access_key']
+secret_key                = params['s3_secret_key']
+secret_key              ||= params['artifactory_access_token']
+secret_key              ||= ''
+ssl_enabled               = params['ssl_enabled']
+ssl_server_certificate    = params['ssl_server_certificate']
+ssl_authority_certificate = params['ssl_authority_certificate']
+ssl_server_private_key    = params['ssl_server_private_key']
 
 begin
   client = PuppetX::Puppetlabs::CD4PEClient.new(web_ui_endpoint, username, password)
@@ -48,8 +48,8 @@ begin
     raise Puppet::Error "Error while saving endpoint settings: #{res.body}"
   end
 
-  if ssl_enabled != nil && server_certificate != nil && authority_certificate != nil && server_private_key != nil
-    res = client.save_ssl_settings(authority_certificate, server_certificate, server_private_key, ssl_enabled);
+  if ssl_enabled != nil && ssl_server_certificate != nil && ssl_authority_certificate != nil && ssl_server_private_key != nil
+    res = client.save_ssl_settings(ssl_authority_certificate, ssl_server_certificate, ssl_server_private_key, ssl_enabled);
 
     if res.code != '200'
       raise Puppet::Error "Error while saving ssl settings: #{res.body}"
