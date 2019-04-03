@@ -27,9 +27,9 @@ Puppet::Type.type(:cd4pe_root_config).provide(:ruby) do
           storage_prefix: existing_config[:storagePathPrefix] || '',
           s3_access_key: existing_config[:storageCredentialsKey] || '',
           ssl_enabled: existing_config[:sslEnabled] || false,
-          server_certificate: existing_config[:serverCertificate] || '',
-          authority_certificate: existing_config[:authorityCertificate] || '',
-          server_private_key: existing_config[:serverPrivateKey] || '',
+          ssl_server_certificate: existing_config[:serverCertificate] || '',
+          ssl_authority_certificate: existing_config[:authorityCertificate] || '',
+          ssl_server_private_key: existing_config[:serverPrivateKey] || '',
         }
       end
       providers << new(resource_hash)
@@ -140,11 +140,11 @@ Puppet::Type.type(:cd4pe_root_config).provide(:ruby) do
 
   def save_ssl_settings(resource)
     ssl_enabled = resource[:ssl_enabled]
-    server_certificate = resource[:server_certificate]
-    authority_certificate = resource[:authority_certificate]
-    server_private_key = resource[:server_private_key]
+    ssl_server_certificate = resource[:ssl_server_certificate]
+    ssl_authority_certificate = resource[:ssl_authority_certificate]
+    ssl_server_private_key = resource[:ssl_server_private_key]
     self.class.api_client.save_ssl_settings(
-      authority_certificate, server_certificate, server_private_key, ssl_enabled)
+      ssl_authority_certificate, ssl_server_certificate, ssl_server_private_key, ssl_enabled)
   end
 
   def self.api_client
