@@ -118,7 +118,7 @@ Puppet::Type.newtype(:cd4pe_root_config) do
     end
   end
 
-  newproperty(:ssl_enabled, :boolean => false, :parent => Puppet::Property::Boolean) do
+  newproperty(:ssl_enabled, :boolean => true, :parent => Puppet::Property::Boolean) do
     desc 'Boolean to enable or disable SSL'
   end
 

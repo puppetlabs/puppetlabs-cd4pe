@@ -22,14 +22,14 @@ Puppet::Type.type(:cd4pe_root_config).provide(:ruby) do
           backend_service_endpoint: existing_config[:backendServiceEndpoint],
           agent_service_endpoint: existing_config[:agentServiceEndpoint],
           storage_provider: existing_config[:storageMethod],
-          storage_endpoint: existing_config[:storageEndpoint] || '',
+          storage_endpoint: existing_config[:storageEndpoint],
           storage_bucket: existing_config[:storageBucket],
-          storage_prefix: existing_config[:storagePathPrefix] || '',
-          s3_access_key: existing_config[:storageCredentialsKey] || '',
+          storage_prefix: existing_config[:storagePathPrefix],
+          s3_access_key: existing_config[:storageCredentialsKey],
           ssl_enabled: existing_config[:sslEnabled] || false,
-          ssl_server_certificate: existing_config[:serverCertificate] || '',
-          ssl_authority_certificate: existing_config[:authorityCertificate] || '',
-          ssl_server_private_key: existing_config[:serverPrivateKey] || '',
+          ssl_server_certificate: existing_config[:sslServerCertificate],
+          ssl_authority_certificate: existing_config[:sslAuthorityCertificate],
+          ssl_server_private_key: existing_config[:sslServerPrivateKey],
         }
       end
       providers << new(resource_hash)
