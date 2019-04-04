@@ -18,7 +18,6 @@ password                 = params['root_password']
 uri = URI.parse(hostname)
 hostname = "http://#{hostname}" if uri.scheme == nil
 
-
 web_ui_endpoint           = params['web_ui_endpoint'] || "#{hostname}:8080"
 backend_service_endpoint  = params['backend_service_endpoint'] || "#{hostname}:8000"
 agent_service_endpoint    = params['agent_service_endpoint'] || "#{hostname}:7000"
@@ -34,26 +33,39 @@ ssl_enabled               = params['ssl_enabled']
 ssl_server_certificate    = params['ssl_server_certificate']
 ssl_authority_certificate = params['ssl_authority_certificate']
 ssl_server_private_key    = params['ssl_server_private_key']
+ssl_endpoint              = params['ssl_endpoint']
+ssl_port                  = params['ssl_port']
 
 begin
   client = PuppetX::Puppetlabs::CD4PEClient.new(web_ui_endpoint, username, password)
   res = client.save_storage_settings(provider, endpoint, bucket, prefix, access_key, secret_key)
+
   if res.code != '200'
-    raise Puppet::Error "Error while saving storage settings: #{res.body}"
+    raise "Error while saving storage settings: #{res.body}"
+  end
+
+  if ssl_enabled != nil && ssl_server_certificate != nil && ssl_authority_certificate != nil && ssl_server_private_key != nil
+    if ssl_enabled
+      if ssl_endpoint == nil || ssl_port == nil
+        raise "ssl_endpoint and ssl_port must be specified if ssl_enabled == true"
+      end
+      # if ssl_enabled == true, and user specifies ssl_endpoint && ssl_port, this takes precedence over a manually specified web_ui_endpoint
+      web_ui_endpoint =  "#{ssl_endpoint}:#{ssl_port}";
+    end
+
+    res = client.save_ssl_settings(ssl_authority_certificate, ssl_server_certificate, ssl_server_private_key, ssl_enabled);
+
+    if res.code != '200'
+      raise "Error while saving ssl settings: #{res.body}"
+    end
+  elsif ssl_enabled != nil || ssl_server_certificate != nil || ssl_authority_certificate != nil || ssl_server_private_key != nil
+    raise "To enable SSL, the following must be specified: ssl_enabled, ssl_server_certificate, ssl_authority_certificate, ssl_server_private_key."
   end
 
   res = client.save_endpoint_settings(web_ui_endpoint, backend_service_endpoint, agent_service_endpoint)
 
   if res.code != '200'
-    raise Puppet::Error "Error while saving endpoint settings: #{res.body}"
-  end
-
-  if ssl_enabled != nil && ssl_server_certificate != nil && ssl_authority_certificate != nil && ssl_server_private_key != nil
-    res = client.save_ssl_settings(ssl_authority_certificate, ssl_server_certificate, ssl_server_private_key, ssl_enabled);
-
-    if res.code != '200'
-      raise Puppet::Error "Error while saving ssl settings: #{res.body}"
-    end
+    raise "Error while saving endpoint settings: #{res.body}"
   end
 
   puts "Configuration complete! Navigate to #{web_ui_endpoint} to upload your CD4PE license and create your first user account."

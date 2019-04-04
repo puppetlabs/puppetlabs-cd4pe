@@ -68,6 +68,14 @@
     "ssl_server_private_key": {
       "type": "Optional[String[1]]",
       "description": "Server Private Key for your SSL configuration. Required if SSL is enabled."
+    },
+    "ssl_endpoint": {
+      "type": "Optional[String[1]]",
+      "description": "SSL Web UI endpoint. Required if SSL is enabled."
+    },
+    "ssl_port": {
+      "type": "Optional[Integer]",
+      "description": "SSL Web UI port. Required if SSL is enabled."
     }
   },
   "input_method": "stdin"
