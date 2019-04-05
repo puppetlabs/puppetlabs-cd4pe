@@ -124,6 +124,21 @@ module PuppetX
         make_request(:post, ROOT_STORAGE_SETTINGS, payload.to_json)
       end
 
+      def save_ssl_settings(ssl_authority_certificate, ssl_server_certificate, ssl_server_private_key, ssl_enabled)
+        payload = {
+          op: 'SaveSslSettings',
+          content: {
+            setting: {
+              authorityCertificate: ssl_authority_certificate,
+              serverCertificate: ssl_server_certificate,
+              serverPrivateKey: ssl_server_private_key,
+              sslEnabled: ssl_enabled,
+            }
+          }
+        }
+        make_request(:post, ROOT_AJAX_ENDPOINT, payload.to_json)
+      end
+
       private
 
       def make_request(type, api_url, payload="")
