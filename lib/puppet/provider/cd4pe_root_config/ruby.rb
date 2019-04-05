@@ -26,7 +26,11 @@ Puppet::Type.type(:cd4pe_root_config).provide(:ruby) do
           storage_bucket: existing_config[:storageBucket],
           storage_prefix: existing_config[:storagePathPrefix],
           s3_access_key: existing_config[:storageCredentialsKey],
-          ssl_enabled: existing_config[:sslEnabled] ? :true : :false,  # This exists because https://tickets.puppetlabs.com/browse/PUP-2368
+
+          # We need to convert the values from boolean value of sslEnabled to symbols 
+          # due to a long standing bug in puppet where it can't enforce falsey values on custom types. 
+          # See https://tickets.puppetlabs.com/browse/PUP-2368
+          ssl_enabled: existing_config[:sslEnabled] ? :true : :false,  
           ssl_server_certificate: existing_config[:sslServerCertificate],
           ssl_authority_certificate: existing_config[:sslAuthorityCertificate],
           ssl_server_private_key: existing_config[:sslServerPrivateKey],
