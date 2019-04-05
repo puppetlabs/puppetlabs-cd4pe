@@ -39,5 +39,6 @@ class cd4pe::root_config(
     ssl_server_private_key    => $ssl_server_private_key,
     ssl_endpoint              => $ssl_endpoint,
     ssl_port                  => $ssl_port,
+    notify                    => Docker::Run['cd4pe'],
   }
 }
