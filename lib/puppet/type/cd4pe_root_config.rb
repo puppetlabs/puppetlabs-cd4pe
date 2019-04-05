@@ -117,6 +117,59 @@ Puppet::Type.newtype(:cd4pe_root_config) do
       true
     end
   end
+
+  newproperty(:ssl_enabled, :boolean => true, :parent => Puppet::Property::Boolean) do
+    desc 'Boolean to enable or disable SSL'
+
+    # We need to munge the values from boolean values to symbols due to a long standing
+    # bug in puppet where it can't enforce falsey values on custom types. 
+    # See https://tickets.puppetlabs.com/browse/PUP-2368
+    munge do |value|
+      if value
+        :true
+      else
+        :false
+      end
+    end
+  end
+
+  newproperty(:ssl_server_certificate) do
+    desc 'Server Certificate for your SSL configuration.'
+    validate do |value|
+      fail 'ssl_server_certificate must be a String.' unless value.is_a?(String)
+    end
+  end
+
+  newproperty(:ssl_authority_certificate) do
+    desc 'Authority Certificate for your SSL configuration.'
+    validate do |value|
+      fail 'ssl_authority_certificate must be a String.' unless value.is_a?(String)
+    end
+  end
+
+  newproperty(:ssl_server_private_key) do
+    desc 'Server Private Key for your SSL configuration.'
+    validate do |value|
+      fail 'ssl_server_private_key must be a String.' unless value.is_a?(String)
+    end
+    def insync?(is)
+      true
+    end
+  end
+
+  newproperty(:ssl_endpoint) do
+    desc 'SSL Web UI Endpoint for your SSL configuration.'
+    validate do |value|
+      fail 'ssl_endpoint must be a String.' unless value.is_a?(String)
+    end
+  end
+
+  newproperty(:ssl_port) do
+    desc 'SSL Web UI Port for your SSL configuration.'
+    validate do |value|
+      fail 'ssl_port must be an Integer.' unless value.is_a?(Integer)
+    end
+  end
 end
 
 def compare_uris(is, should)
