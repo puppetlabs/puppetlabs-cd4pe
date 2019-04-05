@@ -17,7 +17,7 @@ class cd4pe::root_config(
   Optional[String[1]] $ssl_authority_certificate           = undef,
   Optional[Sensitive[String[1]]] $ssl_server_private_key   = undef,
   Optional[String[1]] $ssl_endpoint                        = undef,
-  Optional[Integer] $ssl_port                              = undef,
+  Optional[Integer] $ssl_port                              = 8443,
 ) inherits cd4pe {
 
   cd4pe_root_config { $web_ui_endpoint:

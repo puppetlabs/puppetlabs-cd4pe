@@ -121,8 +121,9 @@ Puppet::Type.newtype(:cd4pe_root_config) do
   newproperty(:ssl_enabled, :boolean => true, :parent => Puppet::Property::Boolean) do
     desc 'Boolean to enable or disable SSL'
 
-    # This munge exists because of an outstanding issue
-    # Observe said bug here: https://tickets.puppetlabs.com/browse/PUP-2368
+    # We need to munge the values from boolean values to symbols due to a long standing
+    # bug in puppet where it can't enforce falsey values on custom types. 
+    # See https://tickets.puppetlabs.com/browse/PUP-2368
     munge do |value|
       if value
         :true

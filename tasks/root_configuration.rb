@@ -35,7 +35,33 @@ ssl_server_certificate    = params['ssl_server_certificate']
 ssl_authority_certificate = params['ssl_authority_certificate']
 ssl_server_private_key    = params['ssl_server_private_key']
 ssl_endpoint              = params['ssl_endpoint']
-ssl_port                  = params['ssl_port']
+ssl_port                  = params['ssl_port'] || 8443
+
+def set_ssl_web_ui_endpoint(web_ui_endpoint, ssl_endpoint, ssl_port)
+  web_ui_endpoint =  "#{ssl_endpoint}:#{ssl_port}";
+end
+
+def all_ssl_params_provided(ssl_enabled, ssl_server_certificate, ssl_authority_certificate, ssl_server_private_key)
+  return ssl_enabled != nil && ssl_server_certificate != nil && ssl_authority_certificate != nil && ssl_server_private_key != nil
+end
+
+def any_ssl_params_provided(ssl_enabled, ssl_server_certificate, ssl_authority_certificate, ssl_server_private_key)
+  return ssl_enabled != nil || ssl_server_certificate != nil || ssl_authority_certificate != nil || ssl_server_private_key != nil
+end
+
+def ssl_enabled_requirements_satisfied(ssl_port, ssl_endpoint)
+  return ssl_port != nil && ssl_endpoint != nil
+end
+
+def restart_cd4pe
+  restart_command = "service docker-cd4pe restart || true"
+  puts "restarting cd4pe..."
+  system_output, status = Open3.capture2e(restart_command)
+  if !status.exitstatus.zero?
+      raise "Critical Failure on cd4pe container restart: #{system_output}"
+  end
+  puts "cd4pe successfully restarted!"
+end
 
 begin
   client = PuppetX::Puppetlabs::CD4PEClient.new(web_ui_endpoint, username, password)
@@ -46,13 +72,13 @@ begin
     raise "Error while saving storage settings: #{res.body}"
   end
 
-  if ssl_enabled != nil && ssl_server_certificate != nil && ssl_authority_certificate != nil && ssl_server_private_key != nil
+  if all_ssl_params_provided(ssl_enabled, ssl_server_certificate, ssl_authority_certificate, ssl_server_private_key)
     if ssl_enabled
-      if ssl_endpoint == nil || ssl_port == nil
+      if ssl_enabled_requirements_satisfied(ssl_port, ssl_endpoint)
+        set_ssl_web_ui_endpoint(web_ui_endpoint, ssl_endpoint, ssl_port);
+      else
         raise "ssl_endpoint and ssl_port must be specified if ssl_enabled == true"
       end
-      # if ssl_enabled == true, and user specifies ssl_endpoint && ssl_port, this takes precedence over a manually specified web_ui_endpoint
-      web_ui_endpoint =  "#{ssl_endpoint}:#{ssl_port}";
     end
 
     res = client.save_ssl_settings(ssl_authority_certificate, ssl_server_certificate, ssl_server_private_key, ssl_enabled);
@@ -60,8 +86,9 @@ begin
     if res.code != '200'
       raise "Error while saving ssl settings: #{res.body}"
     end
+
     restart_after_configuration = true;
-  elsif ssl_enabled != nil || ssl_server_certificate != nil || ssl_authority_certificate != nil || ssl_server_private_key != nil
+  elsif any_ssl_params_provided(ssl_enabled, ssl_server_certificate, ssl_authority_certificate, ssl_server_private_key)
     raise "To enable SSL, the following must be specified: ssl_enabled, ssl_server_certificate, ssl_authority_certificate, ssl_server_private_key."
   end
 
@@ -72,17 +99,10 @@ begin
   end
 
   if restart_after_configuration
-    restart_command = "service docker-cd4pe restart || true"
-    puts "restarting cd4pe..."
-    system_output, status = Open3.capture2e(restart_command)
-    if !status.exitstatus.zero?
-        raise "Critical Failure on cd4pe container restart: #{system_output}"
-    end
-    puts "cd4pe successfully restarted!"
+    restart_cd4pe()
   end
 
   puts "Configuration complete! Navigate to #{web_ui_endpoint} to upload your CD4PE license and create your first user account."
-
 
   exit 0
 rescue Puppet::Error => e
