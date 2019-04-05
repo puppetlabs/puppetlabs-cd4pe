@@ -2,6 +2,7 @@
 
 require 'puppet'
 require 'uri'
+require 'open3'
 
 # Need to append LOAD_PATH
 Puppet.initialize_settings
@@ -38,6 +39,7 @@ ssl_port                  = params['ssl_port']
 
 begin
   client = PuppetX::Puppetlabs::CD4PEClient.new(web_ui_endpoint, username, password)
+  restart_after_configuration = false;
   res = client.save_storage_settings(provider, endpoint, bucket, prefix, access_key, secret_key)
 
   if res.code != '200'
@@ -58,6 +60,7 @@ begin
     if res.code != '200'
       raise "Error while saving ssl settings: #{res.body}"
     end
+    restart_after_configuration = true;
   elsif ssl_enabled != nil || ssl_server_certificate != nil || ssl_authority_certificate != nil || ssl_server_private_key != nil
     raise "To enable SSL, the following must be specified: ssl_enabled, ssl_server_certificate, ssl_authority_certificate, ssl_server_private_key."
   end
@@ -66,6 +69,16 @@ begin
 
   if res.code != '200'
     raise "Error while saving endpoint settings: #{res.body}"
+  end
+
+  if restart_after_configuration
+    restart_command = "service docker-cd4pe restart || true"
+    puts "restarting cd4pe..."
+    system_output, status = Open3.capture2e(restart_command)
+    if !status.exitstatus.zero?
+        raise "Critical Failure on cd4pe container restart: #{system_output}"
+    end
+    puts "cd4pe successfully restarted!"
   end
 
   puts "Configuration complete! Navigate to #{web_ui_endpoint} to upload your CD4PE license and create your first user account."
