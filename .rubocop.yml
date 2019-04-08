@@ -16,6 +16,11 @@ AllCops:
   - "**/Puppetfile"
   - "**/Vagrantfile"
   - "**/Guardfile"
+  - "src/**/*"
+  - "test/**/*"
+  - "checkout/**/*"
+  - "dev/**/*"
+  - "dev-resources/**/*"
 Metrics/LineLength:
   Description: People have wide screens, use them.
   Max: 200
