@@ -1,0 +1,37 @@
+fixtures:
+  repositories:
+      puppet_enterprise:
+          repo: "git@github.com:puppetlabs/puppetlabs-puppet_enterprise.git"
+          ref: origin/kearney
+      pe_puppet_authorization:
+          repo: "git@github.com:puppetlabs/puppetlabs-pe_puppet_authorization.git"
+          ref: origin/irving
+      puppet_authorization:
+          repo: "git@github.com:puppetlabs/puppetlabs-puppet_authorization.git"
+          ref: origin/master
+      stdlib:
+          repo: "git@github.com:puppetlabs/puppetlabs-stdlib.git"
+          ref: origin/master
+      pe_concat:
+          repo: "git@github.com:puppetlabs/puppetlabs-pe_concat.git"
+          ref: origin/2015.2.x
+      pe_inifile:
+          repo: "git@github.com:puppetlabs/puppetlabs-pe_inifile.git"
+          ref: origin/2016.5.x
+      pe_hocon:
+          repo: "git@github.com:puppetlabs/puppetlabs-pe_hocon.git"
+          ref: origin/2018.1.x
+      yumrepo_core:
+          repo: "git@github.com:puppetlabs/puppetlabs-yumrepo_core.git"
+          ref: origin/master
+      pe_r10k:
+          repo: "git@github.com:puppetlabs/puppetlabs-pe_r10k.git"
+          ref: origin/2016.2.x
+      augeas_core:
+          repo: "git@github.com:puppetlabs/puppetlabs-augeas_core.git"
+          ref: origin/master
+      cron_core:
+          repo: "git@github.com:puppetlabs/puppetlabs-cron_core.git"
+          ref: origin/master
+  symlinks:
+    cd4pe: "#{source_dir}"
