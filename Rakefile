@@ -12,6 +12,7 @@ PuppetSyntax.exclude_paths = ignore_paths
 PuppetLint::RakeTask.new :lint do |config|
   # Pattern of files to ignore
   config.ignore_paths = ignore_paths
+  config.pattern = "manifests/**/*.pp"
 end
 
 def changelog_user
