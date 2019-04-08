@@ -57,11 +57,11 @@ class cd4pe (
 
   $app_env_path = "${data_root_dir}/env"
   file { $app_env_path:
-    ensure  => file,
-    owner   => 'root',
-    group   => 'root',
+    ensure    => file,
+    owner     => 'root',
+    group     => 'root',
     show_diff => false,
-    content => epp('cd4pe/app_env.epp', $app_data),
+    content   => epp('cd4pe/app_env.epp', $app_data),
   }
 
   $secret_key = cd4pe::secret_key()
@@ -90,11 +90,11 @@ class cd4pe (
 
     $mysql_env_path = "${data_root_dir}/mysql_env"
     file { $mysql_env_path:
-      ensure  => file,
-      owner   => 'root',
-      group   => 'root',
+      ensure    => file,
+      owner     => 'root',
+      group     => 'root',
       show_diff => false,
-      content => epp('cd4pe/mysql_env.epp', $db_data),
+      content   => epp('cd4pe/mysql_env.epp', $db_data),
     }
 
     docker::run { $db_host:
@@ -133,20 +133,20 @@ class cd4pe (
   }
 
   docker::run {'cd4pe':
-    image                 => "${cd4pe_image}:${cd4pe_version}",
-    extra_parameters      => $extra_params,
-    ports                 => $cd4pe_ports,
-    pull_on_start         => true,
-    volumes               => ['cd4pe-object-store:/disk'],
-    env_file              => [
+    image            => "${cd4pe_image}:${cd4pe_version}",
+    extra_parameters => $extra_params,
+    ports            => $cd4pe_ports,
+    pull_on_start    => true,
+    volumes          => ['cd4pe-object-store:/disk'],
+    env_file         => [
       $app_env_path,
       $secret_key_path,
       $app_db_password_path
     ],
-    net                   => 'cd4pe',
-    subscribe             => [
+    net              => 'cd4pe',
+    subscribe        => [
       File[$app_env_path],
     ],
-    require               => $container_require,
+    require          => $container_require,
   }
 }

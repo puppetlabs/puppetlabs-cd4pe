@@ -20,9 +20,9 @@ class cd4pe::impact_analysis (
   }
 
   puppet_enterprise::trapperkeeper::bootstrap_cfg { 'cdpe-api-service':
-    namespace => 'puppetlabs.services.cdpe-api.cdpe-api-service',
-    container => 'puppetserver',
     ensure    => $_ensure,
+    container => 'puppetserver',
+    namespace => 'puppetlabs.services.cdpe-api.cdpe-api-service',
     require   => Package['pe-puppetserver']
   }
 
