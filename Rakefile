@@ -5,6 +5,14 @@ require 'github_changelog_generator/task' if Bundler.rubygems.find_name('github_
 require 'puppet-strings/tasks' if Bundler.rubygems.find_name('puppet-strings').any?
 require 'json'
 
+ignore_paths = ["checkouts/**/*", "dev/**/*", "dev-resources/**/*", "test/**/*", "src/**/*"]
+
+PuppetSyntax.exclude_paths = ignore_paths
+
+PuppetLint::RakeTask.new :lint do |config|
+  # Pattern of files to ignore
+  config.ignore_paths = ignore_paths
+end
 
 def changelog_user
   return unless Rake.application.top_level_tasks.include? "changelog"
