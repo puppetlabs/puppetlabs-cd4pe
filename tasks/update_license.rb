@@ -4,7 +4,7 @@ require 'puppet'
 require 'uri'
 
 Puppet.initialize_settings
-$:.unshift(Puppet[:plugindest])
+$LOAD_PATH.unshift(Puppet[:plugindest])
 
 require 'puppet_x/puppetlabs/cd4pe_client'
 
@@ -14,12 +14,10 @@ username                 = params['root_email']
 password                 = params['root_password']
 license                  = params['license']
 
-
 uri = URI.parse(hostname)
-hostname = "http://#{hostname}" if uri.scheme == nil
+hostname = "http://#{hostname}" if uri.scheme.nil?
 
-
-web_ui_endpoint          = params['web_ui_endpoint'] || "#{hostname}:8080"
+web_ui_endpoint = params['web_ui_endpoint'] || "#{hostname}:8080"
 
 begin
   client = PuppetX::Puppetlabs::CD4PEClient.new(web_ui_endpoint, username, password)
@@ -28,8 +26,7 @@ begin
     raise Puppet::Error "Error while saving license: #{res.body}"
   end
 
-  puts "License updated"
-
+  puts 'License updated'
 
   exit 0
 rescue Puppet::Error => e

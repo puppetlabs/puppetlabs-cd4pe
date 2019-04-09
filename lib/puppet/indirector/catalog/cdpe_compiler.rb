@@ -7,7 +7,7 @@ require 'yaml'
 # This code is a lift directly from https://github.com/puppetlabs/puppetlabs-catalog_preview
 # Until https://tickets.puppetlabs.com/browse/PUP-9055 has been completed.
 class Puppet::Resource::Catalog::CdpeCompiler < Puppet::Indirector::Code
-  desc "Compiles a catalog for a node."
+  desc 'Compiles a catalog for a node.'
 
   include Puppet::Util
 
@@ -22,20 +22,20 @@ class Puppet::Resource::Catalog::CdpeCompiler < Puppet::Indirector::Code
     Puppet::Util::Profiler.profile('Found facts', [:compiler, :find_facts]) do
       # If the facts were encoded as yaml, then the param reconstitution system
       # in Network::HTTP::Handler will automagically deserialize the value.
-      if text_facts.is_a?(Puppet::Node::Facts)
-        facts = text_facts
-      else
-        # We unescape here because the corresponding code in Puppet::Configurer::FactHandler escapes
-        facts = Puppet::Node::Facts.convert_from(format, CGI.unescape(text_facts))
-      end
+      facts = if text_facts.is_a?(Puppet::Node::Facts)
+                text_facts
+              else
+                # We unescape here because the corresponding code in Puppet::Configurer::FactHandler escapes
+                Puppet::Node::Facts.convert_from(format, CGI.unescape(text_facts))
+              end
 
       unless facts.name == request.key
         raise Puppet::Error, "Catalog for #{request.key.inspect} was requested with fact definition for the wrong node (#{facts.name.inspect})."
       end
 
       options = {
-        :environment => request.environment,
-        :transaction_uuid => request.options[:transaction_uuid],
+        environment: request.environment,
+        transaction_uuid: request.options[:transaction_uuid],
       }
 
       Puppet::Node::Facts.indirection.save(facts, nil, options)
@@ -78,7 +78,7 @@ class Puppet::Resource::Catalog::CdpeCompiler < Puppet::Indirector::Code
     if trusted_param
       # Blows up if it is a parameter as it will be set as $trusted by the compiler as if it was a variable
       node.parameters.delete('trusted')
-      unless trusted_param.is_a?(Hash) && %w{authenticated certname extensions}.all? {|key| trusted_param.has_key?(key) }
+      unless trusted_param.is_a?(Hash) && ['authenticated', 'certname', 'extensions'].all? { |key| trusted_param.key?(key) }
         # trusted is some kind of garbage, do not resurrect
         trusted_param = nil
       end
@@ -95,7 +95,7 @@ class Puppet::Resource::Catalog::CdpeCompiler < Puppet::Indirector::Code
     #
     # Note that trusted_data should be a hash, but (2) and (4) are not
     # hashes, so we to_h at the end
-    if !node.trusted_data
+    unless node.trusted_data
       trusted = Puppet.lookup(:trusted_information) do
         trusted_param || Puppet::Context::TrustedInformation.local(node)
       end
@@ -161,7 +161,7 @@ class Puppet::Resource::Catalog::CdpeCompiler < Puppet::Indirector::Code
           # Switch the node's environment (it finds and instantiates the Environment)
 
           # override environment with specified env for preview
-          overrides = { :current_environment => node.environment }
+          overrides = { current_environment: node.environment }
 
           Puppet.override(overrides, 'puppet-preview-compile') do
             begin
@@ -172,7 +172,7 @@ class Puppet::Resource::Catalog::CdpeCompiler < Puppet::Indirector::Code
                 raise Puppet::Error, error_msg
               end
             rescue StandardError => e
-              raise Puppet::Error, "Error while compiling the preview catalog: #{e.to_s}"
+              raise Puppet::Error, "Error while compiling the preview catalog: #{e}"
             end
           end
         end
@@ -195,8 +195,8 @@ class Puppet::Resource::Catalog::CdpeCompiler < Puppet::Indirector::Code
       node = nil
       begin
         node = Puppet::Node.indirection.find(name,
-                                             :environment => environment,
-                                             :transaction_uuid => transaction_uuid)
+                                             environment: environment,
+                                             transaction_uuid: transaction_uuid)
       rescue => detail
         message = "Failed when searching for node #{name}: #{detail}"
         Puppet.log_exception(detail, message)
@@ -243,8 +243,7 @@ class Puppet::Resource::Catalog::CdpeCompiler < Puppet::Indirector::Code
 
     # And then add the server name and IP
     { 'servername' => 'fqdn',
-      'serverip' => 'ipaddress'
-    }.each do |var, fact|
+      'serverip' => 'ipaddress' }.each do |var, fact|
       if value = Facter.value(fact)
         @server_facts[var] = value
       else
@@ -254,11 +253,11 @@ class Puppet::Resource::Catalog::CdpeCompiler < Puppet::Indirector::Code
 
     if @server_facts['servername'].nil?
       host = Facter.value(:hostname)
-      if domain = Facter.value(:domain)
-        @server_facts['servername'] = [host, domain].join('.')
-      else
-        @server_facts['servername'] = host
-      end
+      @server_facts['servername'] = if domain = Facter.value(:domain)
+                                      [host, domain].join('.')
+                                    else
+                                      host
+                                    end
     end
   end
 end
