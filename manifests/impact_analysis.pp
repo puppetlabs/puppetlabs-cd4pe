@@ -1,69 +1,28 @@
-# Slots the cppe_api extension JAR into a Puppet Server install. Use
-# this class by adding it to the "PE Masters" group or otherwise applying it to
-# a node running PE
 class cd4pe::impact_analysis (
-  Array[String] $whitelisted_certnames,
   Enum['present', 'absent'] $ensure = 'present',
+  Optional[Array[String]] $whitelisted_certnames = undef,
 ) {
-
-  if fact('pe_server_version') =~ String {
-    # PE configuration
-    if (versioncmp(fact('pe_server_version'), '2017.3.0') < 0) or
-       (versioncmp(fact('pe_server_version'), '2019.1.0') >= 0) {
-      warning("The cd4pe::impact_analysis class only supports PE 2017.3 through 2019.1 and should be removed from: ${trusted['certname']}")
-      $_ensure = absent
-    } else {
-      $_ensure = $ensure
+  # If earlier than 2017.3, notify the customer this has no effect
+  if (versioncmp(pe_build_version(), '2017.3.0') < 0) {
+    warning("The cd4pe::impact_analysis class only supports PE 2017.3 through 2019.1 and should be removed from: ${trusted['certname']}")
+  } elsif (versioncmp(pe_build_version(), '2019.1.0') < 0) {
+    # If between 2017.3 and 2019.1, use the legacy
+    class { 'cd4pe::impact_analysis::legacy':
+      ensure                => $ensure,
+      whitelisted_certnames => $whitelisted_certnames
     }
   } else {
-      $_ensure = $ensure
+    # If > 2019.1, we have our new catalog endpoint built in, no need for our legacy code
+    class { 'cd4pe::impact_analysis::legacy':
+      ensure => absent,
+    }
+
+    Pe_puppet_authorization::Rule <| title == 'puppetlabs environment' |> {
+      allow +> { 'rbac' => { 'permission' => 'puppetserver:compile_catalog:*' }}
+    }
+
+    Pe_puppet_authorization::Rule <| title == 'puppetlabs v4 catalog' |> {
+      allow +> { 'rbac' => { 'permission' => 'puppetserver:compile_catalog:*' }}
+    }
   }
-
-  puppet_enterprise::trapperkeeper::bootstrap_cfg { 'cdpe-api-service':
-    ensure    => $_ensure,
-    container => 'puppetserver',
-    namespace => 'puppetlabs.services.cdpe-api.cdpe-api-service',
-    require   => Package['pe-puppetserver']
-  }
-
-   $_puppetserver_service = Exec['pe-puppetserver service full restart']
-
-   $_file_ensure = $_ensure ? {
-     'present' => file,
-     'absent'  => absent,
-   }
-
-  if (versioncmp(pe_build_version(), '2019.0.2') >= 0) {
-    $jar_source_name = 'cdpe-api-aot.jar'
-  } else {
-    $jar_source_name = 'cdpe-api.jar'
-  }
-
-  file {'/opt/puppetlabs/server/data/puppetserver/jars/cdpe-api.jar':
-    ensure  => $_file_ensure,
-    owner   => 'root',
-    group   => 'root',
-    mode    => '0644',
-    source  => "puppet:///modules/cd4pe/${jar_source_name}",
-    backup  => false,
-    notify  => $_puppetserver_service,
-    require => Package['pe-puppetserver']
-  }
-
-  puppet_authorization::rule {'CDPE API access':
-    ensure               => $_ensure,
-    match_request_path   => '/puppet/v3/cd4pe/compile',
-    match_request_type   => 'path',
-    match_request_method => 'get',
-    allow                => $whitelisted_certnames,
-    sort_order           => 601,
-    path                 => '/etc/puppetlabs/puppetserver/conf.d/auth.conf',
-    notify               => $_puppetserver_service,
-    require              => Package['pe-puppetserver']
-  }
-
-  Pe_puppet_authorization::Rule <| title == 'puppetlabs environment' |> {
-    allow +> $whitelisted_certnames,
-  }
-
 }

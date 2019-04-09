@@ -1,9 +1,9 @@
 require 'spec_helper'
 
 ensure_module_defined('Puppet::Provider::Cd4peRootConfig')
-require 'puppet/provider/cd4pe_root_config/cd4pe_root_config'
+require 'puppet/provider/cd4pe_root_config/ruby'
 
-RSpec.describe Puppet::Provider::Cd4peRootConfig::Cd4peRootConfig do
+RSpec.describe Puppet::Provider::Cd4peRootConfig do
   subject(:provider) { described_class.new }
 
   let(:context) { instance_double('Puppet::ResourceApi::BaseContext', 'context') }
