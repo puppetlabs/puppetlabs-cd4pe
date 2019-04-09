@@ -125,3 +125,9 @@ Style/IfUnlessModifier:
   Enabled: false
 Style/SymbolProc:
   Enabled: false
+Style/GuardClause:
+  Enabled: false
+Lint/AssignmentInCondition:
+  Enabled: true
+  Exclude:
+    - lib/puppet/indirector/catalog/cdpe_compiler.rb # copied from catalog_preview, don't want to mess with logic
