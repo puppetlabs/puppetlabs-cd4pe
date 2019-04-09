@@ -10,8 +10,33 @@ require 'spec_helper_local' if File.file?(File.join(File.dirname(__FILE__), 'spe
 include RspecPuppetFacts
 
 default_facts = {
-  puppetversion: Puppet.version,
-  facterversion: Facter.version,
+    :osfamily                  => 'RedHat',
+    :platform_tag              => 'el-6-x86_64',
+    :operatingsystem           => 'CentOS',
+    :lsbmajdistrelease         => '6',
+    :operatingsystemrelease    => '6.1',
+    :is_pe                     => 'true',
+    :pe_concat_basedir         => '/tmp/file',
+    :platform_symlink_writable => true,
+    :puppetversion             => '4.5.1',
+    :aio_agent_version         => '1.5.1',
+    :memorysize                => '1.00 GB',
+    :processorcount            => 1,
+    :id                        => 'root',
+    :gid                       => 'root',
+    :path                      => '/usr/local/sbin:/sbin:/bin:/usr/sbin:/usr/bin:/root/bin:/usr/local/bin',
+    :mountpoints               => { '/' => {}},
+    :puppet_files_dir_present  => 'false',
+    :os                        => {
+      'family'                 => 'RedHat',
+      'name'                   => 'CentOS',
+      'release'                => {
+        'major'                => '6',
+      },
+    },
+    :pe_build                  => '2018.1.0',
+    :memory                    => { 'system' => { 'total_bytes' => 4294967296 } },
+    :processors                => { 'count' => 1 },
 }
 
 default_fact_files = [
@@ -29,8 +54,24 @@ default_fact_files.each do |f|
   end
 end
 
+module Helpers
+  def pre_condition
+<<-PRE_COND
+class {'puppet_enterprise':
+  certificate_authority_host   => 'ca.rspec',
+  puppet_master_host           => 'master.rspec',
+  console_host                 => 'console.rspec',
+  puppetdb_host                => 'puppetdb.rspec',
+  database_host                => 'database.rspec',
+  pcp_broker_host              => 'pcp_broker.rspec',
+}
+PRE_COND
+  end
+end
+
 RSpec.configure do |c|
   c.default_facts = default_facts
+  c.include Helpers
   c.before :each do
     # set to strictest setting for testing
     # by default Puppet runs at warning level
