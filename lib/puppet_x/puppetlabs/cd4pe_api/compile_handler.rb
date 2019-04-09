@@ -4,6 +4,7 @@ require 'puppet/node'
 require 'puppet/resource/catalog'
 require 'pp'
 
+# Provides a rest api handler for custom cdpe compiler
 class PuppetX::Puppetlabs::CD4PEApi::CompileHandler
   def call(request, response)
     # Get all the current indirector configs to restore at the end
@@ -14,7 +15,6 @@ class PuppetX::Puppetlabs::CD4PEApi::CompileHandler
     metadata = Puppet::FileServing::Metadata.indirection.terminus_class
     file = Puppet::FileBucket::File.indirection.terminus_class
     fact_term = Puppet::Node::Facts.indirection.terminus_class
-    fact_cache = Puppet::Node::Facts.indirection.cache_class
     reports = Puppet[:report]
     node_terminus = Puppet::Node.indirection.terminus_class
 
@@ -28,7 +28,7 @@ class PuppetX::Puppetlabs::CD4PEApi::CompileHandler
 
     ret = {
       catalog: nil,
-      logs: []
+      logs: [],
     }
 
     begin
@@ -44,7 +44,7 @@ class PuppetX::Puppetlabs::CD4PEApi::CompileHandler
       }
 
       catalog = Puppet::Resource::Catalog.indirection.find(node, options)
-      unless catalog == nil
+      unless catalog.nil?
         ret[:catalog] = catalog.to_data_hash
       end
     rescue
@@ -61,7 +61,6 @@ class PuppetX::Puppetlabs::CD4PEApi::CompileHandler
       Puppet[:report] = reports
     end
 
-
     options[:back_channel][:logs].each do |log|
       begin
         ret[:logs] << log.to_data_hash
@@ -72,7 +71,6 @@ class PuppetX::Puppetlabs::CD4PEApi::CompileHandler
 
     response.respond_with(200, 'application/json', ret.to_json)
   end
-
 
   def setup_terminuses
     require 'puppet/file_serving/content'
@@ -95,5 +93,4 @@ class PuppetX::Puppetlabs::CD4PEApi::CompileHandler
   def setup_node_cache
     Puppet::Node.indirection.cache_class = Puppet[:node_cache_terminus]
   end
-
 end

@@ -12,55 +12,62 @@ RSpec.describe 'cd4pe::impact_analysis::legacy' do
 
   let(:params) do
     {
-      'whitelisted_certnames' => ['test']
+      'whitelisted_certnames' => ['test'],
     }
   end
 
   context '2018.1.0' do
     before :each do
-      Puppet::Parser::Functions.newfunction(:pe_build_version, :type => :rvalue) do |args|
+      Puppet::Parser::Functions.newfunction(:pe_build_version, type: :rvalue) do |_args|
         '2018.1.0'
       end
     end
 
     context 'valid params' do
-      it { should contain_pe_puppet_authorization__rule('puppetlabs environment')
-        .with_allow(['master.rspec', 'test'])}
-      it { should contain_puppet_authorization__rule('CDPE API access') }
-      it { should contain_file('/opt/puppetlabs/server/data/puppetserver/jars/cdpe-api.jar')
-        .with_source('puppet:///modules/cd4pe/cdpe-api.jar') }
+      it {
+        is_expected.to contain_pe_puppet_authorization__rule('puppetlabs environment')
+          .with_allow(['master.rspec', 'test'])
+      }
+      it { is_expected.to contain_puppet_authorization__rule('CDPE API access') }
+      it {
+        is_expected.to contain_file('/opt/puppetlabs/server/data/puppetserver/jars/cdpe-api.jar')
+          .with_source('puppet:///modules/cd4pe/cdpe-api.jar')
+      }
 
       context 'ensure => absent' do
         let(:params) do
           {
             'whitelisted_certnames' => ['test'],
-            'ensure' => 'absent'
+            'ensure' => 'absent',
           }
         end
-        it { should contain_class('cd4pe::impact_analysis::legacy').with_ensure('absent') }
+
+        it { is_expected.to contain_class('cd4pe::impact_analysis::legacy').with_ensure('absent') }
       end
     end
 
     context 'invalid params' do
       let(:params) {}
-      it { is_expected.to_not compile }
+
+      it { is_expected.not_to compile }
     end
   end
 
   context '2019.1.0' do
-    let (:facts) do
+    let(:facts) do
       {
-        pe_build: '2019.1.0'
+        pe_build: '2019.1.0',
       }
     end
 
     before :each do
-      Puppet::Parser::Functions.newfunction(:pe_build_version, :type => :rvalue) do |args|
+      Puppet::Parser::Functions.newfunction(:pe_build_version, type: :rvalue) do |_args|
         '2019.1.0'
       end
     end
-    it { should contain_file('/opt/puppetlabs/server/data/puppetserver/jars/cdpe-api.jar')
-        .with_source('puppet:///modules/cd4pe/cdpe-api-aot.jar') }
-
+    it {
+      is_expected.to contain_file('/opt/puppetlabs/server/data/puppetserver/jars/cdpe-api.jar')
+        .with_source('puppet:///modules/cd4pe/cdpe-api-aot.jar')
+    }
   end
 end
