@@ -5,9 +5,9 @@ Puppet::Type.type(:cd4pe_root_config).provide(:ruby) do
 
   def self.instances
     providers = []
-    @clients.each do |hostname, v|
+    @clients.each do |_hostname, v|
       client = v[:client]
-      existing_config = client.get_root_config
+      existing_config = client.root_config
 
       if existing_config.code == '200'
         existing_config = JSON.parse(existing_config.body, symbolize_names: true)
@@ -27,10 +27,10 @@ Puppet::Type.type(:cd4pe_root_config).provide(:ruby) do
           storage_prefix: existing_config[:storagePathPrefix],
           s3_access_key: existing_config[:storageCredentialsKey],
 
-          # We need to convert the values from boolean value of sslEnabled to symbols 
-          # due to a long standing bug in puppet where it can't enforce falsey values on custom types. 
+          # We need to convert the values from boolean value of sslEnabled to symbols
+          # due to a long standing bug in puppet where it can't enforce falsey values on custom types.
           # See https://tickets.puppetlabs.com/browse/PUP-2368
-          ssl_enabled: existing_config[:sslEnabled] ? :true : :false,  
+          ssl_enabled: (existing_config[:sslEnabled]) ? :true : :false,
           ssl_server_certificate: existing_config[:sslServerCertificate],
           ssl_authority_certificate: existing_config[:sslAuthorityCertificate],
           ssl_server_private_key: existing_config[:sslServerPrivateKey],
@@ -49,13 +49,14 @@ Puppet::Type.type(:cd4pe_root_config).provide(:ruby) do
       password = r[:root_password]
       @clients[r[:resolvable_hostname]] = {
         client: init_api_client(hostname, username, password),
-        resource: r
+        resource: r,
       }
     end
 
     existing_configs = instances
     resources.keys.each do |config|
-      if provider = existing_configs.find { |c| c.resolvable_hostname.downcase == config.downcase }
+      # rubocup:disable Lint/AssignmentInCondition
+      if provider == existing_configs.find { |c| c.resolvable_hostname.casecmp(config.downcase).zero? }
         resources[config].provider = provider
       end
     end
@@ -92,7 +93,7 @@ Puppet::Type.type(:cd4pe_root_config).provide(:ruby) do
   end
 
   def destroy
-    raise Puppet::Error("cd4pe_root_config does not currently handle ensure => :absent")
+    raise Puppet::Error('cd4pe_root_config does not currently handle ensure => :absent')
   end
 
   def flush
@@ -121,6 +122,7 @@ Puppet::Type.type(:cd4pe_root_config).provide(:ruby) do
   end
 
   private
+
   def save_storage_settings(resource)
     provider = resource[:storage_provider]
     endpoint = resource[:storage_endpoint]
@@ -131,7 +133,8 @@ Puppet::Type.type(:cd4pe_root_config).provide(:ruby) do
     secret_key ||= resource[:artifactory_access_token]
 
     self.class.api_client.save_storage_settings(
-      provider, endpoint, bucket, prefix, access_key, secret_key)
+      provider, endpoint, bucket, prefix, access_key, secret_key
+    )
   end
 
   def save_endpoint_settings(resource)
@@ -139,7 +142,8 @@ Puppet::Type.type(:cd4pe_root_config).provide(:ruby) do
     backend_service_endpoint = resource[:backend_service_endpoint]
     agent_service_endpoint = resource[:agent_service_endpoint]
     self.class.api_client.save_endpoint_settings(
-      web_ui_endpoint, backend_service_endpoint, agent_service_endpoint)
+      web_ui_endpoint, backend_service_endpoint, agent_service_endpoint
+    )
   end
 
   def save_ssl_settings(resource)
@@ -148,11 +152,12 @@ Puppet::Type.type(:cd4pe_root_config).provide(:ruby) do
     ssl_authority_certificate = resource[:ssl_authority_certificate]
     ssl_server_private_key = resource[:ssl_server_private_key]
     self.class.api_client.save_ssl_settings(
-      ssl_authority_certificate, ssl_server_certificate, ssl_server_private_key, ssl_enabled)
+      ssl_authority_certificate, ssl_server_certificate, ssl_server_private_key, ssl_enabled
+    )
   end
 
-  def self.api_client
-    @api_client
+  class << self
+    attr_reader :api_client
   end
 
   def self.init_api_client(hostname, username, password)
