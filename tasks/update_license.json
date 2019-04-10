@@ -15,6 +15,7 @@
     },
     "root_password": {
       "type": "String",
+      "sensitive":true,
       "description": "The password associated with the CDPE root account."
     },
     "license": {

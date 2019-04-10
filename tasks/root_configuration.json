@@ -11,6 +11,7 @@
     },
     "root_password": {
       "type": "String",
+      "sensitive":true,
       "description": "The password to associate with the root account."
     },
     "web_ui_endpoint": {
@@ -47,10 +48,12 @@
     },
     "s3_secret_key": {
       "type": "Optional[String[1]]",
+      "sensitive":true,
       "description": "The AWS secret key that has access to the bucket. Required if using Amazon S3."
     },
     "artifactory_access_token": {
       "type": "Optional[String[1]]",
+      "sensitive":true,
       "description": "API token for your Artifactory instance. Required if using Artifactory."
     },
     "ssl_enabled": {
@@ -67,6 +70,7 @@
     },
     "ssl_server_private_key": {
       "type": "Optional[String[1]]",
+      "sensitive":true,
       "description": "Server Private Key for your SSL configuration. Required if SSL is enabled."
     },
     "ssl_endpoint": {
