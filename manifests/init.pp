@@ -12,6 +12,7 @@ class cd4pe (
   String $db_prefix                              = '',
   String $db_user                                = 'cd4pe',
   Boolean $manage_database                       = true,
+  Boolean $manage_pe_host_mapping                = true,
   String $resolvable_hostname                    = "http://${trusted['certname']}",
   Integer $web_ui_port                           = 8080,
 ){
@@ -121,7 +122,7 @@ class cd4pe (
   $master_server = $::settings::server
   $master_ip     = getvar('serverip')
 
-  if $master_ip {
+  if $master_ip and $manage_pe_host_mapping {
     $extra_params = ["--add-host ${master_server}:${master_ip}"] + $cd4pe_docker_extra_params
   } else {
     $extra_params = $cd4pe_docker_extra_params
