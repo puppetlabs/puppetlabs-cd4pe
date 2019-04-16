@@ -15,6 +15,7 @@ class cd4pe (
   Boolean $manage_pe_host_mapping                = true,
   String $resolvable_hostname                    = "http://${trusted['certname']}",
   Integer $web_ui_port                           = 8080,
+  Integer $web_ui_ssh_port                       = 8443,
 ){
   # Restrict to linux only?
   include ::docker
@@ -114,6 +115,7 @@ class cd4pe (
 
 
   $cd4pe_ports = [
+    "${web_ui_ssh_port}:8443",
     "${web_ui_port}:8080",
     "${backend_service_port}:8000",
     "${agent_service_port}:7000",
