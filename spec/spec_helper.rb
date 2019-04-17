@@ -10,11 +10,13 @@ require 'spec_helper_local' if File.file?(File.join(File.dirname(__FILE__), 'spe
 include RspecPuppetFacts
 
 default_facts = {
+  architecture: 'x86_64',
   osfamily: 'RedHat',
-  platform_tag: 'el-6-x86_64',
+  platform_tag: 'el-7-x86_64',
   operatingsystem: 'CentOS',
-  lsbmajdistrelease: '6',
-  operatingsystemrelease: '6.1',
+  lsbmajdistrelease: '7',
+  operatingsystemrelease: '7.1',
+  operatingsystemmajrelease: '7',
   is_pe: 'true',
   pe_concat_basedir: '/tmp/file',
   platform_symlink_writable: true,
@@ -69,9 +71,49 @@ PRE_COND
   end
 end
 
+module RSpec::Puppet
+  # Rspec-puppet has no support sensitive params...taken from open PR here:
+  # https://github.com/rodjek/rspec-puppet/pull/464/files
+  # A wrapper representing Sensitive data type, eg. in class params.
+  class Sensitive
+    # Create a new Sensitive object
+    # @param [Object] value to wrap
+    def initialize(value)
+      @value = value
+    end
+
+    # @return the wrapped value
+    def unwrap
+      @value
+    end
+
+    # @return true
+    def sensitive?
+      true
+    end
+
+    # @return inspect of the wrapped value, inside Sensitive()
+    def inspect
+      "Sensitive(#{@value.inspect})"
+    end
+
+    # Check for equality with another value.
+    # If compared to Puppet Sensitive type, it compares the wrapped values.
+
+    # @param other [#unwrap, Object] value to compare to
+    def ==(other)
+      if other.respond_to? :unwrap
+        unwrap == other.unwrap
+      else
+        super
+      end
+    end
+  end
+end
+
 RSpec.configure do |c|
   c.default_facts = default_facts
-  c.include Helpers
+  c.include Helpers, RSpec::Puppet::Sensitive
   c.before :each do
     # set to strictest setting for testing
     # by default Puppet runs at warning level
@@ -84,6 +126,14 @@ def ensure_module_defined(module_name)
     last_module.const_set(next_module, Module.new) unless last_module.const_defined?(next_module, false)
     last_module.const_get(next_module, false)
   end
+end
+
+# Helper to return value wrapped in Sensitive type.
+#
+# @param [Object] value to wrap
+# @return [RSpec::Puppet::Sensitive] a new Sensitive wrapper with the new value
+def sensitive(value)
+  RSpec::Puppet::Sensitive.new(value)
 end
 
 # 'spec_overrides' from sync.yml will appear below this line
