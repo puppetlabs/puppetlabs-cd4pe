@@ -40,9 +40,6 @@ Style/BlockDelimiters:
   Description: Prefer braces for chaining. Mostly an aesthetical choice. Better to
     be consistent then.
   EnforcedStyle: braces_for_chaining
-Style/ClassAndModuleChildren:
-  Description: Compact style reduces the required amount of indentation.
-  EnforcedStyle: compact
 Style/EmptyElse:
   Description: Enforce against empty else clauses, but allow `nil` for clarity.
   EnforcedStyle: empty
@@ -83,6 +80,8 @@ Style/Documentation:
   - spec/**/*
 Style/WordArray:
   EnforcedStyle: brackets
+Style/ClassAndModuleChildren:
+  Enabled: false
 Style/CollectionMethods:
   Enabled: true
 Style/MethodCalledOnDoEndBlock:
