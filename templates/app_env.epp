@@ -1,13 +1,4 @@
 <%- |
       Boolean $analytics,
-      String $db_host,
-      Integer $db_port,
-      String $db_name,
-      String $db_user,
-      String $db_prefix,
 | -%>
 ANALYTICS=<%= $analytics %>
-DB_ENDPOINT=mysql://<%= $db_host %>:<%= $db_port %>/<%= $db_name %>
-DB_USER=<%= $db_user %>
-DB_PREFIX=<%= $db_prefix %>
-
