@@ -1,0 +1,9 @@
+<%- |
+      String $db_ssl_root_cert,
+      String $db_ssl_cert,
+      String $db_ssl_key,
+| -%>
+DB_SSL_ROOT_CERT=<%= $db_ssl_root_cert%>
+DB_SSL_CERT=<%= $db_ssl_cert%>
+DB_SSL_KEY=<%= $db_ssl_key%>
+
