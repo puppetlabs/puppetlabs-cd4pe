@@ -30,6 +30,9 @@ RSpec.describe 'cd4pe::db' do
       end
 
       context 'postgres' do
+        let(:facts) do
+          { cd4pe_multimodule_packaging: true }
+        end
         let(:params) do
           {
             data_root_dir: '/etc/puppetlabs/cd4pe',

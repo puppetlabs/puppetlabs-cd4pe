@@ -24,6 +24,9 @@ fixtures:
         ref: origin/master
     translate:
         repo: "git@github.com:puppetlabs/puppetlabs-translate.git"
+    puppet_authorization:
+        repo: "git@github.com:puppetlabs/puppetlabs-puppet_authorization.git"
+        ref: origin/master
   symlinks:
      puppet_enterprise: "#{source_dir}/spec/fixtures/puppet-enterprise-modules/modules/puppet_enterprise"
      pe_concat: "#{source_dir}/spec/fixtures/puppet-enterprise-modules/modules/pe_concat"
@@ -32,5 +35,4 @@ fixtures:
      pe_inifile: "#{source_dir}/spec/fixtures/puppet-enterprise-modules/modules/pe_inifile"
      pe_hocon: "#{source_dir}/spec/fixtures/puppet-enterprise-modules/modules/pe_hocon"
      pe_puppet_authorization: "#{source_dir}/spec/fixtures/puppet-enterprise-modules/modules/pe_puppet_authorization"
-     puppet_authorization: "#{source_dir}/spec/fixtures/puppet-enterprise-modules/modules/puppet_authorization"
      cd4pe: "#{source_dir}"
