@@ -10,9 +10,25 @@ class cd4pe::db::postgres(
   String $ipv6_mask_allow_all_users_ssl   = '::/0',
 ) {
 
-  include puppet_enterprise::packages
 
-  if(versioncmp(pe_compiling_server_version(), '2019.1.0') >= 0) {
+  if(pe_compiling_server_version()) {
+    # This is being compiled via classification, so we can include
+    # the packages class and auto-determine the versioning
+    include puppet_enterprise::packages
+    if(versioncmp(pe_compiling_server_version(), '2019.1.0') >= 0) {
+      $multimodule_packaging = true
+    } else {
+      $multimodule_packaging = false
+    }
+  } else {
+    # this is a local puppet apply, which should be from our one click install
+    $multimodule_packaging = fact('cd4pe_multimodule_packaging')
+    if($multimodule_packaging == undef) {
+      fail('fact cd4pe_multimodule_packaging must be set if running via puppet apply')
+    }
+  }
+
+  if(any2bool($multimodule_packaging)) {
     $client_package_name = 'pe-postgresql96'
     $contrib_package_name = 'pe-postgresql96-contrib'
     $server_package_name = 'pe-postgresql96-server'
@@ -109,8 +125,6 @@ class cd4pe::db::postgres(
       require => Class['pe_postgresql::server']
   }
 
-  # create the razor tablespace
-  # create the razor database
   pe_postgresql::server::tablespace { $db_name:
     location => "${pgsqldir}/${pg_version}/${db_name}",
     require  => Class['pe_postgresql::server'],

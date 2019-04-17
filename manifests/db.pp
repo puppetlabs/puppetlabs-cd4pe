@@ -14,7 +14,7 @@ class cd4pe::db(
 
   if $manage_database {
     if $db_provider == undef {
-      # Check if the customer is using a mysql db from a previous instal
+      # Check if the customer is using a mysql db from a previous install
       $cd4pe_docker_facts = fact('docker.network.cd4pe.Containers')
       if !empty($cd4pe_docker_facts) {
         $cd4pe_mysql = $cd4pe_docker_facts.filter |$k, $v| { $v['Name'] == 'cd4pe_mysql' }.values
