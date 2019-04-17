@@ -1,3 +1,9 @@
 # Forward declarations of Ruby modules used for namespacing
-module PuppetX::Puppetlabs::CD4PEApi
+module PuppetX
+  #
+  module Puppetlabs
+    #
+    module CD4PEApi
+    end
+  end
 end
