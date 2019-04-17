@@ -19,9 +19,7 @@
     {
       "name":"puppetlabs-docker",
       "version_requirement": ">= 3.0.0 < 4.0.0"
-    },
-    { "name":"puppetlabs-puppet_enterprise" },
-    { "name":"puppetlabs-pe_postgres" }
+    }
   ],
   "operatingsystem_support": [
     {
