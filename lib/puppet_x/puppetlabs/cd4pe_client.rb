@@ -14,7 +14,7 @@ module PuppetX::Puppetlabs
     ROOT_STORAGE_SETTINGS = '/root/storage-settings'.freeze
     SIGNUP= '/signup'.freeze
 
-    def initialize(hostname, username, password)
+    def initialize(hostname, username=nil, password=nil)
       uri = URI.parse(hostname)
 
       @config = {
