@@ -12,6 +12,7 @@ module PuppetX::Puppetlabs
     ROOT_AJAX_ENDPOINT = '/root/ajax'.freeze
     ROOT_ENDPOINT_SETTINGS = '/root/endpoint-settings'.freeze
     ROOT_STORAGE_SETTINGS = '/root/storage-settings'.freeze
+    SIGNUP= '/signup'.freeze
 
     def initialize(hostname, username, password)
       uri = URI.parse(hostname)
@@ -23,8 +24,11 @@ module PuppetX::Puppetlabs
         username: username,
         password: password,
       }
-
-      set_cookie
+      
+      # Only set the cookie if creds are provided, otherwise, make unauthenticated requests
+      if @config[:username] and @config[:password]
+        set_cookie
+      end
     end
 
     def set_cookie
@@ -137,6 +141,20 @@ module PuppetX::Puppetlabs
       make_request(:post, ROOT_AJAX_ENDPOINT, payload.to_json)
     end
 
+    def create_user(email, username, password, first_name, last_name, company_name)
+      payload = {
+        op: 'PfiSignup',
+        content: {
+          email: email,
+          passwd: password,
+          username: username,
+          firstName: first_name,
+          lastName: last_name,
+          companyName: company_name,
+        }
+      }
+      make_request(:post, SIGNUP, payload.to_json)
+    end
     private
 
     def make_request(type, api_url, payload = '')
@@ -186,7 +204,7 @@ module PuppetX::Puppetlabs
       end
     end
 
-    # Helper method for returning a user friendly url for the CD4PE instance being used.
+      # Helper method for returning a user friendly url for the CD4PE instance being used.
     def service_url
       "#{@config[:scheme]}://#{@config[:server]}:#{@config[:port]}"
     end
