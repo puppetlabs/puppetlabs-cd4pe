@@ -2,24 +2,24 @@
     "description": "Creates a Continuous Delivery for PE User",
     "parameters": {
         "email": {
-            "type": "String",
+            "type": "String[1]",
             "description": "The email address to be associated with the new user"
         },
         "username": {
-            "type": "String",
+            "type": "String[1]",
             "description": "The username to assign the new user"
         },
         "password": {
-            "type": "String",
+            "type": "String[1]",
             "sensitive": true,
             "description": "The password associated with the new user"
         },
         "first_name": {
-            "type": "String",
+            "type": "String[1]",
             "description": "The first name to associate with the new user"
         },
         "last_name": {
-            "type": "String",
+            "type": "String[1]",
             "description": "The last name to associate with the new user"
         },
         "company_name": {
