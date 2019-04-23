@@ -1,6 +1,31 @@
 {
-    "description": "Creates a CDPE User",
+    "description": "Creates a Continuous Delivery for PE User",
     "parameters": {
+        "email": {
+            "type": "String",
+            "description": "The email address to be associated with the new user"
+        },
+        "username": {
+            "type": "String",
+            "description": "The username to assign the new user"
+        },
+        "password": {
+            "type": "String",
+            "sensitive": true,
+            "description": "The password associated with the new user"
+        },
+        "first_name": {
+            "type": "String",
+            "description": "The first name to associate with the new user"
+        },
+        "last_name": {
+            "type": "String",
+            "description": "The last name to associate with the new user"
+        },
+        "company_name": {
+            "type": "Optional[String[1]]",
+            "description": "Optionally associate a company name with the new user"
+        },
         "resolvable_hostname": {
             "type": "Optional[String[1]]",
             "description": "A resolvable internet address where the Continuous Delivery for PE server can be reached. Required only if the agent certificate is not the machine's resolvable internet address."
@@ -8,31 +33,6 @@
         "web_ui_endpoint": {
             "type": "Optional[String[1]]",
             "description": "The endpoint where the web UI can be reached, in the form http://<resolvable_hostname>:<port>. Required if you set the web_ui_port parameter in the cd4pe class during installation."
-        },
-        "email": {
-            "type": "String",
-            "description": "The email address to be associated with the new user"
-        },
-        "username": {
-            "type": "String",
-            "description": "The username to assign the new CDPE user"
-        },
-        "password": {
-            "type": "String",
-            "sensitive": true,
-            "description": "The password associated with the new CDPE user"
-        },
-        "first_name": {
-            "type": "String",
-            "description": "The first name to associate with the new CDPE user"
-        },
-        "last_name": {
-            "type": "String",
-            "description": "The last name to associate with the new CDPE user"
-        },
-        "company_name": {
-            "type": "Optional[String[1]]",
-            "description": "Optionally associate a company name with the new CDPE user"
         }
     },
     "input_method": "stdin"
