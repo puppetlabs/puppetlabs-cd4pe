@@ -12,7 +12,7 @@ module PuppetX::Puppetlabs
     ROOT_AJAX_ENDPOINT = '/root/ajax'.freeze
     ROOT_ENDPOINT_SETTINGS = '/root/endpoint-settings'.freeze
     ROOT_STORAGE_SETTINGS = '/root/storage-settings'.freeze
-    SIGNUP= '/signup'.freeze
+    SIGNUP_ENDPOINT = '/signup'.freeze
 
     def initialize(hostname, username=nil, password=nil)
       uri = URI.parse(hostname)

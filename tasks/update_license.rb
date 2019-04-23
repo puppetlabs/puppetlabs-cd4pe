@@ -14,6 +14,12 @@ username                 = params['root_email']
 password                 = params['root_password']
 license                  = params['license']
 
+uri = URI.parse(hostname)	
+
+hostname = "http://#{hostname}" if uri.scheme.nil?
+
+web_ui_endpoint = params['web_ui_endpoint'] || "#{hostname}:8080"
+
 begin
   client = PuppetX::Puppetlabs::CD4PEClient.new(web_ui_endpoint, username, password)
   res = client.save_license(license)
