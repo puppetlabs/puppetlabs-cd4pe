@@ -26,13 +26,13 @@ begin
   client = PuppetX::Puppetlabs::CD4PEClient.new(web_ui_endpoint)
   res = client.create_user(email, username, password, first_name, last_name, company_name)
   if res.code != '200'
-    raise Puppet::Error "Error while creating user: #{res.body}"
+    raise "Error while creating user: #{res.body}"
   end
 
-  puts 'Created user'
+  puts "Created user: #{username}"
 
   exit 0
-rescue Puppet::Error => e
+rescue Exception => e
   puts({ status: 'failure', error: e.message }.to_json)
   exit 1
 end
