@@ -21,18 +21,16 @@ uri = URI.parse(hostname)
 hostname = "http://#{hostname}" if uri.scheme.nil?
 
 web_ui_endpoint = params['web_ui_endpoint'] || "#{hostname}:8080"
-
+exitcode = 0 
 begin
   client = PuppetX::Puppetlabs::CD4PEClient.new(web_ui_endpoint)
   res = client.create_user(email, username, password, first_name, last_name, company_name)
   if res.code != '200'
     raise "Error while creating user: #{res.body}"
   end
-
   puts "Created user: #{username}"
-
-  exit 0
 rescue Exception => e
   puts({ status: 'failure', error: e.message }.to_json)
-  exit 1
+  exitcode = 1
 end
+exit exitcode
