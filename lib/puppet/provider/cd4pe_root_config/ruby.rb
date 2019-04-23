@@ -55,8 +55,8 @@ Puppet::Type.type(:cd4pe_root_config).provide(:ruby) do
 
     existing_configs = instances
     resources.keys.each do |config|
-      # rubocup:disable Lint/AssignmentInCondition
-      if provider == existing_configs.find { |c| c.resolvable_hostname.casecmp(config.downcase).zero? }
+      # rubocop:disable Lint/AssignmentInCondition,Performance/Casecmp
+      if provider = existing_configs.find { |c| c.resolvable_hostname.downcase == config.downcase }
         resources[config].provider = provider
       end
     end
