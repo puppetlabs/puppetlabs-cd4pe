@@ -13,14 +13,14 @@ module PuppetX::Puppetlabs
     ROOT_ENDPOINT_SETTINGS = '/root/endpoint-settings'.freeze
     ROOT_STORAGE_SETTINGS = '/root/storage-settings'.freeze
 
-    def initialize(hostname, username, password)
+    def initialize(hostname, email, password)
       uri = URI.parse(hostname)
 
       @config = {
         server: uri.host,
         port: uri.port || '8080',
         scheme: uri.scheme || 'http',
-        username: username,
+        email: email,
         password: password,
       }
 
@@ -31,7 +31,7 @@ module PuppetX::Puppetlabs
       content = {
         op: 'PfiLogin',
         content: {
-          email: @config[:username],
+          email: @config[:email],
           passwd: @config[:password],
         },
       }
@@ -39,6 +39,8 @@ module PuppetX::Puppetlabs
       response = make_request(:post, LOGIN_ENDPOINT, content.to_json)
       if response.code == '200'
         @cookie = response.response['set-cookie'].split(';')[0]
+        content = JSON.parse(response.body, symbolize_names: true)
+        @owner_ajax_endpoint = "/#{content[:username]}/ajax"
       elsif response.code == '401'
         begin
           resp = JSON.parse(response.body, symbolize_names: true)
@@ -72,7 +74,7 @@ module PuppetX::Puppetlabs
       payload = {
         op: 'CreateRootAccount',
         content: {
-          email: @config[:username],
+          email: @config[:email],
           passwd: @config[:password],
         },
       }
@@ -120,6 +122,106 @@ module PuppetX::Puppetlabs
         },
       }
       make_request(:post, ROOT_STORAGE_SETTINGS, payload.to_json)
+    end
+
+    def add_oauth_integration(provider, client_id, client_secret)
+      payload = {
+        op: 'AddOauthIntegration',
+        content: {
+          provider: provider,
+          publicKey: client_id,
+          privateKey: client_secret,
+        },
+      }
+      make_request(:post, ROOT_AJAX_ENDPOINT, payload.to_json)
+    end
+
+    def discover_pe_credentials(creds_name, pe_username, pe_password, pe_token, pe_console_host)
+      payload = {
+        op: 'DiscoverPuppetEnterpriseCredentials',
+        content: {
+          consoleHost: pe_console_host,
+          name: creds_name,
+          username: pe_username,
+          password: pe_password,
+          token: pe_token,
+          puppetServerCertificate: '',
+          puppetServerEndpoint: '',
+          puppetServerPrivateKey: '',
+        },
+      }
+      make_request(:post, @owner_ajax_endpoint, payload.to_json)
+    end
+
+    def add_control_repo(repo_provider, repo_org, source_repo_name, control_repo_name)
+      repos_res = search_source_repos(repo_provider, repo_org, source_repo_name)
+      if repos_res.code != '200'
+        raise Puppet::Error, "Error while searching for repository: #{repos_res.body}"
+      end
+      source_repos = JSON.parse(repos_res.body, symbolize_names: true)
+      raise Puppet::Error, "Aborting.. Could not find repository for name: #{repo_name}" if source_repos.empty?
+      raise Puppet::Error, "Aborting.. Found multiple repositories for repository name: #{repo_name}" if source_repos.length > 1
+      # There should only be one repo from the search
+      source_repo = source_repos[0]
+      payload = {
+        op: 'CreateControlRepo',
+        content: {
+          name: control_repo_name,
+          srcRepoDisplayName: source_repo[:repoDisplayName],
+          srcRepoDisplayOwner: source_repo[:ownerDisplayName],
+          srcRepoId: source_repo[:repoId],
+          srcRepoName: source_repo[:repoName],
+          srcRepoOwner: source_repo[:owner],
+          # The search API returns the value of the provider as an lowercase string. It needs to be uppercase when creating a control repo.
+          srcRepoProvider: source_repo[:provider].upcase,
+        },
+      }
+      make_request(:post, @owner_ajax_endpoint, payload.to_json)
+    end
+
+    def search_source_repos(repo_provider, repo_org, repo_name)
+      params = {
+        op: 'SearchSourceRepos',
+        provider: repo_provider,
+        org: repo_org,
+        search: repo_name,
+      }
+      api_uri = URI(@owner_ajax_endpoint)
+      api_uri.query = URI.encode_www_form(params)
+      make_request(:get, api_uri.to_s)
+    end
+
+    def create_pipeline(pipeline_name, control_repo_name, control_repo_branch)
+      # Default sources
+      sources = [
+        {
+          autoBuildTriggers: ['Commit'],
+          branch: control_repo_branch,
+          containerName: control_repo_branch,
+          trigger: 'SOURCE_REPOSITORY',
+        },
+      ]
+      payload = {
+        op: 'CreatePipeline',
+        content: {
+          controlRepoName: control_repo_name,
+          pipelineName: pipeline_name,
+          sources: sources,
+        },
+      }
+      make_request(:post, @owner_ajax_endpoint, payload.to_json)
+    end
+
+    def post_provider_webhook(source_repo_name, source_repo_owner, source_repo_provider)
+      payload = {
+        op: 'PostProviderWebhook',
+        content: {
+          srcRepoName: source_repo_name,
+          srcRepoOwner: source_repo_owner,
+          srcRepoProvider: source_repo_provider,
+        },
+      }
+      make_request(:post, @owner_ajax_endpoint, payload.to_json)
     end
 
     def save_ssl_settings(ssl_authority_certificate, ssl_server_certificate, ssl_server_private_key, ssl_enabled)
