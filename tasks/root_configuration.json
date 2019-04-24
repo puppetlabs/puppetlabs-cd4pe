@@ -1,5 +1,5 @@
 {
-  "description": "Applys the root configuration for CD4PE. Full documentation at http://docs-internal.puppet.com/docs/continuous-delivery/2.x-dev/install_module.html#task-7157",
+  "description": "Applys the root configuration for Continuous Delivery for PE. Full documentation at https://puppet.com/docs/continuous-delivery/2.x/install_module.html",
   "parameters": {
     "resolvable_hostname": {
       "type": "Optional[String[1]]",
