@@ -24,7 +24,7 @@
         },
         "company_name": {
             "type": "Optional[String[1]]",
-            "description": "Optional. associate a company name with the new user."
+            "description": "Optional. Associate a company name with the new user."
         },
         "resolvable_hostname": {
             "type": "Optional[String[1]]",
