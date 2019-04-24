@@ -1,30 +1,30 @@
 {
-    "description": "Creates a Continuous Delivery for PE User",
+    "description": "Creates a Continuous Delivery for PE user.",
     "parameters": {
         "email": {
             "type": "String[1]",
-            "description": "The email address to be associated with the new user"
+            "description": "The email address to be associated with the new user."
         },
         "username": {
             "type": "String[1]",
-            "description": "The username to assign the new user"
+            "description": "The new user's username."
         },
         "password": {
             "type": "String[1]",
             "sensitive": true,
-            "description": "The password associated with the new user"
+            "description": "The password associated with the new user."
         },
         "first_name": {
             "type": "String[1]",
-            "description": "The first name to associate with the new user"
+            "description": "The new user's first name."
         },
         "last_name": {
             "type": "String[1]",
-            "description": "The last name to associate with the new user"
+            "description": "The new user's last name."
         },
         "company_name": {
             "type": "Optional[String[1]]",
-            "description": "Optionally associate a company name with the new user"
+            "description": "Optional. associate a company name with the new user."
         },
         "resolvable_hostname": {
             "type": "Optional[String[1]]",
