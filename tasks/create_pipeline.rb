@@ -19,7 +19,6 @@ uri = URI.parse(hostname)
 hostname = "http://#{hostname}" if uri.scheme.nil?
 
 web_ui_endpoint = params['web_ui_endpoint'] || "#{hostname}:8080"
-control_repo_name ||= source_repo_name
 exitcode = 0
 begin
   client = PuppetX::Puppetlabs::CD4PEClient.new(web_ui_endpoint, username, password)
