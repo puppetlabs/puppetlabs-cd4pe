@@ -1,0 +1,43 @@
+{
+    "description": "Adds a Control Repository to the Continuous Delivery for PE account.",
+    "parameters": {
+        "email": {
+            "type": "String[1]",
+            "description": "The email address associated with the account."
+          },
+        "password": {
+            "type": "String[1]",
+            "sensitive": true,
+            "description": "The password associated with the account."
+        },
+        "repo_provider": {
+            "type": "Enum['github', 'gitlab', 'githubEnterprise', 'bitbucketServer', 'azureDevOps']",
+            "description": "The repository provider. Must be one of 'github', 'gitlab', 'githubEnterprise', 'bitbucketServer', or 'azureDevOps'."
+        },
+        "source_repo_org": {
+            "type": "String[1]",
+            "description": "The organization associated with the repository."
+        },
+        "source_repo_name": {
+            "type": "String[1]",
+            "description": "The name of the source repository."
+        },
+        "source_repo_branch": {
+            "type": "String[1]",
+            "description": "The default branch to use for the control repository."
+        },
+        "control_repo_name": {
+            "type": "Optional[String[1]]",
+            "description": "Optional. The friendly name to use for the control repository as referenced in Continous Delivery For PE. Defaults to 'source_repo_name'."
+        },
+        "resolvable_hostname": {
+            "type": "Optional[String[1]]",
+            "description": "A resolvable internet address where the Continuous Delivery for PE server can be reached. Required only if the agent certificate is not the machine's resolvable internet address."
+        },
+        "web_ui_endpoint": {
+            "type": "Optional[String[1]]",
+            "description": "The endpoint where the web UI can be reached, in the form http://<resolvable_hostname>:<port>. Required if you set the web_ui_port parameter in the cd4pe class during installation."
+        }
+    },
+    "input_method": "stdin"
+}
