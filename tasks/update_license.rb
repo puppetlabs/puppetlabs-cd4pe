@@ -19,17 +19,17 @@ hostname = "http://#{hostname}" if uri.scheme.nil?
 
 web_ui_endpoint = params['web_ui_endpoint'] || "#{hostname}:8080"
 
+exitcode = 0
 begin
   client = PuppetX::Puppetlabs::CD4PEClient.new(web_ui_endpoint, username, password)
   res = client.save_license(license)
   if res.code != '200'
-    raise Puppet::Error "Error while saving license: #{res.body}"
+    raise "Error while saving license: #{res.body}"
   end
 
   puts 'License updated'
-
-  exit 0
-rescue Puppet::Error => e
+rescue => e
   puts({ status: 'failure', error: e.message }.to_json)
-  exit 1
+  exitcode = 1
 end
+exit exitcode
