@@ -12,7 +12,9 @@ params = JSON.parse(STDIN.read)
 hostname                 = params['resolvable_hostname'] || Puppet[:certname]
 username                 = params['root_email']
 password                 = params['root_password']
-license                  = params['license']
+client_id                = params['client_id']
+client_secret            = params['client_secret']
+provider                 = params['provider']
 
 uri = URI.parse(hostname)
 hostname = "http://#{hostname}" if uri.scheme.nil?
@@ -22,12 +24,11 @@ web_ui_endpoint = params['web_ui_endpoint'] || "#{hostname}:8080"
 exitcode = 0
 begin
   client = PuppetX::Puppetlabs::CD4PEClient.new(web_ui_endpoint, username, password)
-  res = client.save_license(license)
+  res = client.add_oauth_integration(provider, client_id, client_secret)
   if res.code != '200'
-    raise "Error while saving license: #{res.body}"
+    raise "Error while adding VCS integration: #{res.body}"
   end
-
-  puts 'License updated'
+  puts "Added VCS integration for #{provider}"
 rescue => e
   puts({ status: 'failure', error: e.message }.to_json)
   exitcode = 1
