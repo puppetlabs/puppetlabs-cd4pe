@@ -16,8 +16,12 @@
 /log/
 /pkg/
 /spec/fixtures/manifests/
+!/spec/fixtures/modules/cd4pe_test_tasks
 /spec/fixtures/modules/
 /spec/fixtures/puppet-enterprise-modules
+/spec/fixtures/secrets/*
+!/spec/fixtures/secrets/README.md
+inventory.yaml
 /tmp/
 /vendor/
 /convert_report.txt
