@@ -27,6 +27,21 @@ fixtures:
     puppet_authorization:
         repo: "git@github.com:puppetlabs/puppetlabs-puppet_authorization.git"
         ref: origin/master
+    enterprise_tasks:
+        repo: "git@github.com:puppetlabs/enterprise_tasks.git"
+        ref: origin/master
+    pe_xl:
+        repo: "git@github.com:reidmv/reidmv-pe_xl.git"
+        ref: origin/master
+    provision:
+        repo: "git@github.com:puppetlabs/provision.git"
+        ref: origin/master
+    ruby_task_helper:
+        repo: "git@github.com:puppetlabs/puppetlabs-ruby_task_helper.git"
+        ref: origin/master
+    service:
+        repo: "git@github.com:puppetlabs/puppetlabs-service.git"
+        ref: origin/master
   symlinks:
      puppet_enterprise: "#{source_dir}/spec/fixtures/puppet-enterprise-modules/modules/puppet_enterprise"
      pe_concat: "#{source_dir}/spec/fixtures/puppet-enterprise-modules/modules/pe_concat"

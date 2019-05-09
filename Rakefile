@@ -1,9 +1,11 @@
 require 'puppetlabs_spec_helper/rake_tasks'
+require 'puppet_litmus/rake_tasks'
 require 'puppet-syntax/tasks/puppet-syntax'
 require 'puppet_blacksmith/rake_tasks' if Bundler.rubygems.find_name('puppet-blacksmith').any?
 require 'github_changelog_generator/task' if Bundler.rubygems.find_name('github_changelog_generator').any?
 require 'puppet-strings/tasks' if Bundler.rubygems.find_name('puppet-strings').any?
 require 'json'
+require 'bolt_spec/run'
 
 ignore_paths = ["checkouts/**/*", "dev/**/*", "dev-resources/**/*", "test/**/*", "src/**/*", "vendor/**/*", "spec/fixtures/**/*"]
 
@@ -194,4 +196,61 @@ end
 
 file MODULE_PKG => MODULE_PKG_SRCS do
   Rake::Task['build:module'].invoke
+end
+
+namespace :test_environment do
+
+  desc "Provision nodes for a CD4PE test environment"
+  task :provision do
+    Rake::Task['spec_prep'].invoke
+    Rake::Task['litmus:provision'].invoke('vmpooler', 'centos-7-x86_64')
+    Rake::Task['litmus:provision'].reenable
+    Rake::Task['litmus:provision'].invoke('vmpooler', 'centos-7-x86_64')
+  end
+
+	desc "Set up a test environment for CD4PE"
+	task :setup, [:environment_type, :pe_version, :pe_source_provider, :cd4pe_install_type, :cd4pe_image, :cd4pe_version] => :provision do |t, args|
+    # Provision some test nodes and perform installation/configuration of PE & CD4PE
+    include BoltSpec::Run
+    inventory_hash = inventory_hash_from_inventory_file
+    config_data = { 'modulepath' => File.join(Dir.pwd, 'spec', 'fixtures', 'modules') }
+    args.with_defaults(
+      :environment_type => 'acceptance',
+      :pe_version => '2019.1.0',
+      :pe_source_provider => 's3',
+      :cd4pe_install_type => 'installer_task',
+      :cd4pe_image => 'pcr-internal.puppet.net/pipelines/pfi',
+      :cd4pe_version => 'latest',
+    )
+    params = {
+      'environment_type' => args[:environment_type],
+      'pe_version' => args[:pe_version],
+      'pe_source_provider' => args[:pe_source_provider],
+      'cd4pe_install_type' => args[:cd4pe_install_type],
+      'cd4pe_image' => args[:cd4pe_image],
+      'cd4pe_version' => args[:cd4pe_version],
+    }
+    result = run_plan('cd4pe_test_tasks::setup_test_environment',
+      params,
+      config: config_data,
+      inventory: inventory_hash,
+      )
+    puts result
+  end
+
+	desc "Run the CD4PE acceptance tests"
+	task :test do
+	  # Run tests
+	end
+
+	desc "Teardown the CD4PE acceptance test hosts"
+	task :teardown do
+    # Teardown the test environment
+    inventory_hash = inventory_hash_from_inventory_file
+    targets = find_targets(inventory_hash, nil)
+    targets.each  { |t|
+      Rake::Task['litmus:tear_down'].invoke(t)
+      Rake::Task['litmus:tear_down'].reenable
+     }
+  end
 end
