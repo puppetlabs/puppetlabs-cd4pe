@@ -62,6 +62,7 @@ def restart_cd4pe
   puts 'cd4pe successfully restarted!'
 end
 
+exitcode = 0
 begin
   client = PuppetX::Puppetlabs::CD4PEClient.new(web_ui_endpoint, username, password)
   restart_after_configuration = false
@@ -102,9 +103,8 @@ begin
   end
 
   puts "Configuration complete! Navigate to #{web_ui_endpoint} to upload your CD4PE license and create your first user account."
-
-  exit 0
-rescue Puppet::Error => e
+rescue => e
   puts({ status: 'failure', error: e.message }.to_json)
-  exit 1
+  exitcode = 1
 end
+exit exitcode
