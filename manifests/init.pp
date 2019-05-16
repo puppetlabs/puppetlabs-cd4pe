@@ -19,7 +19,8 @@ class cd4pe (
   Integer $web_ui_ssl_port                       = 8443,
 ){
   # Restrict to linux only?
-  include ::docker
+  include docker
+  include cd4pe::anchors
 
   $data_root_dir = '/etc/puppetlabs/cd4pe'
 
@@ -96,15 +97,26 @@ class cd4pe (
     ports            => $cd4pe_ports,
     pull_on_start    => true,
     volumes          => ['cd4pe-object-store:/disk'],
+    net              => 'cd4pe',
     env_file         => [
       $app_env_path,
       $secret_key_path,
       "${data_root_dir}/db_env",
     ],
-    net              => 'cd4pe',
-    subscribe        => [
-      File[$app_env_path],
-    ],
+    subscribe        => File[$app_env_path],
     require          => $container_require,
+    before           => Anchor['cd4pe-service-install'],
+  }
+
+  # This exec is provided as a handle for root_config, which needs to refresh
+  # the service AFTER it's already been ensured running. Because the
+  # root_config class is optional and doesn't always exist (and when it does,
+  # THIS class doesn't always exist), the actual refresh will be handled
+  # through a constant anchor resource.
+  exec { 'cd4pe-service-refresh':
+    refreshonly => true,
+    path        => '/usr/bin:/bin',
+    command     => 'systemctl restart docker-cd4pe',
+    subscribe   => Anchor['cd4pe-service-refresh'],
   }
 }
