@@ -19,6 +19,14 @@ class cd4pe::root_config(
   Optional[String[1]] $ssl_endpoint                        = undef,
   Optional[Integer] $ssl_port                              = 8443,
 ) inherits cd4pe {
+  include cd4pe::anchors
+
+  # If SSL is enabled, trigger a refresh of the CD4PE service on config update.
+  # If SSL is not enabled, there's no need.
+  $notify = $ssl_enabled ? {
+    true    => Anchor['cd4pe-service-refresh'],
+    default => undef,
+  }
 
   cd4pe_root_config { $web_ui_endpoint:
     root_email                => $root_email,
@@ -39,6 +47,8 @@ class cd4pe::root_config(
     ssl_server_private_key    => $ssl_server_private_key,
     ssl_endpoint              => $ssl_endpoint,
     ssl_port                  => $ssl_port,
-    notify                    => Docker::Run['cd4pe'],
+    require                   => Anchor['cd4pe-service-install'],
+    notify                    => $notify,
   }
+
 }
