@@ -401,6 +401,49 @@ _Setup_:
 
 
 ## Control Repo Setup
+[Docs](https://puppet.com/docs/continuous-delivery/2.x/setting_up.html#task-3948)
+
+_DOCS_: Link to [control repo docs](https://puppet.com/docs/pe/2019.1/control_repo.html) in this task.
+
+_DOCS_: Other control repo documentation instructs the user to use `production`
+as the default branch rather than `master`.  Further explanation here (or a link to further explanation)
+about the CD4PE branching and how `production` fits in should be included here.
+
+
+### Azure
+TBD
+
+
+### Bitbucket
+TBD
+
+
+### GitHub
+
+_Setup_:
+* Create GitHub control repo
+* Enable source control integration for appropriate GitHub
+* Navigate to `http://<cd4pe-instance>:<web-ui-port>/<username>/repositories`
+* Click Add Control Repo button
+
+|  Test Name | Steps  |  Expected Result |  Notes |
+| :--------- | :----- | :--------------- | :----- |
+| Verify OAuth redirect | 1. Select 'GitHub' from list <BR> 2. Click Add Credentials button | Browser should be redirected to GitHub OAuth Application authorization page: <BR> * _Organizations and teams_ should set to 'Read-only access' <BR> _Repositories_ should be set to 'Public and private' <BR> _Personal User Data_ should be set to 'Email addresses (read-only)' | |
+| Verify organization redirect | 1. Successfully perform 'Verify OAuth redirect' test <BR> 2. Click 'Authorize' button <BR> 3. Submit GitHub password if instructed | Browser should be redirected to cd4pe 'Add Control Repo' dialog with a 'Select Organization' prompt containing the user and organizations associated with the GitHub OAuth application | |
+| Verify organization selection | 1. Successfully perform 'Verify organization redirect' test <BR> 2. Select username in 'Select organization' list | 'Select repository' selection should appear | |
+| Verify repository selection | 1. Successfully perform 'Verify organization selection' test <BR> 2. Select control repo in 'Select repository' list | 'Create master branch from' selection should appear | _UX_: Should the repos in the list be sorted alphabetically? |
+| Verify create master branch from selection | 1. Successfully perform 'Verify repository selection' test <BR> 2. Select the main branch in 'Select branch' list  | 1. 'Control repo name' field should appear and be pre-populated with the control repo name <BR> 2. 'Add' button should appear | |
+| Verify add control repo | 1. Successfully perform 'Verify create master branch from selection' test <BR> 2. Click Add button | Control repo object should be created in CD4PE and browser should be redirected to `http://<cd4pe-instance>:<web-ui-port>/<username>/repositories/<repo-name>`| |
+| Verify delete control repo | 1. Successfully perform 'Verify add control repo' test <BR> 2. Navigate to `http://<cd4pe-instance>:<web-ui-port>/<username>/repositories` 3. Click trash-can icon for control repo | Deletion confirmation modal should appear
+| Verify delete control repo button | 1. Successfully perform 'Verify delete control repo' test <BR> 2. Click Delete button | Control repo should be absent from list | |
+| Verify no control repos | 1. Delete all control repos | 1. Control repo list should be empty <BR> 2. 'Add control repository' step in setup checklist should be unchecked | |
+
+
+### GitHub Enterprise
+TBD
+
+
+### GitLab
 TBD
 
 
