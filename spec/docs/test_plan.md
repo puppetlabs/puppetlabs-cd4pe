@@ -293,7 +293,9 @@ _Setup_: Navigate to http://<cd4pe-instance.:<web-ui-port>/signup
 
 
 ## Create User Account
-TBD
+Tested as per initial user
+
+_UX_: If the user has proceeded with the "root" account and logged in, there is not an obvious path for creating a user account.  This can be accomplished by logging out and clicking the "Create an account" link on the sign in screen, but this is not intuitive while following the documentation.
 
 
 ## Source Control Integration
@@ -331,12 +333,71 @@ _BUG_: Cannot reproduce. The application successfully processes invalid integrat
 Please contact the site administrator for support along with errorId=[md5:1271bc29cb3b5fcc912da3c4154673bb 2019-06-10 16:57 06y2xeofaekf30tbgl2xt5qsng]
 ```
 
+
 ### GitHub Enterprise
 TBD
 
 
 ### GitLab
 TBD
+
+## PE Integration
+_Setup_: Create "Continuous Delivery" user as per [docs](https://puppet.com/docs/continuous-delivery/2.x/integrate_with_puppet_enterprise.html#task-1594).
+
+_UX_: For PE integrations, this should be performed by the install process.
+
+_Setup_: Add PE credentials to CD4PE as per [docs](https://puppet.com/docs/continuous-delivery/2.x/integrate_with_puppet_enterprise.html#task-7458).
+
+_Setup_: Enable code manager in PE as per [docs](https://puppet.com/docs/pe/2019.1/code_mgr_config.html#code-mgr-enable)
+
+_DOCS_: Notify the user on this page that code manager must be enabled and link to instructions
+
+_Docs_: It should be pointed out in the [docs](https://puppet.com/docs/continuous-delivery/2.x/integrate_with_puppet_enterprise.html#task-7458) that this step cannot be performed by the CD4PE "root" user.
+
+_Setup_:
+* Login to CD4PE as a non-root user
+* Navigate to http://<cd4pe-instance.:<web-ui-port>/<username>/settings/puppet-enterprise
+* Click Add Credentials button
+
+|  Test Name | Steps  |  Expected Result |  Notes |
+| :--------- | :----- | :--------------- | :----- |
+| Verify required fields - must be filled in | 1. Leave all fields blank <BR> 2. Click Save Changes button | Credential setting should fail, reporting that the required fields have not been populated | |
+| Verify Name field - minimum (1) | 1. Leave field blank <BR> 2. Fill in other fields <BR> 3. Click Save Changes button | Credential setting should fail, reporting that the field must be populated | |
+| Verify Name field - maximum (?)  | 1. Fill field with string exceeding maximum <BR> 2. Fill in other fields <BR> 3. Click Save Changes button | Credential setting should fail, reporting the maximum acceptable length | |
+| Verify Name field - character set (utf-8)  | 1. Fill field with '©®' <BR> 2. Fill in other fields <BR> 3. Click Save Changes button | Credential setting should proceed to verify PE authentication | |
+| Verify Name field - valid  | 1. Fill field with 'a' <BR> 2. Fill in other fields <BR> 3. Click Save Changes button | Credential setting should proceed to verify PE authentication | |
+| Verify PE console address field - minimum (1) | 1. Leave field blank <BR> 2. Fill in other fields <BR> 3. Click Save Changes button | Credential setting should fail, reporting that the field must be populated | |
+| Verify PE console address field - invalid url  | 1. Fill field with 'a' <BR> 2. Fill in other fields <BR> 3. Click Save Changes button | Credential setting should fail, reporting that value is an invalid url | _UX_: Recommend help link. _UX_: Strip out echo of "java.net.UnknownHostException" from error notice |
+| Verify PE console address field - Supports multilingual domain  | 1. Fill field with 'http://스타벅스코리아.com/' <BR> 2. Fill in other fields <BR> 3. Click Save Changes button | Credential setting should resolve the domain (116.126.86.86) but fail to authenticate | |
+| Verify PE console address field - should protect against semantic url attacks   | 1. Fill field with 'https://my.pe.server.org/evil/endpoint?resetpassord=true&user=admin' <BR> 2. Fill in other fields <BR> 3. Click Save Changes button | Credential setting should fail, reporting that value is an invalid url | |
+| Verify PE console address field - valid  | 1. Fill field with 'https://<pe-console-server>' <BR> 2. Fill in other fields <BR> 3. Click Save Changes button | Credential setting should proceed to verify PE authentication | |
+| Verify Username field - minimum (1) | 1. Leave field blank <BR> 2. Fill in other fields <BR> 3. Click Save Changes button | Credential setting should fail, reporting that the field must be populated | |
+| Verify Username field - maximum (?)  | 1. Fill field with string exceeding maximum <BR> 2. Fill in other fields <BR> 3. Click Save Changes button | Credential setting should fail, reporting the maximum acceptable length | |
+| Verify Username field - character set (utf-8)  | 1. Fill field with '©®' <BR> 2. Fill in other fields <BR> 3. Click Save Changes button | Credential setting should proceed to verify PE authentication | |
+| Verify Username field - valid  | 1. Fill field with 'a' <BR> 2. Fill in other fields <BR> 3. Click Save Changes button | Credential setting should proceed to verify PE authentication | |
+| Verify Password field - minimum (1) | 1. Leave field blank <BR> 2. Fill in other fields <BR> 3. Click Save Changes button | Credential setting should fail, reporting that the field must be populated | |
+| Verify Password field - maximum (?)  | 1. Fill field with string exceeding maximum <BR> 2. Fill in other fields <BR> 3. Click Save Changes button | Credential setting should fail, reporting the maximum acceptable length | |
+| Verify Password field - character set (utf-8)  | 1. Fill field with '©®' <BR> 2. Fill in other fields <BR> 3. Click Save Changes button | Credential setting should proceed to verify PE authentication | |
+| Verify Password field - valid  | 1. Fill field with 'a' <BR> 2. Fill in other fields <BR> 3. Click Save Changes button | Credential setting should proceed to verify PE authentication | |
+| Verify Token Lifetime (months/years) fields - exclusive (months) | 1. Fill years field with '1' <BR> 2. Fill in months field with '1' | Months field should override years field| |
+| Verify Token Lifetime (months/years) fields - exclusive (years) | 1. Fill months field with '1' <BR> 2. Fill in years field with '1' | Years field should override months field| |
+| Verify Token Lifetime (months) field - minimum (1) | 1. Leave field blank <BR> 2. Fill in other fields except for Token Lifetime (Years) <BR> 3. Click Save Changes button | Credential setting should fail, reporting that the field must be populated | |
+| Verify Token Lifetime (months) field - non-zero | 1. Fill field with '0' <BR> 2. Fill in other fields except for Token Lifetime (Years) <BR> 3. Click Save Changes button | Credential setting should fail, reporting that the field must be greater than zero | |
+| Verify Token Lifetime (months) field - positive | 1. Fill field with '-1' <BR> 2. Fill in other fields except for Token Lifetime (Years) <BR> 3. Click Save Changes button | Credential setting should fail, reporting that the field must be greater than zero | |
+| Verify Token Lifetime (months) field - number | 1. Fill field with 'hello' <BR> 2. Fill in other fields except for Token Lifetime (Years) <BR> 3. Click Save Changes button | Credential setting should fail, reporting that the field must be greater than zero | |
+| Verify Token Lifetime (months) field - maximum (?)  | 1. Fill field with string exceeding maximum <BR> 2. Fill in other fields except for Token Lifetime (Years)<BR> 3. Click Save Changes button | Credential setting should fail, reporting the maximum acceptable length | |
+| Verify Token Lifetime (months) field - Valid  | 1. Fill field with '1' <BR> 2. Fill in other fields except for Token Lifetime (Years)<BR> 3. Click Save Changes button |  Credential setting should proceed to verify PE authentication | |
+| Verify Token Lifetime (years) field - minimum (1) | 1. Leave field blank <BR> 2. Fill in other fields except for Token Lifetime (Months) <BR> 3. Click Save Changes button | Credential setting should fail, reporting that the field must be populated | |
+| Verify Token Lifetime (years) field - non-zero | 1. Fill field with '0' <BR> 2. Fill in other fields except for Token Lifetime (Months) <BR> 3. Click Save Changes button | Credential setting should fail, reporting that the field must be greater than zero | |
+| Verify Token Lifetime (years) field - positive | 1. Fill field with '-1' <BR> 2. Fill in other fields except for Token Lifetime (Months) <BR> 3. Click Save Changes button | Credential setting should fail, reporting that the field must be greater than zero | |
+| Verify Token Lifetime (years) field - number | 1. Fill field with 'hello' <BR> 2. Fill in other fields except for Token Lifetime (Months) <BR> 3. Click Save Changes button | Credential setting should fail, reporting that the field must be greater than zero | |
+| Verify Token Lifetime (years) field - maximum (?)  | 1. Fill field with string exceeding maximum <BR> 2. Fill in other fields except for Token Lifetime (Months)<BR> 3. Click Save Changes button | Credential setting should fail, reporting the maximum acceptable length | |
+| Verify Token Lifetime (years) field - Valid  | 1. Fill field with '1' <BR> 2. Fill in other fields except for Token Lifetime (Months)<BR> 3. Click Save Changes button |  Credential setting should proceed to verify PE authentication | |
+| Verify API Token field - minimum (1) | 1. Leave field blank <BR> 2. Fill in other fields <BR> 3. Click Save Changes button | Credential setting should fail, reporting that the field must be populated | |
+| Verify API Token field - maximum (45)  | 1. Fill field with string exceeding 45 characters <BR> 2. Fill in other fields <BR> 3. Click Save Changes button | Credential setting should fail, reporting an invalid token was entered | |
+| Verify API Token field - invalid character set (utf-8)  | 1. Fill field with '©®' <BR> 2. Fill in other fields <BR> 3. Click Save Changes button | Credential setting should fail, reporting an invalid token was entered | |
+| Verify API Token field - valid  | 1. Fill field with '0DN133wZZvN4ZEqLgYW8Gzmk4u1l5vmswlwgqpdBY1Ls' <BR> 2. Fill in other fields <BR> 3. Click Save Changes button | Credential setting should proceed to verify PE authentication | |
+| Verify integration - valid  | 1. Fill all fields with legit PE credentials  <BR> 2. Click Save Changes button | Credential setting should succeed PE authentication | |
 
 
 ## Control Repo Setup
