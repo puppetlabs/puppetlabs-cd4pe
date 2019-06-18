@@ -230,10 +230,12 @@ TBD
 
 ### Configure endpoint
 
-http://ip-10-227-0-212.amz-dev.puppet.net:8080/configure
-A test license can be downloaded locally from:
-https://github.com/puppetlabs/pipelines-self-paced/blob/master/cd4pe/assets/license.json
+_Setup_:
+* Navigate to `http://<cd4pe-instance>:<web-ui-port>/configure`
+* Download [test license](https://github.com/puppetlabs/pipelines-self-paced/blob/master/cd4pe/assets/license.json)
 
+
+Note: [CDPE-1639](https://tickets.puppetlabs.com/browse/CDPE-1639)
   * Test input
   * Test reload scenarios
      * FAILED: When license has already been uploaded, the configure endpoint
@@ -243,7 +245,6 @@ https://github.com/puppetlabs/pipelines-self-paced/blob/master/cd4pe/assets/lice
 ```
 You do not have access to this operation. Please contact an administrator to gain access.
 ```
-https://tickets.puppetlabs.com/browse/CDPE-1639
 
 This endpoint provides several forms for configuration:
   * Endpoints
@@ -252,15 +253,15 @@ This endpoint provides several forms for configuration:
 
 |  Test Name |  Steps |  Expected Result |  Notes |
 | :--------- | :----- | :--------------- | :----- |
-| Verify license - should provide understandable error (invalid json) | 1. Create empty text file on local machine <BR> 2. Navigate to http://<cd4pe-instance.:<web-ui-port>/configure  <BR> 3. Click 'License' 4. Click Choose button 5. Select file 6. Click Submit License button | License application should fail, reporting that license file is invalid  | |
-| Verify license - should provide understandable error (invalid license schema) | 1. Create json file on local machine with contents of '{}' <BR> 2. Navigate to http://<cd4pe-instance.:<web-ui-port>/configure  <BR> 3. Click 'License' 4. Click Choose button 5. Select file 6. Click Submit License button | License application should fail, reporting that license file is invalid  | |
-| Verify license - should provide understandable error (invalid license) | 1. Create json file on local machine with contents of '{ "document": { "address": "", "companyName": "", "contactEmail": "", "contactName": "", "created": "", "eula": "", "expiration": "", "id": "", "nodes": "", "projects": "", "servers": "", "type": "" }, "signature": "", "eula": "" }' <BR> 2. Navigate to http://<cd4pe-instance.:<web-ui-port>/configure  <BR> 3. Click 'License' 4. Click Choose button 5. Select file 6. Click Submit License button | License application should fail, reporting that license is invalid  | |
+| Verify license - should provide understandable error (invalid json) | 1. Create empty text file on local machine <BR> 2. Navigate to `http://<cd4pe-instance.:<web-ui-port>/configure`  <BR> 3. Click 'License' 4. Click Choose button 5. Select file 6. Click Submit License button | License application should fail, reporting that license file is invalid  | |
+| Verify license - should provide understandable error (invalid license schema) | 1. Create json file on local machine with contents of '{}' <BR> 2. Navigate to `http://<cd4pe-instance>:<web-ui-port>/configure`  <BR> 3. Click 'License' 4. Click Choose button 5. Select file 6. Click Submit License button | License application should fail, reporting that license file is invalid  | |
+| Verify license - should provide understandable error (invalid license) | 1. Create json file on local machine with contents of '{ "document": { "address": "", "companyName": "", "contactEmail": "", "contactName": "", "created": "", "eula": "", "expiration": "", "id": "", "nodes": "", "projects": "", "servers": "", "type": "" }, "signature": "", "eula": "" }' <BR> 2. Navigate to `http://<cd4pe-instance>:<web-ui-port>/configure`  <BR> 3. Click 'License' 4. Click Choose button 5. Select file 6. Click Submit License button | License application should fail, reporting that license is invalid  | |
 | Verify login - should reject invalid credentials (root) | 1. Submit valid license file 2. Click 'or continue to manage configurations as root' 3. Enter 'foo' in Email field 4. Enter 'bar' in Password field 5. Click  Sign In button | Login should fail, reporting that credentials are unknown | |
 | Verify login - should accept valid credentials (root) | 1. Submit valid license file 2. Click 'or continue to manage configurations as root' 3. Enter email used during installation in Email field 4. Enter password used during installation in Password field 5. Click  Sign In button | Login should succeed | _UX:_ The usage of "root" is not used during installation via integrations.  During installation, this is refered to as the "Continuous Delivery for PE administrator" account.  These terms should be consistent. |
 
 
 ### Create initial user
-_Setup_: Navigate to http://<cd4pe-instance.:<web-ui-port>/signup
+_Setup_: Navigate to `http://<cd4pe-instance>:<web-ui-port>/signup`
 
 |  Test Name | Steps  |  Expected Result |  Notes |
 | :--------- | :----- | :--------------- | :----- |
@@ -312,7 +313,7 @@ TBD
 ### GitHub
 _Setup_:
 * [Create GitHub OAuth](https://developer.github.com/apps/building-oauth-apps/creating-an-oauth-app/)
-* Navigate to http://<cd4pe-instance.:<web-ui-port>/root/settings
+* Navigate to `http://<cd4pe-instance>:<web-ui-port>/root/settings`
 * Click Integrations link
 
 _DOCS_: [Docs](https://puppet.com/docs/continuous-delivery/2.x/integrations.html#integrate-github)
@@ -356,7 +357,7 @@ _Docs_: It should be pointed out in the [docs](https://puppet.com/docs/continuou
 
 _Setup_:
 * Login to CD4PE as a non-root user
-* Navigate to http://<cd4pe-instance.:<web-ui-port>/<username>/settings/puppet-enterprise
+* Navigate to `http://<cd4pe-instance>:<web-ui-port>/<username>/settings/puppet-enterprise`
 * Click Add Credentials button
 
 |  Test Name | Steps  |  Expected Result |  Notes |
