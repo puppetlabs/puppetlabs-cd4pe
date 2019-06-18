@@ -308,8 +308,28 @@ TBD
 
 
 ### GitHub
-TBD
+_Setup_:
+* [Create GitHub OAuth](https://developer.github.com/apps/building-oauth-apps/creating-an-oauth-app/)
+* Navigate to http://<cd4pe-instance.:<web-ui-port>/root/settings
+* Click Integrations link
 
+_DOCS_: [Docs](https://puppet.com/docs/continuous-delivery/2.x/integrations.html#integrate-github)
+indicate that CD4PE provides the "Authorization callback URL" for the OAuth App,
+but no guidance is provided for the "Homepage URL".
+
+
+|  Test Name | Steps  |  Expected Result |  Notes |
+| :--------- | :----- | :--------------- | :----- |
+| Verify integration - valid | 1. Fill Client ID field with valid value <BR> 2. Fill Client Secret field with valid value <BR> 3. Click Add link 4. Click Add Integration button | Integration should succeed (How can integration be verified?). | _DOCS_: GitHub authorization follow up does not occur. Terminology in docs does not match current UI.  _UX_: The done button after this interaction seems unnecessary |
+| Verify integration - invalid | 1. Fill Client ID field with invalid value <BR> 2. Fill Client Secret field with invalid value <BR> 3. Click Add link 4. Click Add Integration button | Integration should fail, reporting unable to authenticate with OAuth application | |
+| Verify integration - removal | 1. Fill Client ID field with valid value <BR> 2. Fill Client Secret field with valid value <BR> 3. Click Add link 4. Click Remove link 5. Click Remove Integration button | Integration should be successfully removed | |
+| Verify Client ID field - minimum (1)  | 1. Leave Client ID field blank <BR> 2. Fill Client Secret field with valid value <BR> 3. Click Add link | Add link should be disabled | |
+| Verify Client Secret field - minimum (1)  | 1. Fill Client ID field with valid value <BR> 2. Leave Client Secret field blank <BR> 3. Click Add link | Add link should be disabled | |
+
+_BUG_: Cannot reproduce. The application successfully processes invalid integration values. I was then not able to remove them in a subsequent transaction.
+```
+Please contact the site administrator for support along with errorId=[md5:1271bc29cb3b5fcc912da3c4154673bb 2019-06-10 16:57 06y2xeofaekf30tbgl2xt5qsng]
+```
 
 ### GitHub Enterprise
 TBD
