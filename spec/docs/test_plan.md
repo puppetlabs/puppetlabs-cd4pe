@@ -227,6 +227,8 @@ TBD
 
 ## Initial Login
 
+_UX_: The yellow text on the web ui pages evokes link text.  At small sizes, it is also harder to read.  Suggest using bold for emphasis instead.
+
 
 ### Configure endpoint
 
@@ -297,6 +299,8 @@ _Setup_: Navigate to `http://<cd4pe-instance>:<web-ui-port>/signup`
 Tested as per initial user
 
 _UX_: If the user has proceeded with the "root" account and logged in, there is not an obvious path for creating a user account.  This can be accomplished by logging out and clicking the "Create an account" link on the sign in screen, but this is not intuitive while following the documentation.
+
+_UX_: What is the expected session length?  Currently, user sessions do not seem to expire.  Is this considered a security issue?
 
 
 ## Source Control Integration
