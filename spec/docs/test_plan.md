@@ -448,7 +448,39 @@ TBD
 
 
 ## Add Job Hardware
-TBD
+[Docs](https://puppet.com/docs/continuous-delivery/2.x/configure_job_hardware.html)
+
+_DOCS_: Order of configuration docs
+* Required v optional: job hardware v impact analysis
+* Order to reduce impact (e.g. Configure SSL requires reinstall of distelli agent, so it should come before job hardware doc)
+* Order docs to match setup ux:
+  # Integrate Puppet Enterprise
+  # Integrate source control
+  # Set up job hardware
+  # Add control repository
+  # Create a pipeline
+
+_Setup_:
+* Provision linux host
+* Provision windows host
+* Navigate to `http://<cd4pe-instance>:<web-ui-port>/<username>/job-hardware`
+
+|  Test Name | Steps  |  Expected Result |  Notes |
+| :--------- | :----- | :--------------- | :----- |
+| Verify Add Job Hardware button (\*nix) | 1. Click Job Hardware button | Modal should appear with shell commands listed for \*nix by default | _UX_: Provide guidance about credentials that should be entered when running `distelli agent install` |
+| Verify Add Job Hardware button (windows) | 1. Successfully perform 'Verify Add Job Hardware button (\*nix)' test <BR>  2. Click 'Windows' link | Shell commands listed for windows should appear | _UX_: Instruction for 'SSH' should be 'Remote Desktop' _UX_: Link text is no different than regular text. |
+| Verify distelli install (\*nix) | 1. Successfully perform 'Verify Add Job Hardware button (\*nix)' test <BR>  2. SSH to linux host as root <BR>  3. Run first command displayed in CD4PE | Command should successfully complete;  STDOUT should include `To install the agent, run` | |
+| Verify distelli agent install (\*nix) | 1. Successfully perform 'Verify distelli install (\*nix)' test <BR>  2. SSH to linux host as root <BR>  3. Run second command displayed in CD4PE | Command should successfully complete;  STDOUT should include `Starting Distelli supervisor` | |
+| Verify distelli agent install (\*nix distelli.yml)  | 1. Successfully perform 'Verify distelli install (\*nix)' test <BR>  2. Navigate to `http://<cd4pe-instance>:<web-ui-port>/<username>/settings/agent` <BR>  3. Click 'Create Credential' link <BR>  4. SSH to linux host as root <BR> 5. Create a `distelli.yml` file on the host containing `---\nDistelliAccessToken: <MY_ACCESS_TOKEN>\nDistelliSecretKey: <MY_SECRET_KEY>` where the token and key are copied from the generated credential in step 3 <BR> 6. Run second command displayed in CD4PE, appending `-conf <PATH_TO_DISTELLI.YML_FILE>` to the command | Command should successfully complete;  STDOUT should include `To install the agent, run` | |
+| Verify distelli install (windows) | 1. Successfully perform 'Verify Add Job Hardware button (windows)' test <BR>  2. Remote Desktop to windows host as Administrator <BR>  3. Run first command displayed in CD4PE in a command window | Command should successfully complete; STDOUT should include `To install the agent, run` | |
+| Verify distelli agent install (windows) | 1. Successfully perform 'Verify distelli install (windows)' test <BR>  2. Remote Desktop to windows host as Administrator <BR>  3. Run second command displayed in CD4PE in a command window | Command should successfully complete; | _UX_: No indication in output that the command did the needful. |
+| Verify distelli agent install (windows distelli.yml)  | 1. Successfully perform 'Verify distelli install (windows)' test <BR>  2. Navigate to `http://<cd4pe-instance>:<web-ui-port>/<username>/settings/agent` <BR>  3. Click 'Create Credential' link <BR>  4. Remote Desktop to windows host as Administrator <BR> 5. Create a `distelli.yml` file on the host containing `---\r\nDistelliAccessToken: <MY_ACCESS_TOKEN>\r\nDistelliSecretKey: <MY_SECRET_KEY>` where the token and key are copied from the generated credential in step 3 <BR> 6. Run second command displayed in CD4PE, appending `-conf <PATH_TO_DISTELLI.YML_FILE>` to the command | Command should successfully complete; | _UX_: No indication in output that the command did the needful. |
+| Verify Active toggle | 1. Successfully perform 'Verify distelli agent install (\*nix)' test <BR>  2. Reload `http://<cd4pe-instance>:<web-ui-port>/<username>/job-hardware` <BR>  3. Click 'Job Hardware Active' | Toggle should turn green | |
+| Verify Capability field - minimum (1)  | 1. Successfully perform 'Verify distelli agent install (\*nix)' <BR>  2. Reload `http://<cd4pe-instance>:<web-ui-port>/<username>/job-hardware` <BR> 3. Click 'Add Capability' link for hardware <BR>  4. Leave field blank  5. Click Save link | Capability form should remain open | |
+| Verify Capability field - maximum (?)  | 1. Successfully perform 'Verify distelli agent install (\*nix)' <BR>  2. Reload `http://<cd4pe-instance>:<web-ui-port>/<username>/job-hardware` <BR> 3. Click 'Add Capability' link for hardware <BR>  4. Fill field with string exceeding maximum  5. Click Save link | Save should fail,  reporting the maximum acceptable length  | |
+| Verify Capability field - utf-8  | 1. Successfully perform 'Verify distelli agent install (\*nix)' <BR>  2. Reload `http://<cd4pe-instance>:<web-ui-port>/<username>/job-hardware` <BR> 3. Click 'Add Capability' link for hardware <BR>  4. Fill field with '©®@a.b'  5. Click Save link | Save should succeed | |
+| Verify Capability field - db-inject  | 1. Successfully perform 'Verify distelli agent install (\*nix)' <BR>  2. Reload `http://<cd4pe-instance>:<web-ui-port>/<username>/job-hardware` <BR> 3. Click 'Add Capability' link for hardware <BR>  4. Fill field with "evil'ex"  5. Click Save link | Save should succeed  | _UX_: Should the '+Add Capability' link be hidden while the form is open since the form cannot opened multiple times? |
+
 
 
 ## Pipelines
