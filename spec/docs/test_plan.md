@@ -226,7 +226,70 @@ TBD
 
 
 ## Initial Login
-TBD
+
+
+### Configure endpoint
+
+http://ip-10-227-0-212.amz-dev.puppet.net:8080/configure
+A test license can be downloaded locally from:
+https://github.com/puppetlabs/pipelines-self-paced/blob/master/cd4pe/assets/license.json
+
+  * Test input
+  * Test reload scenarios
+     * FAILED: When license has already been uploaded, the configure endpoint
+       still prompts for license.
+     * FAILED: Uploading duplicate license cannot be completed. Replies with the
+       following error when trying to accept the License Aggreement.
+```
+You do not have access to this operation. Please contact an administrator to gain access.
+```
+https://tickets.puppetlabs.com/browse/CDPE-1639
+
+This endpoint provides several forms for configuration:
+  * Endpoints
+  * Storage
+  * License
+
+|  Test Name |  Steps |  Expected Result |  Notes |
+| :--------- | :----- | :--------------- | :----- |
+| Verify license - should provide understandable error (invalid json) | 1. Create empty text file on local machine <BR> 2. Navigate to http://<cd4pe-instance.:<web-ui-port>/configure  <BR> 3. Click 'License' 4. Click Choose button 5. Select file 6. Click Submit License button | License application should fail, reporting that license file is invalid  | |
+| Verify license - should provide understandable error (invalid license schema) | 1. Create json file on local machine with contents of '{}' <BR> 2. Navigate to http://<cd4pe-instance.:<web-ui-port>/configure  <BR> 3. Click 'License' 4. Click Choose button 5. Select file 6. Click Submit License button | License application should fail, reporting that license file is invalid  | |
+| Verify license - should provide understandable error (invalid license) | 1. Create json file on local machine with contents of '{ "document": { "address": "", "companyName": "", "contactEmail": "", "contactName": "", "created": "", "eula": "", "expiration": "", "id": "", "nodes": "", "projects": "", "servers": "", "type": "" }, "signature": "", "eula": "" }' <BR> 2. Navigate to http://<cd4pe-instance.:<web-ui-port>/configure  <BR> 3. Click 'License' 4. Click Choose button 5. Select file 6. Click Submit License button | License application should fail, reporting that license is invalid  | |
+| Verify login - should reject invalid credentials (root) | 1. Submit valid license file 2. Click 'or continue to manage configurations as root' 3. Enter 'foo' in Email field 4. Enter 'bar' in Password field 5. Click  Sign In button | Login should fail, reporting that credentials are unknown | |
+| Verify login - should accept valid credentials (root) | 1. Submit valid license file 2. Click 'or continue to manage configurations as root' 3. Enter email used during installation in Email field 4. Enter password used during installation in Password field 5. Click  Sign In button | Login should succeed | _UX:_ The usage of "root" is not used during installation via integrations.  During installation, this is refered to as the "Continuous Delivery for PE administrator" account.  These terms should be consistent. |
+
+
+### Create initial user
+_Setup_: Navigate to http://<cd4pe-instance.:<web-ui-port>/signup
+
+|  Test Name | Steps  |  Expected Result |  Notes |
+| :--------- | :----- | :--------------- | :----- |
+| Verify required fields - must be filled in | 1. Leave all fields blank <BR> 2. Click Sign Up button | Account creation should fail, reporting that the required fields have not been populated | |
+| Verify First Name field - minimum (1) | 1. Leave field blank <BR> 2. Fill in other fields <BR> 3. Click Sign up button | Account creation should fail, reporting that the field must be populated | |
+| Verify First Name field - maximum (?)  | 1. Fill field with string exceeding maximum <BR> 2. Fill in other fields <BR> 3. Click Sign Up button | Account creation should fail, reporting the maximum acceptable length | |
+| Verify First Name field - character set (utf-8)  | 1. Fill field with '©®' <BR> 2. Fill in other fields <BR> 3. Click Sign Up button | Account creation should succeed and account should be accessible via login | |
+| Verify First Name field - valid  | 1. Fill field with 'a' <BR> 2. Fill in other fields <BR> 3. Click Sign Up button | Account creation should succeed and account should be accessible via login | |
+| Verify Last Name field - minimum (1) | 1. Leave field blank <BR> 2. Fill in other fields <BR> 3. Click Sign up button | Account creation should fail, reporting that the field must be populated | |
+| Verify Last Name field - maximum (?)  | 1. Fill field with string exceeding maximum <BR> 2. Fill in other fields <BR> 3. Click Sign Up button | Account creation should fail, reporting the maximum acceptable length | |
+| Verify Last Name field - character set (utf-8)  | 1. Fill field with '©®' <BR> 2. Fill in other fields <BR> 3. Click Sign Up button | Account creation should succeed and account should be accessible via login | |
+| Verify Last Name field - valid  | 1. Fill field with 'a' <BR> 2. Fill in other fields <BR> 3. Click Sign Up button | Account creation should succeed and account should be accessible via login | |
+| Verify Email field - must be filled in | 1. Leave field blank <BR> 2. Fill in other fields <BR> 3. Click Sign up button | Account creation should fail, reporting that the field must be populated | |
+| Verify Email field - should accept email address with TLD | 1. Fill field with '!def!xyz%abc@example.org' <BR> 2. Fill in other fields <BR> 3. Click Sign Up button | Account creation should succeed and account should be accessible via login | |
+| Verify Email field - should accept email address without TLD | 1. Fill field with '!def!xyz%abc@example' <BR> 2. Fill in other fields <BR> 3. Click Sign Up button | Account creation should succeed and account should be accessible via login | |
+| Verify Email field - should accept UTF-8 in local | 1. Fill field with email '©®@a.b' <BR> 2. Fill in other fields <BR> 3. Click Sign Up button | Account creation should succeed and account should be accessible via login | |
+| Verify Email field - should reject malformed email address | 1. Fill field with "evil'ex" <BR> 2. Fill in other fields <BR> 3. Click Sign Up button | Account creation should fail, reporting that the field must be valid email | |
+| Verify Email field - should accept local of 64 chars | 1. Fill field with 'MalignPreyOiledPalmFireSomeAddictPygmyEntitlementSpikesEnlis@example.org' <BR> 2. Fill in other fields <BR> 3. Click Sign Up button | Account creation should succeed and account should be accessible via login | |
+| Verify Email field - local must not exceed 64 chars | 1. Fill field with 'MalignPreyOiledPalmFireSomeAddictPygmyEntitlementSpikesEnlistment@example.org' <BR> 2. Fill in other fields <BR> 3. Click Sign Up button | Account creation should fail, reporting that the field must be valid email | |
+| Verify Email field - should accept domain of 255 chars | 1. Fill field with 'user@MalignPreyOiledPalmFireSomeAddictPygmyEntitlementSpikesEnlistmentVaudevilleLatishaDecriedJovianLenghtwiseTroubleshooterClamberCaterersAnthropologistGarbedSlicerExpediencyBroodingPilafRiddlesForthcomingUnkindlierTitanicAlzheimerDoubterDumpedFifesMe.org' <BR> 2. Fill in other fields <BR> 3. Click Sign Up button | Account creation should succeed and account should be accessible via login | |
+| Verify Email field - domain must not exceed 255 chars | 1. Fill field with 'user@MalignPreyOiledPalmFireSomeAddictPygmyEntitlementSpikesEnlistmentVaudevilleLatishaDecriedJovianLenghtwiseTroubleshooterClamberCaterersAnthropologistGarbedSlicerExpediencyBroodingPilafRiddlesForthcomingUnkindlierTitanicAlzheimerDoubterDumpedFifesMel.org' <BR> 2. Fill in other fields <BR> 3. Click Sign Up button | Account creation should fail, reporting that the field must be valid email | |
+| Verify Username field - minimum (1) | 1. Leave field blank <BR> 2. Fill in other fields <BR> 3. Click Sign up button | Account creation should fail, reporting that the field must be populated | |
+| Verify Username field - maximum (?)  | 1. Fill field with string exceeding maximum <BR> 2. Fill in other fields <BR> 3. Click Sign Up button | Account creation should fail, reporting the maximum acceptable length | |
+| Verify Username field - character set (invalid)  | 1. Fill field with string containing invalid characters <BR> 2. Fill in other fields <BR> 3. Click Sign Up button | Account creation should fail, reporting what the valid character set is | |
+| Verify Username field - valid  | 1. Fill field with 'a' <BR> 2. Fill in other fields <BR> 3. Click Sign Up button | Account creation should succeed and account should be accessible via login | |
+| Verify Password field - minimum (1) | 1. Leave field blank <BR> 2. Fill in other fields <BR> 3. Click Sign up button | Account creation should fail, reporting that the field must be populated | |
+| Verify Password field - maximum (?)  | 1. Fill field with string exceeding maximum <BR> 2. Fill in other fields <BR> 3. Click Sign Up button | Account creation should fail, reporting the maximum acceptable length | |
+| Verify Password field - character set (utf-8)  | 1. Fill field with '©®' <BR> 2. Fill in other fields <BR> 3. Click Sign Up button | Account creation should succeed and account should be accessible via login | |
+| Verify Password field - valid  | 1. Fill field with 'a' <BR> 2. Fill in other fields <BR> 3. Click Sign Up button | Account creation should succeed and account should be accessible via login | |
 
 
 ## Create User Account
