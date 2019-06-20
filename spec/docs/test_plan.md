@@ -493,7 +493,113 @@ TBD
 
 
 ## Code Deploy
-TBD
+[Docs](https://puppet.com/docs/continuous-delivery/2.x/start_deploying.html)
+
+_Setup_:
+* [Integrate with PE](#pe-integration)
+* [Create environemt node groups](https://puppet.com/docs/continuous-delivery/2.x/start_deploying.html#task-8401) for testing environment. Is part of this performed by the integration job in 2019.1.0?
+* Create node for testing environment
+  * Provision
+  * Install PE agent `curl -k https://<pe-server>:8140/packages/current/install.bash | bash`
+  * Regenerate cert with `pp_environment` trusted fact.
+    * Stop agent: `puppet apply -e 'service { "puppet": ensure => "stopped" }'`
+    * Nuke cert: `rm -rf /etc/puppetlabs/puppet/ssl/*`
+    * Create csr extension attribute:
+        ```
+        cat > $(puppet config print confdir)/csr_attributes.yaml <<EOF
+        ---
+        extension_requests:
+          pp_environment: 'testing'
+        EOF
+        ```
+    * On the master, revoke and clean the previous agent cert: `AGENT_CERT=<agent certname> ; puppetserver ca revoke --certname $AGENT_CERT && puppetserver ca clean --certname $AGENT_CERT`
+      * _UX_: I expected the "Reject" button in PE to do this.
+    * On the agent, submit new cert request: `puppet agent -t`
+    * On the master, sign cert request
+    * On the agent, apply catalog: `puppet agent -t`
+
+_DOCS_: https://puppet.com/docs/continuous-delivery/2.x/start_deploying.html#concept-9880 s/An environment node group is node group/An environment node group is a node group/
+
+_DOCS_: "pp_environment trusted fact": Link to documentation on how to apply the trusted fact to nodes
+
+_DOCS_: "Specify the Git branch corresponding to the environment.":  How??  This seems to happen _magically_ without user intervention.
+
+### Manual
+[Docs](https://puppet.com/docs/continuous-delivery/2.x/start_deploying.html#task-3794)
+
+_Setup_:
+* Navigate to `http://<cd4pe-instance>:<web-ui-port>/<username>/repositories`
+* Click on appropriate control repo
+
+_DOCS_: s/Select he branch/Select the branch/
+
+|  Test Name | Steps  |  Expected Result |  Notes |
+| :--------- | :----- | :--------------- | :----- |
+| Verify New Deployment button | 1. Click New Deployment button | Modal should appear with all branches listed | _UX_: Without docs, this button is difficult to discover |
+| Verify branch selection | 1. Successfully perform 'Verify New Deployment button' test <BR> 2. Select 'testing' in 'Select a branch' list | 'Select a commit' selection should appear | _UX_: Selection name is not consistent with Job Hardware modal |
+| Verify commit selection | 1. Successfully perform 'Verify branch selection' test <BR> 2. Select commit in 'Select a commit' list | 'Select Puppet Enterprise instance' selection should appear with a default selection <BR> 'Select a node group' selection should appear |  _UX_: Selection names are not internally consistent |
+| Verify node group selection | 1. Successfully perform 'Verify commit selection' test <BR> 2. Select 'All testing' node group in 'Select a node group' list | 'Select a deployment policy' selection should appear | _UX_: Blue text within selection boxes implies a link but does not have that functionality.  Suggest a different color for emphasis. |
+| Verify deployment policy help | 1. Successfully perform 'Verify node group selection' test <BR> 2. Click 'Help me choose' link in 'Select a deployment policy' header | Deployment Policy document should be opened in another browser tab | |
+| Verify Direct Deployment policy selection | 1. Successfully perform 'Verify node group selection' test <BR> 2. Select  'Direct Deployment Policy' in 'Select a deployment policy' list | Policy settings should appear <BR>  All settings _except_ timeout should be disabled <BR> Description field should appear | |
+| Verify Timeout field (direct deployment) - minimum (1)  | 1. Successfully perform 'Verify Direct Deployment policy selection' test  <BR>  3. Enter 'test deploy' in the Description field <BR>  4. Delete the contents of the timeout field  <BR> 5. Click 'Deploy' button | Deploy button should be grayed out or unavailable | |
+| Verify Timeout field (direct deployment) - maximum (1440)  | 1. Successfully perform 'Verify Direct Deployment policy selection' test  <BR>  3. Enter 'test deploy' in the Description field <BR>  4. Enter '2000' in the contents of the timeout field  <BR> 5. Click 'Deploy' button | Deploy button should be grayed out or unavailable | |
+| Verify Timeout field (direct deployment) - numeric | 1. Successfully perform 'Verify Direct Deployment policy selection' test  <BR>  3. Enter 'test deploy' in the Description field <BR>  4. Enter 'hello' in the contents of the timeout field  <BR> 5. Click 'Deploy' button | Deploy button should be grayed out or unavailable | |
+| Verify Terminate Conditions toggle (direct deployment) | 1. Successfully perform 'Verify Direct Deployment policy selection' test <BR>  2. Click the 'Abort deployment if' box | Toggle should turn green and node count field should be enabled  | |
+| Verify Terminate nodes field (direct deployment) - minimum (1)  | 1. Successfully perform 'Verify Terminate Conditions toggle' test  <BR>  3. Enter 'test deploy' in the Description field <BR>  4. Delete the contents of the node count field  <BR> 5. Click 'Deploy' button | Deploy button should be grayed out or unavailable | |
+| Verify Terminate nodes field (direct deployment) - maximum (?)  | 1. Successfully perform 'Verify Terminate Conditions toggle' test  <BR>  3. Enter 'test deploy' in the Description field <BR>  4. Enter a number that exceeds the allowed maximum in the contents of the timeout field  <BR> 5. Click 'Deploy' button | Deploy button should be grayed out or unavailable | |
+| Verify Terminate nodes field (direct deployment) - numeric | 1. Successfully perform 'Verify Terminate Conditions toggle' test  <BR>  3. Enter 'test deploy' in the Description field <BR>  4. Enter 'hello' in the contents of the node count field  <BR> 5. Click 'Deploy' button | Deploy button should be grayed out or unavailable | |
+| Verify No-op toggle (direct deployment) | 1. Successfully perform 'Verify Direct Deployment policy selection' test <BR>  2. Click the 'Run this deployment in no-op mode' box | Toggle should turn green | |
+| Verify direct deployment | 1. Successfully perform 'Verify Direct Deployment policy selection' test  <BR>  3. Enter 'test deploy' in the Description field  4. Click 'Deploy' button | Deploy should be successfully submitted | |
+| Verify Eventual Consistency policy selection | 1. Successfully perform 'Verify node group selection' test <BR>  2. Select 'Eventual Consistency Policy' in 'Select a deployment policy' list | Description field should appear | |
+| Verify eventual consistency deployment | 1. Successfully perform 'Verify Eventual Consistency policy selection' test  <BR>  3. Enter 'test deploy' in the Description field  4. Click 'Deploy' button | Deploy should be successfully submitted | |
+| Verify Temporary Branch policy selection | 1. Successfully perform 'Verify node group selection' test <BR> 2. Select  'Temporary Branch Policy' in 'Select a deployment policy' list | Policy settings should appear <BR>  All settings _except_ timeout and stagger should be disabled <BR> Description field should appear | |
+| Verify Timeout field (temp branch) - minimum (1)  | 1. Successfully perform 'Verify Temporary Branch policy selection' test  <BR>  3. Enter 'test deploy' in the Description field <BR>  4. Delete the contents of the timeout field  <BR> 5. Click 'Deploy' button | Deploy button should be grayed out or unavailable | |
+| Verify Timeout field (temp branch) - maximum (1440)  | 1. Successfully perform 'Verify Temporary Branch policy selection' test  <BR>  3. Enter 'test deploy' in the Description field <BR>  4. Enter '2000' in the contents of the timeout field  <BR> 5. Click 'Deploy' button | Deploy button should be grayed out or unavailable | |
+| Verify Timeout field (temp branch) - numeric | 1. Successfully perform 'Verify Temporary Branch policy selection' test  <BR>  3. Enter 'test deploy' in the Description field <BR>  4. Enter 'hello' in the contents of the timeout field  <BR> 5. Click 'Deploy' button | Deploy button should be grayed out or unavailable | |
+| Verify stagger nodes field (temp branch) - minimum (1)  | 1. Successfully perform 'Verify Temporary Branch policy selection' test  <BR>  3. Enter 'test deploy' in the Description field <BR>  4. Delete the contents of the stagger nodes field  <BR> 5. Click 'Deploy' button | Deploy button should be grayed out or unavailable | |
+| Verify stagger nodes field (temp branch) - maximum (?)  | 1. Successfully perform 'Verify Temporary Branch policy selection' test  <BR>  3. Enter 'test deploy' in the Description field <BR>  4. Enter a number that exceeded the allowed maximum in the contents of the stagger nodes field  <BR> 5. Click 'Deploy' button | Deploy button should be grayed out or unavailable | |
+| Verify stagger nodes field (temp branch) - numeric | 1. Successfully perform 'Verify Temporary Branch policy selection' test  <BR>  3. Enter 'test deploy' in the Description field <BR>  4. Enter 'hello' in the contents of the stagger nodes field  <BR> 5. Click 'Deploy' button | Deploy button should be grayed out or unavailable | |
+| Verify stagger delay field (temp branch) - minimum (1)  | 1. Successfully perform 'Verify Temporary Branch policy selection' test  <BR>  3. Enter 'test deploy' in the Description field <BR>  4. Delete the contents of the stagger delay field  <BR> 5. Click 'Deploy' button | Deploy button should be grayed out or unavailable | |
+| Verify stagger delay field (temp branch) - maximum (?)  | 1. Successfully perform 'Verify Temporary Branch policy selection' test  <BR>  3. Enter 'test deploy' in the Description field <BR>  4. Enter a number that exceeded the allowed maximum in the contents of the stagger delay field  <BR> 5. Click 'Deploy' button | Deploy button should be grayed out or unavailable | |
+| Verify stagger delay field (temp branch) - numeric | 1. Successfully perform 'Verify Temporary Branch policy selection' test  <BR>  3. Enter 'test deploy' in the Description field <BR>  4. Enter 'hello' in the contents of the stagger delay field  <BR> 5. Click 'Deploy' button | Deploy button should be grayed out or unavailable | |
+| Verify Terminate Conditions toggle (temp branch) | 1. Successfully perform 'Verify Temporary Branch policy selection' test <BR>  2. Click the 'Abort deployment if' box | Toggle should turn green and node count field should be enabled  | |
+| Verify Terminate nodes field (temp branch) - minimum (1)  | 1. Successfully perform 'Verify Terminate Conditions toggle' test  <BR>  3. Enter 'test deploy' in the Description field <BR>  4. Delete the contents of the node count field  <BR> 5. Click 'Deploy' button | Deploy button should be grayed out or unavailable | |
+| Verify Terminate nodes field (temp branch) - maximum (?)  | 1. Successfully perform 'Verify Terminate Conditions toggle' test  <BR>  3. Enter 'test deploy' in the Description field <BR>  4. Enter a number that exceeds the allowed maximum in the contents of the timeout field  <BR> 5. Click 'Deploy' button | Deploy button should be grayed out or unavailable | |
+| Verify Terminate nodes field (temp branch) - numeric | 1. Successfully perform 'Verify Terminate Conditions toggle' test  <BR>  3. Enter 'test deploy' in the Description field <BR>  4. Enter 'hello' in the contents of the node count field  <BR> 5. Click 'Deploy' button | Deploy button should be grayed out or unavailable | |
+| Verify No-op toggle (temp branch) | 1. Successfully perform 'Verify Temporary Branch policy selection' test <BR>  2. Click the 'Run this deployment in no-op mode' box | Toggle should turn green | |
+| Verify temporary branch deployment | 1. Successfully perform 'Verify Temporary Branch policy selection' test  <BR>  3. Enter 'test deploy' in the Description field  4. Click 'Deploy' button | Deploy should be successfully submitted | |
+| Verify Incremental Branch policy selection | 1. Successfully perform 'Verify node group selection' test <BR> 2. Select  'Incremental Branch Policy' in 'Select a deployment policy' list | Policy settings should appear <BR>  All settings _except_ timeout and stagger should be disabled <BR> Description field should appear | |
+| Verify Timeout field (incr branch) - minimum (1)  | 1. Successfully perform 'Verify Incremental Branch policy selection' test  <BR>  3. Enter 'test deploy' in the Description field <BR>  4. Delete the contents of the timeout field  <BR> 5. Click 'Deploy' button | Deploy button should be grayed out or unavailable | |
+| Verify Timeout field (incr branch) - maximum (1440)  | 1. Successfully perform 'Verify Incremental Branch policy selection' test  <BR>  3. Enter 'test deploy' in the Description field <BR>  4. Enter '2000' in the contents of the timeout field  <BR> 5. Click 'Deploy' button | Deploy button should be grayed out or unavailable | |
+| Verify Timeout field (incr branch) - numeric | 1. Successfully perform 'Verify Incremental Branch policy selection' test  <BR>  3. Enter 'test deploy' in the Description field <BR>  4. Enter 'hello' in the contents of the timeout field  <BR> 5. Click 'Deploy' button | Deploy button should be grayed out or unavailable | |
+| Verify stagger nodes field (incr branch) - minimum (1)  | 1. Successfully perform 'Verify Incremental Branch policy selection' test  <BR>  3. Enter 'test deploy' in the Description field <BR>  4. Delete the contents of the stagger nodes field  <BR> 5. Click 'Deploy' button | Deploy button should be grayed out or unavailable | |
+| Verify stagger nodes field (incr branch) - maximum (?)  | 1. Successfully perform 'Verify Incremental Branch policy selection' test  <BR>  3. Enter 'test deploy' in the Description field <BR>  4. Enter a number that exceeded the allowed maximum in the contents of the stagger nodes field  <BR> 5. Click 'Deploy' button | Deploy button should be grayed out or unavailable | |
+| Verify stagger nodes field (incr branch) - numeric | 1. Successfully perform 'Verify Incremental Branch policy selection' test  <BR>  3. Enter 'test deploy' in the Description field <BR>  4. Enter 'hello' in the contents of the stagger nodes field  <BR> 5. Click 'Deploy' button | Deploy button should be grayed out or unavailable | |
+| Verify stagger delay field (incr branch) - minimum (1)  | 1. Successfully perform 'Verify Incremental Branch policy selection' test  <BR>  3. Enter 'test deploy' in the Description field <BR>  4. Delete the contents of the stagger delay field  <BR> 5. Click 'Deploy' button | Deploy button should be grayed out or unavailable | |
+| Verify stagger delay field (incr branch) - maximum (?)  | 1. Successfully perform 'Verify Incremental Branch policy selection' test  <BR>  3. Enter 'test deploy' in the Description field <BR>  4. Enter a number that exceeded the allowed maximum in the contents of the stagger delay field  <BR> 5. Click 'Deploy' button | Deploy button should be grayed out or unavailable | |
+| Verify stagger delay field (incr branch) - numeric | 1. Successfully perform 'Verify Incremental Branch policy selection' test  <BR>  3. Enter 'test deploy' in the Description field <BR>  4. Enter 'hello' in the contents of the stagger delay field  <BR> 5. Click 'Deploy' button | Deploy button should be grayed out or unavailable | |
+| Verify Terminate Conditions toggle (incr branch) | 1. Successfully perform 'Verify Incremental Branch policy selection' test <BR>  2. Click the 'Abort deployment if' box | Toggle should turn green and node count field should be enabled  | |
+| Verify Terminate nodes field (incr branch) - minimum (1)  | 1. Successfully perform 'Verify Terminate Conditions toggle' test  <BR>  3. Enter 'test deploy' in the Description field <BR>  4. Delete the contents of the node count field  <BR> 5. Click 'Deploy' button | Deploy button should be grayed out or unavailable | |
+| Verify Terminate nodes field (incr branch) - maximum (?)  | 1. Successfully perform 'Verify Terminate Conditions toggle' test  <BR>  3. Enter 'test deploy' in the Description field <BR>  4. Enter a number that exceeds the allowed maximum in the contents of the timeout field  <BR> 5. Click 'Deploy' button | Deploy button should be grayed out or unavailable | |
+| Verify Terminate nodes field (incr branch) - numeric | 1. Successfully perform 'Verify Terminate Conditions toggle' test  <BR>  3. Enter 'test deploy' in the Description field <BR>  4. Enter 'hello' in the contents of the node count field  <BR> 5. Click 'Deploy' button | Deploy button should be grayed out or unavailable | |
+| Verify No-op toggle (incr branch) | 1. Successfully perform 'Verify Incremental Branch policy selection' test <BR>  2. Click the 'Run this deployment in no-op mode' box | Toggle should turn green | |
+| Verify incremental branch deployment | 1. Successfully perform 'Verify Incremental Branch policy selection' test  <BR>  3. Enter 'test deploy' in the Description field  4. Click 'Deploy' button | Deploy should be successfully submitted | |
+| Verify Blue Green Branch policy selection | 1. Successfully perform 'Verify node group selection' test <BR> 2. Select  'Blue Green Branch Policy' in 'Select a deployment policy' list | Policy settings should appear <BR>  All settings _except_ timeout and stagger should be disabled <BR> Description field should appear | |
+| Verify Timeout field (blue/green branch) - minimum (1)  | 1. Successfully perform 'Verify Blue Green Branch policy selection' test  <BR>  3. Enter 'test deploy' in the Description field <BR>  4. Delete the contents of the timeout field  <BR> 5. Click 'Deploy' button | Deploy button should be grayed out or unavailable | |
+| Verify Timeout field (blue/green branch) - maximum (1440)  | 1. Successfully perform 'Verify Blue Green Branch policy selection' test  <BR>  3. Enter 'test deploy' in the Description field <BR>  4. Enter '2000' in the contents of the timeout field  <BR> 5. Click 'Deploy' button | Deploy button should be grayed out or unavailable | |
+| Verify Timeout field (blue/green branch) - numeric | 1. Successfully perform 'Verify Blue Green Branch policy selection' test  <BR>  3. Enter 'test deploy' in the Description field <BR>  4. Enter 'hello' in the contents of the timeout field  <BR> 5. Click 'Deploy' button | Deploy button should be grayed out or unavailable | |
+| Verify stagger nodes field (blue/green branch) - minimum (1)  | 1. Successfully perform 'Verify Blue Green Branch policy selection' test  <BR>  3. Enter 'test deploy' in the Description field <BR>  4. Delete the contents of the stagger nodes field  <BR> 5. Click 'Deploy' button | Deploy button should be grayed out or unavailable | |
+| Verify stagger nodes field (blue/green branch) - maximum (?)  | 1. Successfully perform 'Verify Blue Green Branch policy selection' test  <BR>  3. Enter 'test deploy' in the Description field <BR>  4. Enter a number that exceeded the allowed maximum in the contents of the stagger nodes field  <BR> 5. Click 'Deploy' button | Deploy button should be grayed out or unavailable | |
+| Verify stagger nodes field (blue/green branch) - numeric | 1. Successfully perform 'Verify Blue Green Branch policy selection' test  <BR>  3. Enter 'test deploy' in the Description field <BR>  4. Enter 'hello' in the contents of the stagger nodes field  <BR> 5. Click 'Deploy' button | Deploy button should be grayed out or unavailable | |
+| Verify stagger delay field (blue/green branch) - minimum (1)  | 1. Successfully perform 'Verify Blue Green Branch policy selection' test  <BR>  3. Enter 'test deploy' in the Description field <BR>  4. Delete the contents of the stagger delay field  <BR> 5. Click 'Deploy' button | Deploy button should be grayed out or unavailable | |
+| Verify stagger delay field (blue/green branch) - maximum (?)  | 1. Successfully perform 'Verify Blue Green Branch policy selection' test  <BR>  3. Enter 'test deploy' in the Description field <BR>  4. Enter a number that exceeded the allowed maximum in the contents of the stagger delay field  <BR> 5. Click 'Deploy' button | Deploy button should be grayed out or unavailable | |
+| Verify stagger delay field (blue/green branch) - numeric | 1. Successfully perform 'Verify Blue Green Branch policy selection' test  <BR>  3. Enter 'test deploy' in the Description field <BR>  4. Enter 'hello' in the contents of the stagger delay field  <BR> 5. Click 'Deploy' button | Deploy button should be grayed out or unavailable | |
+| Verify Terminate Conditions toggle (blue/green branch) | 1. Successfully perform 'Verify Blue Green Branch policy selection' test <BR>  2. Click the 'Abort deployment if' box | Toggle should turn green and node count field should be enabled  | |
+| Verify Terminate nodes field (blue/green branch) - minimum (1)  | 1. Successfully perform 'Verify Terminate Conditions toggle' test  <BR>  3. Enter 'test deploy' in the Description field <BR>  4. Delete the contents of the node count field  <BR> 5. Click 'Deploy' button | Deploy button should be grayed out or unavailable | |
+| Verify Terminate nodes field (blue/green branch) - maximum (?)  | 1. Successfully perform 'Verify Terminate Conditions toggle' test  <BR>  3. Enter 'test deploy' in the Description field <BR>  4. Enter a number that exceeds the allowed maximum in the contents of the timeout field  <BR> 5. Click 'Deploy' button | Deploy button should be grayed out or unavailable | |
+| Verify Terminate nodes field (blue/green branch) - numeric | 1. Successfully perform 'Verify Terminate Conditions toggle' test  <BR>  3. Enter 'test deploy' in the Description field <BR>  4. Enter 'hello' in the contents of the node count field  <BR> 5. Click 'Deploy' button | Deploy button should be grayed out or unavailable | |
+| Verify No-op toggle (blue/green branch) | 1. Successfully perform 'Verify Blue Green Branch policy selection' test <BR>  2. Click the 'Run this deployment in no-op mode' box | Toggle should turn green | |
+| Verify blue green branch deployment | 1. Successfully perform 'Verify Blue Green Branch policy selection' test  <BR>  3. Enter 'test deploy' in the Description field  4. Click 'Deploy' button | Deploy should be successfully submitted | |
 
 
 ## Impact Analysis
