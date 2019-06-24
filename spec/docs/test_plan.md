@@ -459,11 +459,11 @@ _DOCS_: Order of configuration docs
 * Required v optional: job hardware v impact analysis
 * Order to reduce impact (e.g. Configure SSL requires reinstall of distelli agent, so it should come before job hardware doc)
 * Order docs to match setup ux:
-  # Integrate Puppet Enterprise
-  # Integrate source control
-  # Set up job hardware
-  # Add control repository
-  # Create a pipeline
+  * Integrate Puppet Enterprise
+  * Integrate source control
+  * Set up job hardware
+  * Add control repository
+  * Create a pipeline
 
 _Setup_:
 * Provision linux host
@@ -489,7 +489,54 @@ _Setup_:
 
 
 ## Pipelines
-TBD
+[Docs](https://puppet.com/docs/continuous-delivery/2.x/start_building_your_modules_pipeline.html)
+
+_Setup_:
+* [Setup control repo](#control-repo-setup)
+* Navigate to `http://<cd4pe-instance>:<web-ui-port>/<username>/repositories/<repo-name>`
+
+### Create Pipeline
+|  Test Name | Steps  |  Expected Result |  Notes |
+| :--------- | :----- | :--------------- | :----- |
+| Verify Add Pipeline link | 1. Click '+Add Pipeline' link | Modal should appear with 'Single Branch' selected by default and 'Select Branch' selection | |
+| Verify pipeline single branch | 1. Successfully perform 'Verify Add Pipeline link' test <BR>  2. Click 'Single Branch' radio button | 'Select Branch' selection should appear | |
+| Verify pipeline single branch - unselected | 1. Successfully perform 'Verify Add Pipeline link' test <BR>  2. Click Add Pipeline button | Error should be displayed that a branch must be selected | |
+| Verify pipeline single branch - selected | 1. Successfully perform 'Verify Add Pipeline link' test <BR>  2. Select a branch from the 'Select Branch' list <BR>  3. Click Add Pipeline button | The pipeline creation should succeed | |
+| Verify pipeline branch regex | 1. Successfully perform 'Verify Add Pipeline link' test <BR>  2. Click 'Branch Regex' radio button | 'Configure regex' field should appear | |
+| Verify pipeline branch regex - minimum (1) | 1. Successfully perform 'Verify pipeline branch regex' test <BR>  2. Delete contents of the 'Branch Regex' field <BR>  3. Click Add Pipeline button | Invalid regex error should be displayed | |
+| Verify pipeline branch regex - maximum (?) | 1. Successfully perform 'Verify pipeline branch regex' test <BR>  2. Enter '.' repeated to exceed the maximum allowed value in the 'Branch Regex' field <BR>  3. Click Add Pipeline button | Error should be displayed indicating the entry exceeds the maximum | |
+| Verify pipeline branch regex - invalid | 1. Successfully perform 'Verify pipeline branch regex' test <BR>  2. Enter '[' in the 'Branch Regex' field <BR>  3. Click Add Pipeline button | Invalid regex error should be displayed | |
+| Verify pipeline branch regex - groups | 1. Successfully perform 'Verify pipeline branch regex' test <BR>  2. Enter '[^0-9]\*([0-9]\*)[.]([0-9]*)[.]([0-9]*)([0-9A-Za-z-]\*)' in the 'Branch Regex' field <BR>  3. Click Add Pipeline button | The pipeline creation should succeed | |
+| Verify pipeline branch regex - utf-8 | 1. Successfully perform 'Verify pipeline branch regex' test <BR>  2. Enter '©®?a.b' in the 'Branch Regex' field <BR>  3. Click Add Pipeline button | The pipeline creation should succeed | |
+
+
+### Create Stage
+|  Test Name | Steps  |  Expected Result |  Notes |
+| :--------- | :----- | :--------------- | :----- |
+| Verify Add stage button | 1. Successfully perform 'Verify pipeline single branch' test <BR>  2. Click '+Add Stage' button | Modal should appear with 'Deployment' selected by default and 'Select a node group' selection | _UX_: The button is grey, implying that it is disabled. UX seems inconsistent: if a pipeline is selected, but no stage created the treatment is different from after stage is added. |
+| Verify Add stage job | 1. Successfully perform 'Verify Add stage button' test <BR>  2. Click 'Job' radio button | 'Select Job' should appear | |
+| Verify Add stage job - unselected | 1. Successfully perform 'Verify Add stage job' test <BR>  2. Click Add Stage button | Error should be displayed that a branch must be selected | |
+| Verify Add stage job - selected | 1. Successfully perform 'Verify Add stage job' test <BR>  2. Select a job from the 'Select Job' list <BR>  3. Click Add Stage button | The stage creation should succeed and 'add another stage' modal should appear | _DOCS_: Link to explanation of canned jobs ; _UX_: 'Add item to Stage:0' title for 'add another stage' modal is unclear; _UX_: Should be able to shift-click select multiple jobs and multiple stages added at once |
+| Verify Add stage deployment | 1. Successfully perform 'Verify Add stage button' test <BR>  2. Click 'Deployment' radio button | 'Select a node group' should appear | |
+| Perform tests from [manual deployment modal](#manual) | | | |
+| Verify Add stage impact analysis - without deployment | 1. Successfully perform 'Verify Add stage button' test <BR>  2. Click 'Impact Analysis' radio button | Error should appear that this type of stage is not available until a deployment stage has been added | _UX_: This stage option should not be presented until it is a valid choice |
+| Verify Add stage impact analysis - with deployment (immediate radio selection) | 1. Successfully add deployment stage via Direct Deployment policy without clicking Done button  <BR>  2. Click 'Impact Analysis' radio button | Impact analysis modal should appear without error | |
+| Verify Add stage impact analysis - with deployment (previously created) | 1. Successfully add deployment stage via Direct Deployment policy <BR>  2. Successfully perform 'Verify Add stack button' test <BR>  3. Click 'Impact Analysis' radio button | Impact analysis modal should appear without error | |
+| Verify batch size field (impact analysis) - minimum (1)  | 1. Successfully perform 'Verify Add stage impact analysis - with deployment (previously created)' test  <BR>  2. Delete the contents of the 'Compile up to xx node catalogs' field <BR>  3. Click 'Add Impact Analysis' button | Add Impact Analysis button should be grayed out/unavailable OR error should be displayed indicating that batch size must be set | |
+| Verify batch size field (impact analysis) - maximum (?)  | 1. Successfully perform 'Verify Add stage impact analysis - with deployment (previously created)' test  <BR>  2. Enter a number that exceeds the allowed maximum in the 'Compile up to xx node catalogs' field <BR>  3. Click 'Add Impact Analysis' button | Add Impact Analysis button should be grayed out/unavailable OR error should be displayed indicating that the number exceeds the allowed maximum | |
+| Verify batch size field (impact analysis) - not zero  | 1. Successfully perform 'Verify Add stage impact analysis - with deployment (previously created)' test  <BR>  2. Enter '0' in the 'Compile up to xx node catalogs' field <BR>  3. Click 'Add Impact Analysis' button | Add Impact Analysis button should be grayed out/unavailable OR error should be displayed indicating that the batch size must be set | |
+| Verify batch size field (impact analysis) - not negative  | 1. Successfully perform 'Verify Add stage impact analysis - with deployment (previously created)' test  <BR>  2. Enter '-1' in the 'Compile up to xx node catalogs' field <BR>  3. Click 'Add Impact Analysis' button | Add Impact Analysis button should be grayed out/unavailable OR error should be displayed indicating that the batch size must be set | |
+| Verify batch size field (impact analysis) - numeric  | 1. Successfully perform 'Verify Add stage impact analysis - with deployment (previously created)' test  <BR>  2. Enter 'hello' in the 'Compile up to xx node catalogs' field <BR>  3. Click 'Add Impact Analysis' button | Add Impact Analysis button should be grayed out/unavailable OR error should be displayed indicating that the batch size must be set | _UX_: The error states of this field are inconsistent with those in pipeline creation |
+| Verify run for selected environments (impact analysis)  | 1. Successfully perform 'Verify Add stage impact analysis - with deployment (previously created)' test  <BR>  2. Click 'Run for selected environments' radio button | List of deployment environments should appear |
+| Verify run for selected environments (impact analysis) - none selected  | 1. Successfully perform 'Verify run for selected environments (impact analysis)' test  <BR>  2. Deselect all environments <BR> 3. Click 'Add Impact Analysis' button | Error should be displayed that an environment must be selected | |
+| Verify run for selected environments (impact analysis) - selected  | 1. Successfully perform 'Verify run for selected environments (impact analysis)' test  <BR>  2. Select one environment <BR> 3. Click 'Add Impact Analysis' button | Impact analysis should be created
+
+
+_UX_: The following condition should be addressed by hiding the deployment options that will create the loop.
+> Error for stage at index 1.
+> Destinations with rolling deployment has deployment loop.
+> Sorry, deploying to the testing branch from this pipeline is not allowed.
+> Doing so would create an infinite deployment loop.
 
 
 ## Code Deploy
