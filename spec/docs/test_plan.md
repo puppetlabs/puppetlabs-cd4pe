@@ -459,11 +459,11 @@ _DOCS_: Order of configuration docs
 * Required v optional: job hardware v impact analysis
 * Order to reduce impact (e.g. Configure SSL requires reinstall of distelli agent, so it should come before job hardware doc)
 * Order docs to match setup ux:
-  # Integrate Puppet Enterprise
-  # Integrate source control
-  # Set up job hardware
-  # Add control repository
-  # Create a pipeline
+  * Integrate Puppet Enterprise
+  * Integrate source control
+  * Set up job hardware
+  * Add control repository
+  * Create a pipeline
 
 _Setup_:
 * Provision linux host
