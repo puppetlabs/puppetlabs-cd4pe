@@ -343,8 +343,20 @@ Please contact the site administrator for support along with errorId=[md5:1271bc
 TBD
 
 
-### GitLab
-TBD
+### GitLab <a id="vcs-gitlab"></a>
+_Setup_:
+* Create GitLab server
+  * Provision host
+  * Install software
+      ```
+      curl https://packages.gitlab.com/install/repositories/gitlab/gitlab-ee/script.rpm.sh | sudo bash
+      EXTERNAL_URL="http://$(hostname)" yum install -y gitlab-ee
+      ```
+  * Set root password by opening `$EXTERNAL_URL` in a browser
+  * Create access token in `$EXTERNAL_URL/profile/personal_access_tokens`
+
+No specific integration required.  Nothing to test.
+
 
 ## PE Integration
 _Setup_: Create "Continuous Delivery" user as per [docs](https://puppet.com/docs/continuous-delivery/2.x/integrate_with_puppet_enterprise.html#task-1594).
@@ -449,7 +461,22 @@ TBD
 
 
 ### GitLab
-TBD
+_Setup_:
+* Create [GitLab server](#vcs-gitlab)
+* Create GitLab control repo
+* Navigate to `http://<cd4pe-instance>:<web-ui-port>/<username>/repositories`
+* Click Add Control Repo button
+
+|  Test Name | Steps  |  Expected Result |  Notes |
+| :--------- | :----- | :--------------- | :----- |
+| Verify source control selection | 1. Select 'GitLab' from list | 'Select organization' selection should appear | |
+| Verify organization selection | 1. Successfully perform 'Verify source control selection' test <BR>  2. Select username in 'Select organization' list | 'Select repository' selection should appear | _UX_: This selection is for a Gitlab user not an organization |
+| Verify repository selection | 1. Successfully perform 'Verify organization selection' test <BR>  2. Select control repo in 'Select repository' list | 'Create master branch from' selection should appear | _UX_: Should the repos in the list be sorted alphabetically? |
+| Verify create master branch from selection | 1. Successfully perform 'Verify repository selection' test <BR> 2. Select the main branch in 'Select branch' list  | 1. 'Control repo name' field should appear and be pre-populated with the control repo name <BR> 2. 'Add' button should appear | |
+| Verify add control repo | 1. Successfully perform 'Verify create master branch from selection' test <BR> 2. Click Add button | Control repo object should be created in CD4PE and browser should be redirected to `http://<cd4pe-instance>:<web-ui-port>/<username>/repositories/<repo-name>`| |
+| Verify delete control repo | 1. Successfully perform 'Verify add control repo' test <BR> 2. Navigate to `http://<cd4pe-instance>:<web-ui-port>/<username>/repositories` 3. Click trash-can icon for control repo | Deletion confirmation modal should appear
+| Verify delete control repo button | 1. Successfully perform 'Verify delete control repo' test <BR> 2. Click Delete button | Control repo should be absent from list | |
+| Verify no control repos | 1. Delete all control repos | 1. Control repo list should be empty <BR> 2. 'Add control repository' step in setup checklist should be unchecked | |
 
 
 ## Add Job Hardware
