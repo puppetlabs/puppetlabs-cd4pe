@@ -572,6 +572,7 @@ _UX_: The following condition should be addressed by hiding the deployment optio
 _Setup_:
 * [Integrate with PE](#pe-integration)
 * [Create environemt node groups](https://puppet.com/docs/continuous-delivery/2.x/start_deploying.html#task-8401) for testing environment. Is part of this performed by the integration job in 2019.1.0?
+* [Create job hardware](#add-job-hardware)
 * Create node for testing environment
   * Provision
   * Install PE agent `curl -k https://<pe-server>:8140/packages/current/install.bash | bash`
@@ -674,6 +675,72 @@ _DOCS_: s/Select he branch/Select the branch/
 | Verify Terminate nodes field (blue/green branch) - numeric | 1. Successfully perform 'Verify Terminate Conditions toggle' test  <BR>  3. Enter 'test deploy' in the Description field <BR>  4. Enter 'hello' in the contents of the node count field  <BR> 5. Click 'Deploy' button | Deploy button should be grayed out or unavailable | |
 | Verify No-op toggle (blue/green branch) | 1. Successfully perform 'Verify Blue Green Branch policy selection' test <BR>  2. Click the 'Run this deployment in no-op mode' box | Toggle should turn green | |
 | Verify blue green branch deployment | 1. Successfully perform 'Verify Blue Green Branch policy selection' test  <BR>  3. Enter 'test deploy' in the Description field  4. Click 'Deploy' button | Deploy should be successfully submitted | |
+
+
+### Pipeline
+[Docs](https://puppet.com/docs/continuous-delivery/2.x/start_building_your_modules_pipeline.html#task-8025)
+
+_Setup_:
+* Perform [add job hardware](#add_job_hardware) setup.
+* Perform [code deploy](#code-deploy) setup.
+
+
+#### Test <a name="pipeline-test"></a>
+_Setup_:
+* Navigate to `http://<cd4pe-instance>:<web-ui-port>/<username>/repositories`
+* Click on appropriate control repo
+* Click on master branch
+* Create pipeline with job stage:
+  1. Successfully perform 'Verify Add stage job - selected' test from the [Pipelines: Create Stage](#create-stage) section above on the master pipeline using the 'puppetfile-syntax-validate' job.
+  1. Click 'Done'
+
+|  Test Name | Steps  |  Expected Result |  Notes |
+| :--------- | :----- | :--------------- | :----- |
+| Verify commit hook event | 1. Add and commit a change to the control repo master branch <BR>  2. Push the change, if necessary, to the git server <BR>  3. Wait 5 seconds | The 'New Events' button should appear on the `http://<cd4pe-instance>:<web-ui-port>/<username>/repositories/<control-repo>` page | |
+| Verify job trigger - success | 1. Successfully complete 'Verify commit hook event' test <BR>  2. Click the 'New Events' button | An event for the deployment should appear at the top of the event list.  It should include: <BR> - `master @ <SHA>` where the SHA matches that of the commit. <BR> - A job succeeded notice | |
+| Verify job trigger - failure | 1. Add and commit a change to the control repo master branch that invalidates the Puppetfile <BR>  2. Push the change, if necessary, to the git server <BR>  3. Wait 5 seconds | An event for the deployment should appear at the top of the event list.  It should include: <BR> - `master @ <SHA>` where the SHA matches that of the commit. <BR> - A job failed notice | |
+| Verify job event pipeline detail | 1. Successfully complete 'Verify job trigger - success' test <BR>  2. Click the 'Succeeded' link in the event | The event details should appear with the following: <BR> - A link to the job run <BR> - a 'Rerun Job' button <BR> - A Push webhook | |
+| Verify job details | 1. Successfully complete 'Verify job event pipeline detail' test <BR>  2. Click the link to the job number | The job page should load `http://<cd4pe-instance>:<web-ui-port>/<username>/jobs/<job-number>`.  It should include: <BR> - The completed status of the job. <BR> - Commit `master @ <SHA>` where the SHA matches the commit that triggered the job. <BR> - A log of the distelli build for the job. | |
+
+
+#### Deploy
+_Setup_:
+* Navigate to `http://<cd4pe-instance>:<web-ui-port>/<username>/repositories`
+* Click on appropriate control repo
+* Click on master branch
+* Create pipeline with deploy stage:
+  1. Successfully perform 'Verify Add stage deployment' test from the [Pipelines: Create Stage](#create-stage) section above on the master pipeline.
+  1. Select the 'testing' node group
+  1. Select the 'Direct Deployment Policy' deployment policy
+  1. Click 'Add Stage'
+
+|  Test Name | Steps  |  Expected Result |  Notes |
+| :--------- | :----- | :--------------- | :----- |
+| Verify commit hook event | 1. Add and commit a change to the control repo master branch <BR>  2. Push the change, if necessary, to the git server <BR>  3. Wait 5 seconds | The 'New Events' button should appear on the `http://<cd4pe-instance>:<web-ui-port>/<username>/repositories/<control-repo>` page | |
+| Verify deployment trigger | 1. Successfully complete 'Verify commit hook event' test <BR>  2. Click the 'New Events' button | An event for the deployment should appear at the top of the event list.  It should include: <BR> - `master @ <SHA>` where the SHA matches that of the commit. <BR> - A deployment succeeded notice | |
+| Verify deploy event pipeline detail | 1. Successfully complete 'Verify deployment trigger - success' test <BR>  2. Click the 'Succeeded' link in the event | The event details should appear with the following: <BR> - A link to the deployment run <BR> - A Push webhook | |
+| Verify deploy details | 1. Successfully complete 'Verify deploy event pipeline detail' test <BR>  2. Click the link to the deploy number | The job page should load `http://<cd4pe-instance>:<web-ui-port>/<username>/deployments/<deploy-number>`.  It should include: <BR> - The completed status of the job. <BR> - Commit `master @ <SHA>` where the SHA matches the commit that triggered the deploy. <BR> - Update Ref: A commit push to the testing branch <BR> - Code deploy: Indicating the testing environment <BR> - Rolling Deployment: A link to the PE job running puppet on the nodes classified for the testing environment <BR> - Cleanup | _UX_: If puppet run completes with failures, the color of the 'Puppet Run Jobs' should not be green. |
+
+
+#### Pull Request
+_Setup_:
+* Perform [Code Deploy::Pipelines::Test](#pipeline-test) setup.
+* Enable Pull Request trigger on pipeline
+  1. Navigate to `http://<cd4pe-instance>:<web-ui-port>/<username>/repositories/<control-repo>`
+  1. Click 'Pipeline Settings' for master pipeline (tool icon)
+  1. Enable 'Pull Request' trigger (_UX_: Label 'Pull Request' with space)
+  1. Click 'Save Settings' button
+  1. Click 'Done' button
+* Create `foobar` branch on the control repo
+
+
+|  Test Name | Steps  |  Expected Result |  Notes |
+| :--------- | :----- | :--------------- | :----- |
+| Verify pull request hook event | 1. Add and commit a change to the control repo foobar branch <BR>  2. Push the change, if necessary, to the git server <BR>  3. Open a request to merge changes from foobar branch to master branch <BR>  4. Wait 5 seconds | The 'New Events' button should appear on the `http://<cd4pe-instance>:<web-ui-port>/<username>/repositories/<control-repo>` page | |
+| Verify pull request trigger - success | 1. Successfully complete 'Verify pull request hook event' test <BR>  2. Click the 'New Events' button | An event for the PR should appear at the top of the event list.  It should include: <BR> - `foobar @ <SHA>` where the SHA matches that of the commit. <BR> - A job succeeded notice | |
+| Verify pull request event pipeline detail | 1. Successfully complete 'Verify pull request trigger - success' test <BR>  2. Click the 'Succeeded' link in the event | The event details should appear with the following: <BR> - A link to the job run <BR> - a 'Rerun Job' button <BR> - A Pull Request webhook | |
+| Verify pull request job details | 1. Successfully complete 'Verify pull request event pipeline detail' test <BR>  2. Click the link to the job number | The job page should load `http://<cd4pe-instance>:<web-ui-port>/<username>/jobs/<job-number>`.  It should include: <BR> - The completed status of the job. <BR> - Commit `foobar @ <SHA>` where the SHA matches the commit that triggered the job. <BR> - A log of the distelli build for the job. | |
+| Verify pull request VCS integration | 1. Successfully complete 'Verify pull request hook event' test <BR>  2. Open the VCS UI for the pull request opened | An entry for the pipeline should appear.  It should include: <BR> - A link to the event for the run of the pipeline stage | |
 
 
 ## Impact Analysis
