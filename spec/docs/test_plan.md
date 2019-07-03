@@ -566,6 +566,49 @@ _UX_: The following condition should be addressed by hiding the deployment optio
 > Doing so would create an infinite deployment loop.
 
 
+## Job
+
+### Create Job
+[Docs](https://puppet.com/docs/continuous-delivery/2.x/example_jobs.html#puppet-linter)??
+
+_SETUP_:
+* Navigate to Jobs
+
+
+|  Test Name | Steps  |  Expected Result |  Notes |
+| :--------- | :----- | :--------------- | :----- |
+| Verify New Job button | 1. Click New Job button | New Job modal should appear | |
+| Verify required fields - must be filled in | 1. Leave all fields blank <BR> 2. Click Create Job button | Job creation should fail, reporting that the required fields have not been populated | |
+| Verify Job Name field - minimum (1) | 1. Successfully perform 'Verify New Job button' test <BR>  2. Leave field blank <BR>  3. Fill in other fields <BR>  4. Click Create Job button | Job creation should fail, reporting that the field must be populated | |
+| Verify Job Name field - maximum (?) | 1. Successfully perform 'Verify New Job button' test <BR>  2. Fill field with string exceeding maximum <BR>  3. Fill in other fields <BR>  4. Click Create Job button | Job creation should fail, reporting the maximum acceptable length | |
+| Verify Job Name field - character set (utf-8) | 1. Successfully perform 'Verify New Job button' test <BR>  2. Fill field with '©®' <BR>  3. Fill in other fields <BR>  4. Click Create Job button | Job creation should succeed and job should be accessible in jobs list | |
+| Verify Job Name field - valid | 1. Successfully perform 'Verify New Job button' test <BR>  2. Fill field with 'a' <BR>  3. Fill in other fields <BR>  4. Click Create Job button | Job creation should succeed and job should be accessible in jobs list | |
+| Verify Job Description field - minimum (1) | 1. Successfully perform 'Verify New Job button' test <BR>  2. Leave field blank <BR>  3. Fill in other fields <BR>  4. Click Create Job button | Job creation should fail, reporting that the field must be populated | |
+| Verify Job Description field - maximum (?) | 1. Successfully perform 'Verify New Job button' test <BR>  2. Fill field with string exceeding maximum <BR>  3. Fill in other fields <BR>  4. Click Create Job button | Job creation should fail, reporting the maximum acceptable length | |
+| Verify Job Description field - character set (utf-8) | 1. Successfully perform 'Verify New Job button' test <BR>  2. Fill field with '©®' <BR>  3. Fill in other fields <BR>  4. Click Create Job button | Job creation should succeed and job should be accessible in jobs list | |
+| Verify Job Description field - valid | 1. Successfully perform 'Verify New Job button' test <BR>  2. Fill field with 'a' <BR>  3. Fill in other fields <BR>  4. Click Create Job button | Job creation should succeed and job should be accessible in jobs list | |
+| Verify Job Commands field - minimum (1) | 1. Successfully perform 'Verify New Job button' test <BR>  2. Leave field blank <BR>  3. Fill in other fields <BR>  4. Click Create Job button | Job creation should fail, reporting that the field must be populated | |
+| Verify Job Commands field - maximum (?) | 1. Successfully perform 'Verify New Job button' test <BR>  2. Fill field with string exceeding maximum <BR>  3. Fill in other fields <BR>  4. Click Create Job button | Job creation should fail, reporting the maximum acceptable length | |
+| Verify Job Commands field - character set (utf-8) | 1. Successfully perform 'Verify New Job button' test <BR>  2. Fill field with '©®' <BR>  3. Fill in other fields <BR>  4. Click Create Job button | Job creation should succeed and job should be accessible in jobs list | |
+| Verify Job Commands field - valid | 1. Successfully perform 'Verify New Job button' test <BR>  2. Fill field with 'a' <BR>  3. Fill in other fields <BR>  4. Click Create Job button | Job creation should succeed and job should be accessible in jobs list | |
+| Verify Docker Image Name - minimum (1) | 1. Successfully perform 'Verify New Job button' test <BR>  2. Turn on docker container selection <BR>  3. Leave Docker Image field blank <BR>  4. Fill in other fields <BR>  5. Click Create Job button | Job creation should fail, reporting that the Docker Image field must be populated when running the job in a container | |
+| Verify Docker Image Name - maximum (255) | 1. Successfully perform 'Verify New Job button' test <BR>  2. Turn on docker container selection <BR>  3. Fill Docker Image field with string exceeding maximum <BR>  4. Fill in other fields <BR>  5. Click Create Job button | Job creation should fail, reporting that the Docker Image field must be populated when running the job in a container | [Ref](https://success.docker.com/article/dtr-max-length-repo-name) |
+| Verify Docker Image Name - invalid characters | 1. Successfully perform 'Verify New Job button' test <BR>  2. Turn on docker container selection <BR>  3. Fill Docker Image field with 'A☃\\?'  <BR>  4. Fill in other fields <BR>  5. Click Create Job button | Job creation should fail, reporting that name must conform to specification |[Ref](https://docs.docker.com/registry/spec/api/#overview) |
+| Verify Docker Image Name - valid | 1. Successfully perform 'Verify New Job button' test <BR>  2. Turn on docker container selection <BR>  3. Fill Docker Image field with 'a'  <BR>  4. Fill in other fields <BR>  5. Click Create Job button | Job creation should succeed and job should be accessible in jobs list | |
+| Verify Docker Run Arguments - minimum (0) | 1. Successfully perform 'Verify New Job button' test <BR>  2. Turn on docker container selection <BR>  3. Leave Docker Run Arguments field blank <BR>  4. Fill in other fields <BR>  5. Click Create Job button | Job creation should succeed and job should be accessible in jobs list | |
+| Verify Docker Run Arguments - maximum (?) | 1. Successfully perform 'Verify New Job button' test <BR>  2. Turn on docker container selection <BR>  3. Fill Docker Run Arguments field with string exceeding maximum <BR>  4. Fill in other fields <BR>  5. Click Create Job button | Job creation should fail, reporting that the Docker Image field must be populated when running the job in a container | |
+| Verify Docker Run Arguments - invalid syntax | 1. Successfully perform 'Verify New Job button' test <BR>  2. Turn on docker container selection <BR>  3. Fill Docker Image field with 'foobar'  <BR>  4. Fill in other fields <BR>  5. Click Create Job button | Job creation should fail, reporting that name must conform to --key=value specification |[Ref](https://docs.docker.com/engine/reference/run) |
+| Verify Docker Run Arguments - invalid character set | 1. Successfully perform 'Verify New Job button' test <BR>  2. Turn on docker container selection <BR>  3. Fill Docker Image field with '--☃=y'  <BR>  4. Fill in other fields <BR>  5. Click Create Job button | Job creation should fail, reporting that name must conform to ascii specification |[Ref](https://docs.docker.com/engine/reference/run) |
+| Verify Docker Image Name - valid syntax | 1. Successfully perform 'Verify New Job button' test <BR>  2. Turn on docker container selection <BR>  3. Fill Docker Image field with '--x="no-new-privileges:true\|false"'  <BR>  4. Fill in other fields <BR>  5. Click Create Job button | Job creation should succeed and job should be accessible in jobs list | |
+| Verify Capabilities selection - minimum (1) | 1. Successfully perform 'Verify New Job button' test <BR>  2. Leave Capabilities selection items unselected  <BR>  3. Fill in other fields <BR>  4. Click Create Job button | Job creation should fail, reporting that a capability must be selected | |
+| Verify Capabilities selection - maximum (3) | 1. Successfully perform 'Verify New Job button' test <BR>  2. Select 4 items in Capabilities selection  <BR>  3. Fill in other fields <BR>  4. Click Create Job button | Job creation should fail, reporting the maximum | |
+| Verify Environment Variables - minimum (0) | 1. Successfully perform 'Verify New Job button' test <BR>  2. Leave Environment Variables field blank <BR>  3. Fill in other fields <BR>  4. Click Create Job button | Job creation should succeed and job should be accessible in jobs list | |
+| Verify Environment Variables - maximum (?) | 1. Successfully perform 'Verify New Job button' test <BR>  2. Fill Environment Variables field with string exceeding maximum <BR>  3. Fill in other fields <BR>  4. Click Create Job button | Job creation should fail, reporting the maximum acceptable length | |
+| Verify Environment Variables - invalid syntax | 1. Successfully perform 'Verify New Job button' test <BR>  2. Fill Environment Variables field with 'foobar'  <BR>  3. Fill in other fields <BR>  4. Click Create Job button | Job creation should fail, reporting that name must conform to key=value specification | |
+| Verify Environment Variables - valid syntax | 1. Successfully perform 'Verify New Job button' test <BR>  2. Fill Environment Variables field with 'foo=bar\nbar=baz'  <BR>  3. Fill in other fields <BR>  4. Click Create Job button | Job creation should succeed and job should be available in the jobs list |
+| Verify Environment Variables - character set (utf-8) | 1. Successfully perform 'Verify New Job button' test <BR>  2. Fill Environment Variables field with 'foo=©®'  <BR>  3. Fill in other fields <BR>  4. Click Create Job button | Job creation should succeed and job should be available in the jobs list |
+
+
 ## Code Deploy
 [Docs](https://puppet.com/docs/continuous-delivery/2.x/start_deploying.html)
 
@@ -685,22 +728,131 @@ _Setup_:
 * Perform [code deploy](#code-deploy) setup.
 
 
-#### Test <a name="pipeline-test"></a>
+#### Job <a name="pipeline-job"></a>
+[Doc](https://puppet.com/docs/continuous-delivery/2.x/example_jobs.html)
+
 _Setup_:
 * Navigate to `http://<cd4pe-instance>:<web-ui-port>/<username>/repositories`
 * Click on appropriate control repo
 * Click on master branch
-* Create pipeline with job stage:
-  1. Successfully perform 'Verify Add stage job - selected' test from the [Pipelines: Create Stage](#create-stage) section above on the master pipeline using the 'puppetfile-syntax-validate' job.
-  1. Click 'Done'
+
+
+##### Control Repo Puppetfile Syntax Validate
+|  Test Name | Steps  |  Expected Result |  Notes |
+| :--------- | :----- | :--------------- | :----- |
+| Verify puppetfile-syntax-validate job present | 1. Successfully perform 'Verify Add stage job' test [Pipelines: Create Stage](#create-stage) | 'control-repo-puppetfile-syntax-validate' should be present in the 'Select Job' list | |
+| Verify Add puppetfile-syntax-validate job | 1. Successfully perform 'Verify Add stage job' test [Pipelines: Create Stage](#create-stage) <BR>  2. Select 'control-repo-puppetfile-syntax-validate' job from the 'Select Job' list <BR>  3. Click Add Stage button <BR>  4. Click 'Done' button | The 'control-repo-puppetfile-syntax-validate' job should appear as Pipeline stage | |
+| Verify puppetfile-syntax-validate job trigger - success | 1. Add and commit a change to the control repo master branch adding a comment to the Puppetfile <BR>  2. Push the change, if necessary, to the git server <BR>  3. Wait 5 seconds | An event for the deployment should appear at the top of the event list.  It should include: <BR> - `master @ <SHA>` where the SHA matches that of the commit. <BR> - A job succeeded notice | |
+| Verify puppetfile-syntax-validate job trigger - failure | 1. Add and commit a change to the control repo master branch that invalidates the Puppetfile <BR>  2. Push the change, if necessary, to the git server <BR>  3. Wait 5 seconds | An event for the deployment should appear at the top of the event list.  It should include: <BR> - `master @ <SHA>` where the SHA matches that of the commit. <BR> - A job failed notice | |
+| Verify puppetfile-syntax-validate job event pipeline detail | 1. Successfully complete 'Verify job trigger - success' test <BR>  2. Click the 'Succeeded' link in the event | The event details should appear with the following: <BR> - A link to the job run <BR> - a 'Rerun Job' button <BR> - A Push webhook | |
+| Verify puppetfile-syntax-validate job details | 1. Successfully complete 'Verify job event pipeline detail' test <BR>  2. Click the link to the job number | The job page should load `http://<cd4pe-instance>:<web-ui-port>/<username>/jobs/<job-number>`.  It should include: <BR> - The completed status of the job. <BR> - Commit `master @ <SHA>` where the SHA matches the commit that triggered the job. <BR> - A log of the distelli build for the job. <BR> - The log should match /Running .\* -m Validate that a control repo's Puppetfile is syntactically correct/ | |
+
+
+##### Control Repo Template Syntax Validate
+|  Test Name | Steps  |  Expected Result |  Notes |
+| :--------- | :----- | :--------------- | :----- |
+| Verify template-syntax-validate job present | 1. Successfully perform 'Verify Add stage job' test [Pipelines: Create Stage](#create-stage) | 'control-repo-template-syntax-validate' should be present in the 'Select Job' list | |
+| Verify Add template-syntax-validate job | 1. Successfully perform 'Verify Add stage job' test [Pipelines: Create Stage](#create-stage) <BR>  2. Select 'control-repo-template-syntax-validate' job from the 'Select Job' list <BR>  3. Click Add Stage button <BR>  4. Click 'Done' button | The 'control-repo-template-syntax-validate' job should appear as Pipeline stage | |
+| Verify template-syntax-validate job trigger - success | 1. Add and commit a change to the control repo master branch adding a comment to a template <BR>  2. Push the change, if necessary, to the git server <BR>  3. Wait 5 seconds | An event for the deployment should appear at the top of the event list.  It should include: <BR> - `master @ <SHA>` where the SHA matches that of the commit. <BR> - A job succeeded notice | |
+| Verify template-syntax-validate job trigger - failure | 1. Add and commit a change to the control repo master branch that invalidates a template <BR>  2. Push the change, if necessary, to the git server <BR>  3. Wait 5 seconds | An event for the deployment should appear at the top of the event list.  It should include: <BR> - `master @ <SHA>` where the SHA matches that of the commit. <BR> - A job failed notice | |
+| Verify template-syntax-validate job event pipeline detail | 1. Successfully complete 'Verify job trigger - success' test <BR>  2. Click the 'Succeeded' link in the event | The event details should appear with the following: <BR> - A link to the job run <BR> - a 'Rerun Job' button <BR> - A Push webhook | |
+| Verify template-syntax-validate job details | 1. Successfully complete 'Verify job event pipeline detail' test <BR>  2. Click the link to the job number | The job page should load `http://<cd4pe-instance>:<web-ui-port>/<username>/jobs/<job-number>`.  It should include: <BR> - The completed status of the job. <BR> - Commit `master @ <SHA>` where the SHA matches the commit that triggered the job. <BR> - A log of the distelli build for the job. <BR> - The log should match /Running .\* -m Validate that a control repo's templates are syntactically correct/ | |
+
+
+##### Control Repo Hiera Syntax Validate
+|  Test Name | Steps  |  Expected Result |  Notes |
+| :--------- | :----- | :--------------- | :----- |
+| Verify hiera-syntax-validate job present | 1. Successfully perform 'Verify Add stage job' test [Pipelines: Create Stage](#create-stage) | 'control-repo-hiera-syntax-validate' should be present in the 'Select Job' list | |
+| Verify Add hiera-syntax-validate job | 1. Successfully perform 'Verify Add stage job' test [Pipelines: Create Stage](#create-stage) <BR>  2. Select 'control-repo-hiera-syntax-validate' job from the 'Select Job' list <BR>  3. Click Add Stage button <BR>  4. Click 'Done' button | The 'control-repo-hiera-syntax-validate' job should appear as Pipeline stage | |
+| Verify hiera-syntax-validate job trigger - success | 1. Add and commit a change to the control repo master branch adding a comment to the hiera data <BR>  2. Push the change, if necessary, to the git server <BR>  3. Wait 5 seconds | An event for the deployment should appear at the top of the event list.  It should include: <BR> - `master @ <SHA>` where the SHA matches that of the commit. <BR> - A job succeeded notice | |
+| Verify hiera-syntax-validate job trigger - failure | 1. Add and commit a change to the control repo master branch that invalidates the hiera data <BR>  2. Push the change, if necessary, to the git server <BR>  3. Wait 5 seconds | An event for the deployment should appear at the top of the event list.  It should include: <BR> - `master @ <SHA>` where the SHA matches that of the commit. <BR> - A job failed notice | |
+| Verify hiera-syntax-validate job event pipeline detail | 1. Successfully complete 'Verify job trigger - success' test <BR>  2. Click the 'Succeeded' link in the event | The event details should appear with the following: <BR> - A link to the job run <BR> - a 'Rerun Job' button <BR> - A Push webhook | |
+| Verify hiera-syntax-validate job details | 1. Successfully complete 'Verify job event pipeline detail' test <BR>  2. Click the link to the job number | The job page should load `http://<cd4pe-instance>:<web-ui-port>/<username>/jobs/<job-number>`.  It should include: <BR> - The completed status of the job. <BR> - Commit `master @ <SHA>` where the SHA matches the commit that triggered the job. <BR> - A log of the distelli build for the job. <BR> - The log should match /Running .\* -m Validate that a control repo's Hiera data is syntactically correct/ | |
+
+
+##### Control Repo Puppet Manifest Syntax Validate
+|  Test Name | Steps  |  Expected Result |  Notes |
+| :--------- | :----- | :--------------- | :----- |
+| Verify manifest-syntax-validate job present | 1. Successfully perform 'Verify Add stage job' test [Pipelines: Create Stage](#create-stage) | 'control-repo-manifest-syntax-validate' should be present in the 'Select Job' list | |
+| Verify Add manifest-syntax-validate job | 1. Successfully perform 'Verify Add stage job' test [Pipelines: Create Stage](#create-stage) <BR>  2. Select 'control-repo-manifest-syntax-validate' job from the 'Select Job' list <BR>  3. Click Add Stage button <BR>  4. Click 'Done' button | The 'control-repo-manifest-syntax-validate' job should appear as Pipeline stage | |
+| Verify manifest-syntax-validate job trigger - success | 1. Add and commit a change to the control repo master branch adding a comment to a manifest <BR>  2. Push the change, if necessary, to the git server <BR>  3. Wait 5 seconds | An event for the deployment should appear at the top of the event list.  It should include: <BR> - `master @ <SHA>` where the SHA matches that of the commit. <BR> - A job succeeded notice | |
+| Verify manifest-syntax-validate job trigger - failure | 1. Add and commit a change to the control repo master branch that invalidates a manifest <BR>  2. Push the change, if necessary, to the git server <BR>  3. Wait 5 seconds | An event for the deployment should appear at the top of the event list.  It should include: <BR> - `master @ <SHA>` where the SHA matches that of the commit. <BR> - A job failed notice | |
+| Verify manifest-syntax-validate job event pipeline detail | 1. Successfully complete 'Verify job trigger - success' test <BR>  2. Click the 'Succeeded' link in the event | The event details should appear with the following: <BR> - A link to the job run <BR> - a 'Rerun Job' button <BR> - A Push webhook | |
+| Verify manifest-syntax-validate job details | 1. Successfully complete 'Verify job event pipeline detail' test <BR>  2. Click the link to the job number | The job page should load `http://<cd4pe-instance>:<web-ui-port>/<username>/jobs/<job-number>`.  It should include: <BR> - The completed status of the job. <BR> - Commit `master @ <SHA>` where the SHA matches the commit that triggered the job. <BR> - A log of the distelli build for the job. <BR> - The log should match /Running .\* -m Validate that a control repo's Puppet manifest code is syntactically correct/ | |
+
+
+##### Module PDK Validate
+|  Test Name | Steps  |  Expected Result |  Notes |
+| :--------- | :----- | :--------------- | :----- |
+| Verify pdk-validate job present | 1. Successfully perform 'Verify Add stage job' test [Pipelines: Create Stage](#create-stage) | 'module-pdk-validate' should be present in the 'Select Job' list | |
+| Verify Add pdk-validate job | 1. Successfully perform 'Verify Add stage job' test [Pipelines: Create Stage](#create-stage) <BR>  2. Select 'module-pdk-validate' job from the 'Select Job' list <BR>  3. Click Add Stage button <BR>  4. Click 'Done' button | The 'module-pdk-validate' job should appear as Pipeline stage | |
+| Verify pdk-validate job trigger - success | 1. Add and commit a change the module master branch adding a comment to a manifest <BR>  2. Push the change, if necessary, to the git server <BR>  3. Wait 5 seconds | An event for the deployment should appear at the top of the event list.  It should include: <BR> - `master @ <SHA>` where the SHA matches that of the commit. <BR> - A job succeeded notice | |
+| Verify pdk-validate job trigger - failure | 1. Add and commit a change to the module master branch that invalidates a manifest <BR>  2. Push the change, if necessary, to the git server <BR>  3. Wait 5 seconds | An event for the deployment should appear at the top of the event list.  It should include: <BR> - `master @ <SHA>` where the SHA matches that of the commit. <BR> - A job failed notice | |
+| Verify pdk-validate job event pipeline detail | 1. Successfully complete 'Verify job trigger - success' test <BR>  2. Click the 'Succeeded' link in the event | The event details should appear with the following: <BR> - A link to the job run <BR> - a 'Rerun Job' button <BR> - A Push webhook | |
+| Verify pdk-validate job details | 1. Successfully complete 'Verify job event pipeline detail' test <BR>  2. Click the link to the job number | The job page should load `http://<cd4pe-instance>:<web-ui-port>/<username>/jobs/<job-number>`.  It should include: <BR> - The completed status of the job. <BR> - Commit `master @ <SHA>` where the SHA matches the commit that triggered the job. <BR> - A log of the distelli build for the job. <BR> - The log should match /Running .\* -m Validate that a module's Puppet manifest code is syntactically correct/ | |
+
+
+##### Run Module Unit Test
+|  Test Name | Steps  |  Expected Result |  Notes |
+| :--------- | :----- | :--------------- | :----- |
+| Verify rspec-puppet job present | 1. Successfully perform 'Verify Add stage job' test [Pipelines: Create Stage](#create-stage) | 'module-rspec-puppet' should be present in the 'Select Job' list | |
+| Verify Add rspec-puppet job | 1. Successfully perform 'Verify Add stage job' test [Pipelines: Create Stage](#create-stage) <BR>  2. Select 'module-rspec-puppet' job from the 'Select Job' list <BR>  3. Click Add Stage button <BR>  4. Click 'Done' button | The 'module-rspec-puppet' job should appear as Pipeline stage | |
+| Verify rspec-puppet job trigger - success | 1. Add and commit a change to the module master branch adding a comment to an rspec test <BR>  2. Push the change, if necessary, to the git server <BR>  3. Wait 5 seconds | An event for the deployment should appear at the top of the event list.  It should include: <BR> - `master @ <SHA>` where the SHA matches that of the commit. <BR> - A job succeeded notice | |
+| Verify rspec-puppet job trigger - failure | 1. Add and commit a change to the control repo master branch that invalidates an rspec test <BR>  2. Push the change, if necessary, to the git server <BR>  3. Wait 5 seconds | An event for the deployment should appear at the top of the event list.  It should include: <BR> - `master @ <SHA>` where the SHA matches that of the commit. <BR> - A job failed notice | |
+| Verify rspec-puppet job event pipeline detail | 1. Successfully complete 'Verify job trigger - success' test <BR>  2. Click the 'Succeeded' link in the event | The event details should appear with the following: <BR> - A link to the job run <BR> - a 'Rerun Job' button <BR> - A Push webhook | |
+| Verify rspec-puppet job details | 1. Successfully complete 'Verify job event pipeline detail' test <BR>  2. Click the link to the job number | The job page should load `http://<cd4pe-instance>:<web-ui-port>/<username>/jobs/<job-number>`.  It should include: <BR> - The completed status of the job. <BR> - Commit `master @ <SHA>` where the SHA matches the commit that triggered the job. <BR> - A log of the distelli build for the job. <BR> - The log should match /Running .\* -m Run rspec-puppet unit tests on a module/ | |
+
+
+##### Custom Job
+[Docs](https://puppet.com/docs/continuous-delivery/2.x/example_jobs.html#puppet-linter)
+_SETUP_:
+* Navigate to Jobs
+* Click 'New Job' button
+* Enter 'control-repo-custom' in Job name field
+* Enter 'Lint Puppet Code' in Description field
+* Enter the following in Commands field
+```
+#!/bin/bash
+
+LINT_OPTS=("--fail-on-warnings" "--no-documentation-check" "--no-140chars-check" "--no-autoloader_layout-check" "--no-class_inherits_from_params_class-check")
+
+for f in **/**pp; do
+   [[ $f =~ plans/ ]] && continue
+
+   if puppet-lint "${LINT_OPTS[@]}" "$f"; then
+      echo "SUCCESS: $f"
+   else
+      echo "FAILED: $f"
+      failures+=("$f")
+   fi
+done
+
+if (( ${#failures[@]} > 0 )); then
+   echo "Puppet-lint validation on the Control Repo has failed in the following manifests:"
+   echo -e "\t ${failures[@]}"
+   exit 1
+else
+   echo "Puppet-lint validation on the Control Repo has succeeded."
+fi
+```
+* Enable docker configuration
+* Select DOCKER capability
+* Enter 'puppet/puppet-dev-tools' in the docker container field
+* Click 'Create Job' button:  Job should be successfully created
+* Click 'Done' button:  Job should be visible in jobs list
+
 
 |  Test Name | Steps  |  Expected Result |  Notes |
 | :--------- | :----- | :--------------- | :----- |
-| Verify commit hook event | 1. Add and commit a change to the control repo master branch <BR>  2. Push the change, if necessary, to the git server <BR>  3. Wait 5 seconds | The 'New Events' button should appear on the `http://<cd4pe-instance>:<web-ui-port>/<username>/repositories/<control-repo>` page | |
-| Verify job trigger - success | 1. Successfully complete 'Verify commit hook event' test <BR>  2. Click the 'New Events' button | An event for the deployment should appear at the top of the event list.  It should include: <BR> - `master @ <SHA>` where the SHA matches that of the commit. <BR> - A job succeeded notice | |
-| Verify job trigger - failure | 1. Add and commit a change to the control repo master branch that invalidates the Puppetfile <BR>  2. Push the change, if necessary, to the git server <BR>  3. Wait 5 seconds | An event for the deployment should appear at the top of the event list.  It should include: <BR> - `master @ <SHA>` where the SHA matches that of the commit. <BR> - A job failed notice | |
-| Verify job event pipeline detail | 1. Successfully complete 'Verify job trigger - success' test <BR>  2. Click the 'Succeeded' link in the event | The event details should appear with the following: <BR> - A link to the job run <BR> - a 'Rerun Job' button <BR> - A Push webhook | |
-| Verify job details | 1. Successfully complete 'Verify job event pipeline detail' test <BR>  2. Click the link to the job number | The job page should load `http://<cd4pe-instance>:<web-ui-port>/<username>/jobs/<job-number>`.  It should include: <BR> - The completed status of the job. <BR> - Commit `master @ <SHA>` where the SHA matches the commit that triggered the job. <BR> - A log of the distelli build for the job. | |
+| Verify custom job present | 1. Successfully perform 'Verify Add stage job' test [Pipelines: Create Stage](#create-stage) | 'control-repo-custom' should be present in the 'Select Job' list | |
+| Verify Add custom job | 1. Successfully perform 'Verify Add stage job' test [Pipelines: Create Stage](#create-stage) <BR>  2. Select 'control-repo-custom' job from the 'Select Job' list <BR>  3. Click Add Stage button <BR>  4. Click 'Done' button | The 'control-repo-custom' job should appear as Pipeline stage | |
+| Verify custom job trigger - success | 1. Add and commit a change to the control-repo master branch adding a comment to an rspec test <BR>  2. Push the change, if necessary, to the git server <BR>  3. Wait 5 seconds | An event for the deployment should appear at the top of the event list.  It should include: <BR> - `master @ <SHA>` where the SHA matches that of the commit. <BR> - A job succeeded notice | |
+| Verify custom job trigger - failure | 1. Add and commit a change to the control repo master branch that invalidates an rspec test <BR>  2. Push the change, if necessary, to the git server <BR>  3. Wait 5 seconds | An event for the deployment should appear at the top of the event list.  It should include: <BR> - `master @ <SHA>` where the SHA matches that of the commit. <BR> - A job failed notice | |
+| Verify custom job event pipeline detail | 1. Successfully complete 'Verify job trigger - success' test <BR>  2. Click the 'Succeeded' link in the event | The event details should appear with the following: <BR> - A link to the job run <BR> - a 'Rerun Job' button <BR> - A Push webhook | |
+| Verify custom job details | 1. Successfully complete 'Verify job event pipeline detail' test <BR>  2. Click the link to the job number | The job page should load `http://<cd4pe-instance>:<web-ui-port>/<username>/jobs/<job-number>`.  It should include: <BR> - The completed status of the job. <BR> - Commit `master @ <SHA>` where the SHA matches the commit that triggered the job. <BR> - A log of the distelli build for the job. <BR> - The log should match /Puppet-lint validation on the Control Repo has/ | |
+
+
+_BUG_:?? Capability requirements for existing stages are not updated after job capabilities are updated when executing re-run.
 
 
 #### Deploy
@@ -724,7 +876,7 @@ _Setup_:
 
 #### Pull Request
 _Setup_:
-* Perform [Code Deploy::Pipelines::Test](#pipeline-test) setup.
+* Perform [Code Deploy::Pipelines::Job](#pipeline-job) setup.
 * Enable Pull Request trigger on pipeline
   1. Navigate to `http://<cd4pe-instance>:<web-ui-port>/<username>/repositories/<control-repo>`
   1. Click 'Pipeline Settings' for master pipeline (tool icon)
