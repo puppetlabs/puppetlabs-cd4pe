@@ -360,3 +360,78 @@ namespace :test_environment do
      }
   end
 end
+
+namespace :test do
+  desc "Provision nodes for a CD4PE test environment"
+  task :provision do
+    Rake::Task['spec_prep'].invoke
+    Rake::Task['litmus:provision'].invoke('vmpooler', 'centos-7-x86_64')
+    Rake::Task['litmus:provision'].reenable
+    Rake::Task['litmus:provision'].invoke('vmpooler', 'centos-7-x86_64')
+  end
+  namespace :install do
+    task :pe do
+      inventory_hash = inventory_hash_from_inventory_file
+      puts inventory_hash
+    end
+    namespace :cd4pe do
+      task :oneclick do
+      end
+
+      task :module do
+        Rake::Task['spec_prep'].invoke
+
+        if File.exists?('inventory.yaml')
+          # inventory_hash_from_inventory_file throws error if inventory file doesn't exist
+          inventory_hash = inventory_hash_from_inventory_file
+          targets = find_targets(inventory_hash, nil)
+        else
+          targets = nil
+        end
+
+        if targets.nil? or targets.empty?
+          Rake::Task['litmus:provision'].invoke('vmpooler', 'centos-7-x86_64')
+          inventory_hash = inventory_hash_from_inventory_file
+          targets = find_targets(inventory_hash, nil)
+          target = targets.first
+        else
+          target = targets.first
+        end
+
+        add_node_to_group(inventory_hash, target, 'cd4pe')
+
+
+        Rake::Task['litmus:install_agent'].invoke('puppet6')
+        puts "installing cd4pe module"
+        Rake::Task['litmus:install_module'].invoke
+        include BoltSpec::Run
+        config_data = { 'modulepath' => File.join(Dir.pwd, 'spec', 'fixtures', 'modules') }
+        manifest = <<-MANIFEST
+          include docker
+          docker::run { 'cd4pe_postgres':
+            image                 => 'postgres:9.6',
+            net                   => 'cd4pe',
+            ports                 => ["5432:5432"],
+            volumes               => ['cd4pe-postgres:/var/lib/postgresql/data'],
+            env                   => ['POSTGRES_PASSWORD=puppetlabs'],
+            health_check_interval => 10,
+          }
+
+          class { "cd4pe":
+            manage_database => false,
+            db_host         => 'cd4pe_postgres',
+            db_name         => 'postgres',
+            db_pass         => Sensitive('puppetlabs'),
+            db_port         => 5432,
+            db_provider     => 'postgres',
+            db_user         => 'postgres',
+            db_prefix       => 'test',
+          }
+        MANIFEST
+        ret = apply_manifest(manifest, target, execute:true, config: config_data, inventory: inventory_hash)
+        puts ret
+      end
+    end
+  end
+
+end

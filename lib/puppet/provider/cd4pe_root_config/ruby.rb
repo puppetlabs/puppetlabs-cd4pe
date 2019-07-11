@@ -79,6 +79,11 @@ Puppet::Type.type(:cd4pe_root_config).provide(:ruby) do
     storage_success = resp.code == '200'
     resp = save_ssl_settings(@resource)
     ssl_success = resp.code == '200'
+    install_shared_job_hardware = @resource[:install_shared_job_hardware]
+    if(install_shared_job_hardware)
+      response = install_shared_job_hardware()
+      puts "\n\n\n#{response}\n\n"
+    end
 
     if endpoint_success && storage_success && ssl_success
       @resource.original_parameters.each_key do |k|
@@ -154,6 +159,11 @@ Puppet::Type.type(:cd4pe_root_config).provide(:ruby) do
     self.class.api_client.save_ssl_settings(
       ssl_authority_certificate, ssl_server_certificate, ssl_server_private_key, ssl_enabled
     )
+  end
+
+  def install_shared_job_hardware()
+    self.class.api_client.list_agent_credentials()
+
   end
 
   class << self

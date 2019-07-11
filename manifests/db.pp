@@ -51,6 +51,20 @@ class cd4pe::db(
       }
     }
   } else {
+    $app_db_password_path = "${data_root_dir}/cd4pe_db_password"
+    $_db_pass = unwrap($db_pass)
+    file { $app_db_password_path:
+      ensure  => file,
+      owner   => 'root',
+      group   => 'root',
+      content => "DB_PASS=${_db_pass}\n",
+      replace => false,
+    }
+
+    Docker::Run <| title == 'cd4pe' |> {
+      env_file +> ["${cd4pe::db::data_root_dir}/cd4pe_db_password"]
+    }
+
     cd4pe::db::app_db_env { 'app_db_env file':
       db_host     => $db_host,
       db_port     => $db_port,
