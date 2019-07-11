@@ -18,6 +18,7 @@ class cd4pe::root_config(
   Optional[Sensitive[String[1]]] $ssl_server_private_key   = undef,
   Optional[String[1]] $ssl_endpoint                        = undef,
   Optional[Integer] $ssl_port                              = 8443,
+  Optional[Boolean] $install_shared_job_hardware           = false,
 ) inherits cd4pe {
   include cd4pe::anchors
 
@@ -47,6 +48,7 @@ class cd4pe::root_config(
     ssl_server_private_key    => $ssl_server_private_key,
     ssl_endpoint              => $ssl_endpoint,
     ssl_port                  => $ssl_port,
+    install_shared_job_hardware => $install_shared_job_hardware,
     require                   => Anchor['cd4pe-service-install'],
     notify                    => $notify,
   }
