@@ -1009,4 +1009,74 @@ _Setup_:
 
 
 ## Impact Analysis
-TBD
+[Doc](https://puppet.com/docs/continuous-delivery/2.x/impact_analysis.html)
+
+_Setup_:
+* [Install CD4PE](#installation)
+* [Integrate with GitLab](#gitlab)
+* [Integrate with PE](#pe-integration)
+* Create topic branch
+* Add pipeline for topic branch
+* Add direct deployment stage for each node group to pipeline. (Enhancement: Add a shortcut for this.)
+* Add impact analysis stage to pipeline
+* Reorder stages putting impact analysis on top. (UX: Remove the constraint that a deploy step must be added first)
+* Modify `manifests/site.pp` on topic branch
+```
+node default {
+  file { '/tmp/foo':
+    ensure => directory,
+  }
+  tidy { '/tmp/foo':
+    recurse => true,
+    backup  => false
+  }
+  file { '/tmp/foo/test.txt':
+    content => 'Foo me once, shame on foo!'
+  }
+}
+```
+* Navigate to `http://<cd4pe-instance>:<web-ui-port>/<workspace>/repositories/<control-repo>`
+
+### New Impact Analysis Button
+|  Test Name | Steps  |  Expected Result |  Notes |
+| :--------- | :----- | :--------------- | :----- |
+| Verify New Impact Analysis Button | 1. Click New Impact Analysis button | 'New Impact Analysis' modal should appear with 'Select a branch' selection available | |
+| Verify branch selection | 1. Successfully perform 'Verify New Impact Analysis Button' test <BR> 2. Select topic branch from the 'Select a branch' list | 'Select a commit' should appear | |
+| Verify commit selection | 1. Successfully perform 'Verify branch selection' test <BR> 2. Select latest commit from the 'Select a commit' list | 'Select Puppet Enterprise instance' should appear | |
+| Verify PE instance selection | 1. Successfully perform 'Verify commit selection' test <BR> 2. Select PE instance in 'Select Puppet Enterprise instance' list | 'Select a node group' selection should appear |  _UX_: Selection names are not internally consistent |
+| Verify node group selection | 1. Successfully perform 'Verify PE instance selection' test <BR> 2. Select 'All testing' node group in 'Select a node group' list | Concurrent node catalog selection should appear | |
+| Verify concurrent node catalogs - minimum (1)  | 1. Successfully perform 'Verify node group selection' test  <BR>  2. Delete the contents of the concurrent node catalog field  <BR> 3. Click 'Analyze' button | Analyze button should be grayed out or unavailable | |
+| Verify concurrent node catalogs - maximum (?)  | 1. Successfully perform 'Verify node group selection' test  <BR>  2. Enter a number that exceeds the allowed maximum in the concurrent node catalog field  <BR> 3. Click 'Analyze' button | Analyze button should be grayed out or unavailable | |
+| Verify concurrent node catalogs - non-numeric  | 1. Successfully perform 'Verify node group selection' test  <BR>  2. Enter 'hello' in the concurrent node catalog field  <BR> 3. Click 'Analyze' button | Analyze button should be grayed out or unavailable | |
+| Verify concurrent node catalogs - numeric  | 1. Successfully perform 'Verify node group selection' test  <BR>  2. Enter '5' in the concurrent node catalog field  <BR> 3. Click 'Analyze' button | 1. 'Impact analysis in progress' should be displayed <BR> 2. 'View Impact Analysis' button should be displayed | |
+| Verify View Impact Analysis button | 1. Successfully perform 'Verify concurrent node catalogs - numeric' test <BR> 2. Click 'View Impact Analysis' button |  Browser should be directed to `http://<cd4pe-instance>:<web-ui-port>/<workspace>/analysis/<number>` where run number corresponds to the run created (see [Run Results](#impact-analysis-run-results) test section)| |
+
+
+### Impact Analysis Run Results
+_Setup_: Successfully perform 'Verify View Impact Analysis button' test.
+
+|  Test Name | Steps  |  Expected Result |  Notes |
+| :--------- | :----- | :--------------- | :----- |
+| Verify run results elements | None. | Page should contain: <BR> 1. Link to branch associated with analysis run <BR> 2. Link to commit associated with analysis run <BR> 3. Name of PE server associated with analysis run <BR> 4. Environment associated with analysis run <BR> 5. Number of resource changes in environment  <BR> 6. Number of impacted nodes in environment <BR> 7. Link to change details | |
+| Verify change details - resource view | Click View changes link for environment associated with analysis run | Page should appear with changes defaulted to resources view. This view should contain a list of resources.  For each resource, the number of parameters changed for each resource should be listed.  If there is only a single changed parameter, its current and new values should be listed.  For each resource, the number of impacted nodes should be listed and this number should link to a detailed view. | |
+| Verify resource change details - resource view | 1. Click View changes link for environment associated with analysis run <BR> 2. For a resource, click on number of impacted nodes  | A modal containing details for the resource should appear with resource view defaulted.  This view should contain: <BR> 1. The number of impacted nodes <BR> 2. Each parameter with its: Current value, new value, and status.  | |
+| Verify resource change details - impacted nodes view | 1. Click View changes link for environment associated with analysis run <BR> 2. For a resource, click on number of impacted nodes <BR> 3. Click impacted nodes view radio button | A list of certnames for impacted nodes should appear. | |
+| Verify change details - nodes view | 1. Click View changes link for environment associated with analysis run <BR> 2. Click Nodes view radio button | This view should contain a list of nodes impacted.  For each node, the certname, summary of impacted resources, compile status, and link to detailed view should be listed. | |
+| Verify impacted node detail | 1. Click View changes link for environment associated with analysis run <BR> 2. Click Nodes view radio button  <BR> 3. Click 'View details' link for an impacted node | A modal containing details for the resources impacted for the specific node should appear. For each resource, the name, all changed parameters with current and new values, as well as status should be listed. | |
+
+
+### Impact Analysis As Part of Pipeline Run
+_Setup_:
+* Click Run Pipeline Button
+* Select pipeline
+* Select commit
+* Click Trigger Pipeline button
+  * Pipeline should be successfully triggered
+* Click Done
+* Refresh the page to see new events.
+
+
+|  Test Name | Steps  |  Expected Result |  Notes |
+| :--------- | :----- | :--------------- | :----- |
+| Verify impact analysis in pipeline events | 1. Click on the most recent event number | The pipeline stage should be revealed and should include the impact analysis logo, a match to /Impact Analysis[Running|Done], and a link to the analysis run | |
+| Verify impact analysis run link in pipeline events | 1. Successfully complete 'Verify impact analysis in pipeline events' test <BR> 2. Click impact analysis run number | Browser should be directed to `http://<cd4pe-instance>:<web-ui-port>/<workspace>/analysis/<number>` where run number corresponds to the run created (see [Run Results](#impact-analysis-run-results) test section)| |
