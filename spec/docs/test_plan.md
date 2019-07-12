@@ -311,7 +311,44 @@ TBD
 
 
 ### Bitbucket
-TBD
+[Doc](https://puppet.com/docs/continuous-delivery/2.x/integrations.html#integrate-bitbucket-server)
+
+_Setup_:
+* Create Bitbucket server (instructions out of scope).
+* Navigate to `http://<cd4pe-instance>:<web-ui-port>/<workspace>/settings`
+* Click Source Control link
+* Click on Bitbucket Server link: Bitbucket Server Credentials modal should open
+
+|  Test Name | Steps  |  Expected Result |  Notes |
+| :--------- | :----- | :--------------- | :----- |
+| Verify Bitbucket Server Host field - minimum (1) | 1. Leave field blank <BR> 2. Fill in other fields <BR> 3. Click Add Credentials button | Credential setting should fail, reporting that the field must be populated | |
+| Verify Bitbucket Server Host field - maximum (domain 255) | 1. Fill field with a host value whose domain exceeds 255 characters <BR>  2. Fill in other fields <BR> 3. Click Add Credentials button | Credential setting should fail, reporting that hostname is invalid (support schema) | |
+| Verify Bitbucket Server Host field  - invalid | 1. Fill field with '!@#$%^&?' value <BR> 2. Fill in other fields <BR> 3. Click Add Credentials button | Credential setting should fail, reporting that hostname is invalid (support schema) | |
+| Verify Bitbucket Server Host field  - Supports multilingual domain  | 1. Fill field with 'http://스타벅스코리아.com/' <BR> 2. Fill in other fields <BR> 3. Click Add Credentials button | Credential setting should proceed to verify Bitbucket authentication | |
+| Verify Bitbucket Server Host field  - Trims whitespace  | 1. Fill field with '    http://example.org/   ' <BR> 2. Fill in other fields <BR> 3. Click Add Credentials button | Credential setting should proceed to verify Bitbucket authentication | |
+| Verify Bitbucket Server Host field  - valid  | 1. Fill field with 'http://example.org/' <BR> 2. Fill in other fields <BR> 3. Click Add Credentials button | Credential setting should proceed to verify Bitbucket authentication | |
+| Verify Username field - minimum (1) | 1. Leave field blank <BR> 2. Fill in other fields <BR> 3. Click Add Credentials button | Credential setting should fail, reporting that the field must be populated | |
+| Verify Username field - maximum (?)  | 1. Fill field with string exceeding maximum <BR> 2. Fill in other fields <BR> 3. Click Add Credentials  button | Credential setting should fail, reporting the maximum acceptable length | |
+| Verify Username field - character set (utf-8)  | 1. Fill field with '©®' <BR> 2. Fill in other fields <BR> 3. Click Add Credentials button | Credential setting should proceed to verify Bitbucket authentication | Does Bitbucket support this?|
+| Verify Username field - valid  | 1. Fill field with 'a' <BR> 2. Fill in other fields <BR> 3. Click Add Credentials button | Credential setting should proceed to verify PE authentication | |
+| Verify Password field - minimum (1) | 1. Leave field blank <BR> 2. Fill in other fields <BR> 3. Click Add Credentials button | Credential setting should fail, reporting that the field must be populated | |
+| Verify Password field - maximum (?)  | 1. Fill field with string exceeding maximum <BR> 2. Fill in other fields <BR> 3. Click Add Credentials button | Credential setting should fail, reporting the maximum acceptable length | |
+| Verify Password field - character set (utf-8)  | 1. Fill field with '©®' <BR> 2. Fill in other fields <BR> 3. Click Add Credentials button | Credential setting should proceed to verify Bitbucket authentication | |
+| Verify Password field - valid  | 1. Fill field with 'a' <BR> 2. Fill in other fields <BR> 3. Click Add Credentials button | Credential setting should proceed to verify Bitbucket authentication | |
+| Verify SSH Port field - minimum (1)  | 1. Leave field blank <BR>  2. Fill in other fields <BR>  3. Click Add Crentials button | Credential setting should fail, reporting that the field must be populated | |
+| Verify SSH Port field - not zero  | 1. Fill field with '0' <BR>  2. Fill in other fields <BR>  3. Click Add Crentials button | Credential setting should fail, reporting that the field must be a value between 1-65535 | |
+| Verify SSH Port field - maximum (65535)  | 1. Fill field with '65536' <BR>  2. Fill in other fields <BR>  3. Click Add Crentials button | Credential setting should fail, reporting that the field must be a value between 1-65535 | |
+| Verify SSH Port field - non-numeric  | 1. Fill field with 'a' <BR>  2. Fill in other fields <BR>  3. Click Add Crentials button | Credential setting should fail, reporting that the field must be a value between 1-65535 | |
+| Verify SSH Url field - minimum (0) | 1. Leave field blank <BR> 2. Fill in other fields <BR> 3. Click Add Credentials button | Credential setting should proceed to verify Bitbucket authentication | |
+| Verify SSH Url field - maximum (domain 255) | 1. Fill field with a host value whose domain exceeds 255 characters <BR>  2. Fill in other fields <BR> 3. Click Add Credentials button | Credential setting should fail, reporting that hostname is invalid (support schema) | |
+| Verify SSH Url field  - invalid | 1. Fill field with '!@#$%^&?' value <BR> 2. Fill in other fields <BR> 3. Click Add Credentials button | Credential setting should fail, reporting that hostname is invalid (support schema) | |
+| Verify SSH Url field  - Supports multilingual domain  | 1. Fill field with 'http://스타벅스코리아.com/' <BR> 2. Fill in other fields <BR> 3. Click Add Credentials button | Credential setting should proceed to verify Bitbucket authentication | |
+| Verify SSH Url field  - Trims whitespace  | 1. Fill field with '    http://example.org/   ' <BR> 2. Fill in other fields <BR> 3. Click Add Credentials button | Credential setting should proceed to verify Bitbucket authentication | |
+| Verify SSH Url field  - valid  | 1. Fill field with 'http://example.org/' <BR> 2. Fill in other fields <BR> 3. Click Add Credentials button | Credential setting should proceed to verify Bitbucket authentication | |
+| Verify SSH User field - minimum (0) | 1. Leave field blank <BR> 2. Fill in other fields <BR> 3. Click Add Credentials button | Credential setting should proceed to verify Bitbucket authentication | |
+| Verify SSH User field - maximum (?) | 1. Fill field with string exceeding maximum  <BR>  2. Fill in other fields <BR> 3. Click Add Credentials button | Credential setting should fail, reporting the maximim allowable value | |
+| Verify SSH User field - character set (utf-8)  | 1. Fill field with '©®' <BR> 2. Fill in other fields <BR> 3. Click Add Credentials button | Credential setting should proceed to verify Bitbucket authentication | Does Bitbucket support this? |
+| Verify SSH User field - valid  | 1. Fill field with 'a' <BR> 2. Fill in other fields <BR> 3. Click Add Credentials button | Credential setting should proceed to verify PE authentication | |
 
 
 ### GitHub
