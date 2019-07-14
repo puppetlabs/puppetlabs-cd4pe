@@ -306,8 +306,34 @@ _UX_: What is the expected session length?  Currently, user sessions do not seem
 ## Source Control Integration
 
 
-### Azure
-TBD
+### Azure DevOps
+[Doc](https://puppet.com/docs/continuous-delivery/2.x/integrations.html#integrate-azure-devops)
+
+_Root Setup_:
+* Create Azure Oauth application (instructions out of scope)
+* Integrate azure with cd4pe
+  * Login as root
+  * Navigate to `http://<cd4pe-instance>:<web-ui-port>/root/settings`
+  * Click Integrations link
+
+|  Test Name | Steps  |  Expected Result |  Notes |
+| :--------- | :----- | :--------------- | :----- |
+| Verify ADO integration - valid | 1. Fill Client ID field with valid value <BR> 2. Fill Client Secret field with valid value <BR> 3. Click Add link <BR> 4. Click Add Integration button | Integration should succeed (How can integration be verified?). | |
+| Verify ADO integration - invalid | 1. Fill Client ID field with invalid value <BR> 2. Fill Client Secret field with invalid value <BR> 3. Click Add link <BR> 4. Click Add Integration button | Integration should fail, reporting unable to authenticate with OAuth application | |
+| Verify ADO integration - removal | 1. Fill Client ID field with valid value <BR> 2. Fill Client Secret field with valid value <BR> 3. Click Add link <BR> 4. Click Remove link <BR> 5. Click Remove Integration button | Integration should be successfully removed | |
+| Verify Client ID field - minimum (1)  | 1. Leave Client ID field blank <BR> 2. Fill Client Secret field with valid value <BR> 3. Click Add link | Add link should be disabled | |
+| Verify Client Secret field - minimum (1)  | 1. Fill Client ID field with valid value <BR> 2. Leave Client Secret field blank <BR> 3. Click Add link | Add link should be disabled | |
+
+_User Setup_:
+* Login as user
+* Navigate to `http://<cd4pe-instance>:<web-ui-port>/<workspace>/settings`
+* Click Source Control link
+
+|  Test Name | Steps  |  Expected Result |  Notes |
+| :--------- | :----- | :--------------- | :----- |
+| Verify ADO settings link | 1. Click Azure DevOps link <BR> | 'Azure DevOps Credentials' modal should appear | |
+| Verify ADO credentials button | 1. Successfully perform 'Verify ADO settings link' test <BR> 2. Click Add Credentials button | Browser should redirect to Azure DevOps login page | |
+| Verify ADO login | 1. Successfully perform 'Verify ADO credentials button' test <BR> 2. Login to Azure DevOps | Browser should redirect to CD4PE | |
 
 
 ### Bitbucket
