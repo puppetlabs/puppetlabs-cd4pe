@@ -947,5 +947,66 @@ _Setup_:
 | Verify pull request VCS integration | 1. Successfully complete 'Verify pull request hook event' test <BR>  2. Open the VCS UI for the pull request opened | An entry for the pipeline should appear.  It should include: <BR> - A link to the event for the run of the pipeline stage | |
 
 
+### Approval
+[Docs](https://puppet.com/docs/continuous-delivery/2.x/approval.html)
+
+_Setup_:
+* Perform [add job hardware](#add_job_hardware) setup.
+* Perform [code deploy](#code-deploy) setup.
+
+#### Create Group
+_Setup_:
+* Navigate to `http://<cd4pe-instance>:<web-ui-port>/<workspace>/settings/groups`
+
+|  Test Name | Steps  |  Expected Result |  Notes |
+| :--------- | :----- | :--------------- | :----- |
+| Verify Add Group link | 1. Click '+Create Group' link | 'Create Group' modal should appear | _UX_: Link should be '+Add Group' to be consistent |
+| Verify Group Name field - minimum (1)  | 1. Leave field blank <BR> 2. Fill in other fields <BR> 3. Click Create Group button | Group creation should fail, reporting that the field must be populated | |
+| Verify Group Name field - maximum (?)  | 1. Fill field with string exceeding maximum <BR> 2. Fill in other fields <BR> 3. Click Create Group button | Group creation should fail, reporting maximum acceptable length | |
+| Verify Group Name field - invalid character set  | 1. Fill field with 'ༀ-%© foo' <BR> 2. Fill in other fields <BR> 3. Click Install button | Group creation should fail, reporting acceptable character set | |
+| Verify Group Name field - valid character set  | 1. Fill field with '-_-_foo' <BR> 2. Fill in other fields <BR> 3. Click Install button | Group creation should succeed and group should be accessible in group list | |
+| Verify Group Description field - minimum (1)  | 1. Leave field blank <BR> 2. Fill in other fields <BR> 3. Click Create Group button | Group creation should fail, reporting that the field must be populated | |
+| Verify Group Description field - maximum (?)  | 1. Fill field with string exceeding maximum <BR> 2. Fill in other fields <BR> 3. Click Create Group button | Group creation should fail, reporting maximum acceptable length | |
+| Verify Group Description field - utf-8 character set  | 1. Fill field with 'ༀ-%© foo' <BR> 2. Fill in other fields <BR> 3. Click Install button | Group creation should succeed and group should be accessible in group list | |
+| Verify delete group | 1. Successfully perform 'Verify Group Name field - valid character set' test <BR> 2. Navigate to `http://<cd4pe-instance>:<web-ui-port>/<workspace>/settings/groups` <BR> 3. Click trash-can icon for group | Deletion confirmation modal should appear | |
+| Verify delete group button | 1. Successfully perform 'Verify delete group' test <BR> 2. Click Remove button | Group should be absent from list | |
+| Verify no groups | 1. Delete all groups | Group list should be empty | |
+| Verify group details button | 1. Successfully perform 'Verify Group Name field - valid character set' test <BR> 2. Navigate to `http://<cd4pe-instance>:<web-ui-port>/<workspace>/settings/groups` <BR> 3. Click view details icon for group | Group details modal should appear | |
+| Verify permissions | 1. Successfully perform 'Verify group details button' test <BR> 2. Click '+Set Permissions' for control repos <BR> 3. Check List <BR>  4. Click Set Permissions button for control repos | 'List' should appear in the permissions for control repos | _UX_: Should there be a single Set Permissions button for this modal that saves all selections rather than individual buttons per section?  Should all sections be expanded? |
+| Verify group members | 1. Successfully perform 'Verify group details button' test <BR> 2. Click '+Add Members' <BR> 3. Select user <BR>  4. Click Add Members button for control repos | User should appear in group member list | _UX_: Button should be 'Add Members' for consistency |
+
+
+#### Manage Protected Environment
+_Setup_:
+* [Create approval group](#create-group)
+* Navigate to `http://<cd4pe-instance>:<web-ui-port>/<workspace>/settings/puppet-enterprise`
+
+|  Test Name | Steps  |  Expected Result |  Notes |
+| :--------- | :----- | :--------------- | :----- |
+| Verify protected environments link | 1. Click numeric link under protected environments column for PE classifier under test | 'Puppet Enterprise Protected Environments' modal should appear | |
+| Verify no environments cancel button | 1. Successfully perform 'Verify protected environments link' test <BR> 2. Click Cancel button | 'Puppet Enterprise Protected Environments' modal should close and return user to the PE settings page | |
+| Verify no environments add button | 1. Successfully perform 'Verify protected environments link' test <BR> 2. Click Add button | Select Puppet environment should appear with list of environment | UX: Capitalization of environment inconsistent |
+| Verify puppet environment selection - minimum (1)  | 1. Successfully perform 'Verify no environments add button' test <BR> 2. Leave field blank <BR> 3. Fill in other fields <BR> 4. Click Add button | Protected environment creation should fail, reporting that the field must be populated | |
+| Verify approval group selection - minimum (1)  | 1. Successfully perform 'Verify no environments add button' test <BR>  2. Leave field blank <BR> 3. Fill in other fields <BR> 4. Click Add button | Protected environment creation should fail, reporting that the field must be populated | |
+| Verify add protected environment | 1. Successfully perform 'Verify no environments add button' test <BR> 2. Select Puppet environment <BR> 3. Enable approval group <BR> 4. Click Add button | Protected environment creation should succeed and the number of protected environments for the PE integration should be incremented | UX: toggle widget seems weird here. Expected checkbox |
+
+
+#### Approval Workflow
+_Setup_:
+* [Create approval group](#create-group)
+* [Create protected environment](#manage-protected-environment)
+* [Create pipeline with deployment stage to the protected environment](#deploy)
+* [Manually trigger pipeline](#manual)
+
+|  Test Name | Steps  |  Expected Result |  Notes |
+| :--------- | :----- | :--------------- | :----- |
+| Verify deploy pending approval | 1. Expand events associated with pipeline run | Deployment stage should have status: 'Deployment Pending Approval' | |
+| Verify approval notice in message center  | 1. Navigate to `http://<cd4pe-instance>:<web-ui-port>/<user>/messages` | Message should be listed for pipeline run with a link to provide approval | |
+| Verify approve deployment run | 1. Successfully perform 'Verify approval notice in message' test <BR> 2. Click on approval link | Deployment run should appear with a 'pending approval' status and a button to provide approval | |
+| Verify approve deployment modal | 1. Successfully perform 'Verify approval deployment run' test <BR> 2. Click on provide approval button | 'Provide Approval Decision' modal should appear | |
+| Verify decline approve deployment | 1. Successfully perform 'Verify approval deployment modal' test <BR> 2. Click on deny button | Deployment run should appear with a 'declined' status and NOT execute the code deploy | |
+| Verify approve deployment | 1. Successfully perform 'Verify approval deployment modal' test <BR> 2. Click on approve button | Deployment run should appear with an 'approved' status and execute the code deploy | |
+
+
 ## Impact Analysis
 TBD
