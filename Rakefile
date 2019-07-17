@@ -239,14 +239,7 @@ end
 
 namespace :test do
   namespace :install do
-    task :pe do
-    inventory_hash = inventory_hash_from_inventory_file
-    puts inventory_hash
-    end
     namespace :cd4pe do
-      task :oneclick do
-      end
-
       task :module, [:image, :version] do |t, args|
         image = args[:image] || ENV['CD4PE_IMAGE']
         version = args[:version] || ENV['CD4PE_VERSION']
