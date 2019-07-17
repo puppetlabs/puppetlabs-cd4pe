@@ -42,6 +42,12 @@ fixtures:
     service:
         repo: "git@github.com:puppetlabs/puppetlabs-service.git"
         ref: origin/master
+    facts:
+        repo: "git@github.com:puppetlabs/puppetlabs-facts.git"
+        ref: origin/master
+    puppet_agent:
+        repo: "git@github.com:puppetlabs/puppetlabs-puppet_agent.git"
+        ref: origin/master
   symlinks:
      puppet_enterprise: "#{source_dir}/spec/fixtures/puppet-enterprise-modules/modules/puppet_enterprise"
      pe_concat: "#{source_dir}/spec/fixtures/puppet-enterprise-modules/modules/pe_concat"

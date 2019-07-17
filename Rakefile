@@ -198,8 +198,113 @@ file MODULE_PKG => MODULE_PKG_SRCS do
   Rake::Task['build:module'].invoke
 end
 
-namespace :test_environment do
+namespace :ci do
+  task :create_inventory_file, [:hostname, :platform] do |t, args|
+    hostname = args[:hostname] || ENV['CI_HOSTNAME']
+    platform = args[:platform] || ENV['CI_PLATFORM']
+    # this method comes from https://github.com/puppetlabs/provision/blob/master/lib/task_helper.rb
+    # should this method be in core litmus?
+    if File.file?('inventory.yaml')
+      inventory_hash = inventory_hash_from_inventory_file('inventory.yaml')
+    else
+      inventory_hash = {
+        'groups' => [
+          { 'name' => 'docker_nodes', 'nodes' => [] },
+          { 'name' => 'ssh_nodes', 'nodes' => [] },
+          { 'name' => 'winrm_nodes', 'nodes' => [] }
+        ]}
+    end
 
+    node = {
+      'name' => hostname,
+      'config' => {
+        'transport' => 'ssh',
+        'ssh' => {
+          'user' => 'root',
+          'password' => 'Qu@lity!',
+          'host-key-check' => false
+        }
+      },
+      'facts' => {
+        'provisioner' => 'abs',
+        'platform' => platform,
+      }
+    }
+
+    add_node_to_group(inventory_hash, node, 'ssh_nodes')
+    puts "writing hash to disk: #{inventory_hash}"
+    write_to_inventory_file(inventory_hash, 'inventory.yaml')
+  end
+end
+
+namespace :test do
+  namespace :install do
+    namespace :cd4pe do
+      task :module, [:image, :version] do |t, args|
+        image = args[:image] || ENV['CD4PE_IMAGE']
+        version = args[:version] || ENV['CD4PE_VERSION']
+
+        Rake::Task['spec_prep'].invoke
+        if File.exists?('inventory.yaml')
+          # inventory_hash_from_inventory_file throws error if inventory file doesn't exist
+          inventory_hash = inventory_hash_from_inventory_file
+          targets = find_targets(inventory_hash, nil)
+        else 
+          targets = nil
+        end
+
+        if targets.nil? or targets.empty?
+          Rake::Task['litmus:provision'].invoke('vmpooler', 'centos-7-x86_64')
+          inventory_hash = inventory_hash_from_inventory_file
+          targets = find_targets(inventory_hash, nil)
+          target = targets.first
+        else
+          target = targets.first
+        end
+
+        add_node_to_group(inventory_hash, target, 'cd4pe')
+
+        cd4pe_image = image.nil? ? "" : "cd4pe_image => '#{image}',"
+        cd4pe_version = version.nil? ? "" : "cd4pe_version => '#{version}',"
+
+        Rake::Task['litmus:install_agent'].invoke('puppet6')
+        puts "installing cd4pe module"
+        Rake::Task['litmus:install_module'].invoke
+        include BoltSpec::Run
+        config_data = { 'modulepath' => File.join(Dir.pwd, 'spec', 'fixtures', 'modules') }
+        manifest = <<-MANIFEST
+          include docker
+          docker::run { 'cd4pe_postgres':
+            image                 => 'postgres:9.6',
+            net                   => 'cd4pe',
+            ports                 => ["5432:5432"],
+            volumes               => ['cd4pe-postgres:/var/lib/postgresql/data'],
+            env                   => ['POSTGRES_PASSWORD=puppetlabs'],
+            health_check_interval => 10,
+          }
+
+          class { "cd4pe":
+            #{cd4pe_image}
+            #{cd4pe_version}
+            manage_database => false,
+            db_host         => 'cd4pe_postgres',
+            db_name         => 'postgres',
+            db_pass         => Sensitive('puppetlabs'),
+            db_port         => 5432,
+            db_provider     => 'postgres',
+            db_user         => 'postgres',
+            db_prefix       => 'test',
+          }
+        MANIFEST
+        ret = apply_manifest(manifest, target, execute:true, config: config_data, inventory: inventory_hash)
+        puts ret
+      end
+    end
+  end
+
+end
+
+namespace :test_environment do
   desc "Provision nodes for a CD4PE test environment"
   task :provision do
     Rake::Task['spec_prep'].invoke
