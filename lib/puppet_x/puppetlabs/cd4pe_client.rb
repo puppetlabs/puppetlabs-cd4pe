@@ -13,6 +13,7 @@ module PuppetX::Puppetlabs
     ROOT_ENDPOINT_SETTINGS = '/root/endpoint-settings'.freeze
     ROOT_STORAGE_SETTINGS = '/root/storage-settings'.freeze
     SIGNUP_ENDPOINT = '/signup'.freeze
+    HW_CONFIG_ENDPOINT = '/root/hw-config'.freeze
 
     def initialize(hostname, email = nil, password = nil)
       uri = URI.parse(hostname)
@@ -258,17 +259,17 @@ module PuppetX::Puppetlabs
     end
 
     def create_agent_credentials()
-      endpoint = "#{ROOT_AJAX_ENDPOINT}?op=CreateAgentCredentials"
+      endpoint = "#{HW_CONFIG_ENDPOINT}?op=CreateAgentCredentials"
       make_request(:get, endpoint)
     end
 
     def list_agent_credentials()
-      endpoint = "#{ROOT_AJAX_ENDPOINT}?op=ListAgentCredentials"
+      endpoint = "#{HW_CONFIG_ENDPOINT}?op=ListAgentCredentials"
       make_request(:get, endpoint)
     end
 
     def list_servers()
-      endpoint = "#{ROOT_AJAX_ENDPOINT}?op=ListServers"
+      endpoint = "#{HW_CONFIG_ENDPOINT}?op=ListServers"
       make_request(:get, endpoint)
     end
 

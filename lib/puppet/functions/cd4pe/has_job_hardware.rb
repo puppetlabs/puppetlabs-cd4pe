@@ -9,15 +9,19 @@ Puppet::Functions.create_function(:'cd4pe::has_job_hardware') do
   end
 
   def has_job_hardware(host, root_username, root_password)
-    client = PuppetX::Puppetlabs::CD4PEClient.new(host, root_username, root_password.unwrap)
+    begin
+      client = PuppetX::Puppetlabs::CD4PEClient.new(host, root_username, root_password.unwrap)
 
-    response = client.list_servers
-    if(response == '200')
-      response_body = JSON.parse(response.body, symbolize_names: true)
-      return response_body[:rows].length > 0
-    else
-      Puppet.debug("Unable to find servers")
-      return false
+      response = client.list_servers
+      if(response.code == '200')
+        response_body = JSON.parse(response.body, symbolize_names: true)
+        return response_body[:rows].length > 0
+      else
+        Puppet.debug("Unable to find servers, response code #{response.code}")
+        return false
+      end
+    rescue => exception
+      Puppet.debug("Unable to contact server at #{host} to get job hardware, moving on.", exception.backtrace)
     end
   end
 end
