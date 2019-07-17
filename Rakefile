@@ -294,6 +294,7 @@ namespace :test do
             db_provider     => 'postgres',
             db_user         => 'postgres',
             db_prefix       => 'test',
+            analytics       => false,
           }
         MANIFEST
         ret = apply_manifest(manifest, target, execute:true, config: config_data, inventory: inventory_hash)
