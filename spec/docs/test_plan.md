@@ -243,12 +243,32 @@ See [Integrations 2019.1.x Advanced](#2019-advanced)
 TBD
 
 
-### Via OVA
-TBD
-
-
 ### Via Docker
-TBD
+_Setup_:
+
+1. Deploy PE (version agnostic)
+   * TODO: Detailed steps here
+1. Provision node to be dedicated to CD4PE to run on
+   * Via VMPooler/VMFloaty: `floaty get redhat-7-x86_64`
+1. Add node to PE; Accept key; run puppet on node
+   * TODO: Detailed steps here
+1. Install Docker on node
+   * `puppet module install puppetlabs-docker`
+   * `puppet apply -e "class { 'docker': repo_opt => '--enablerepo=localmirror-extras', }"`
+1. Setup MySQL database on node
+   * `docker pull mysql:5.7`
+   * `docker run --name mysqldbtest -e MYSQL_ROOT_PASSWORD=mypass -e MYSQL_DATABASE=cdpe -e MYSQL_USER=cdpe -e MYSQL_PASSWORD=mypass -d mysql:5.7 --character-set-server=latin1 --collation-server=latin1_swedish_ci`
+   * Get mysql container's IP address
+     * `export mysqlip=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' mysqldbtest)`
+1. Generate encryption key
+   * `export secret=$(dd bs=1 if=/dev/urandom count=16 2>/dev/null | base64)`
+
+
+|  Test Name | Steps  |  Expected Result |  Notes |
+| :--------- | :----- | :--------------- | :----- |
+| Verify docker pull | 1. SSH to CD4PE node <BR> 2. Run `docker pull puppet/continuous-delivery-for-puppet-enterprise:latest` | 1. Command should complete with '0' exit code <BR> 2. STDOUT should contain 'Status: Downloaded newer image' **OR** 'Status: Image is up to date' | |
+| Verify docker run | 1. SSH to CD4PE node <BR> 2. Run `docker run --rm --name cd4pe -v cd4pe:/disk -e DB_ENDPOINT=mysql://$mysqlip:3306/cdpe -e DB_USER=cdpe -e DB_PASS=mypass -e DB_PREFIX=cdpe_ -e DUMP_URI=dump://localhost:7000 -e PFI_SECRET_KEY=$secret -p 8080:8080 -p 8000:8000 -p 7000:7000 puppet/continuous-delivery-for-puppet-enterprise:latest` | 1. Command should complete with '0' exit code <BR> 2. STDOUT should return a Docker container ID | |
+| Verify cd4pe running | 1. Successfully complete 'Verify docker run' test <BR> 2. Point web browser to `<cd4pe-docker-host>:8080` | CD4PE setup page should be displayed | |
 
 
 ## Initial Login
