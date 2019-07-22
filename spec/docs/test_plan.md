@@ -210,7 +210,33 @@ _Parameters_:
 
 
 ### Via PE Integrations (2019.0.x or 2018.1.x)
-TBD
+
+
+#### Environment Setup
+1. Deploy PE 2018.1.8
+   * TODO: Detailed steps here
+1. Provision node to be dedicated to CD4PE to run on
+   * TODO: Detailed steps here
+1. Add node to PE; Accept key; run puppet on node
+   * TODO: Detailed steps here
+
+
+#### Basic
+_Setup_: In the PE console, navigate to Integrations:
+
+|  Test Name | Steps  |  Expected Result |  Notes |
+| :--------- | :----- | :--------------- | :----- |
+| Verify documentation link | 1. Click '...get started with Continuous Delivery...' link  | Browser should open CD4PE installation instructions on https://puppet.com/docs in a new tab | |
+| Verify install button | 1. Click Install button | Run task page should be displayed with 1. The Task field pre-populated with 'pe_installer_cd4pe::install' <BR> 2. The 'cd4pe_admin_email' and 'cd4pe_admin_password' parameters highlighted as mandatory | |
+| Add node to task inventory | 1. Successfully complete the 'Verify install button' test <BR> 2. Add cd4pe node to task inventory | | This is a setup task for the tests below |
+| Verify cd4pe_admin_email parameter - minimum (1) | 1. Successfully complete the 'Add node to task inventory' test <BR> 2. Fill in field with '""' <BR> 3. Fill in other fields  <BR> 3. Click Run Job button | Task should fail reporting that parameter requires a string of at least one character | |
+| Verify cd4pe_admin_email parameter - maximum (385) | 1. Successfully complete the 'Add node to task inventory' test <BR> 2. Fill in field with a string exceeding maximum  <BR> 3. Fill in other fields  <BR> 3. Click Run Job button | Task should fail reporting that parameter requires a string not exceeding maximum | local(64)@domain(255).tld(63) See: https://tools.ietf.org/html/rfc822#section-6.1 and https://tools.ietf.org/html/rfc1035 |
+| Verify cd4pe_admin_password parameter - minimum (1) | 1. Successfully complete the 'Add node to task inventory' test <BR> 2. Fill in field with '""' <BR> 3. Fill in other fields  <BR> 3. Click Run Job button | Task should fail reporting that parameter requires a string of at least one character | |
+| Verify cd4pe_admin_password parameter - maximum (?) | 1. Successfully complete the 'Add node to task inventory' test <BR> 2. Fill in field with a string exceeding maximum  <BR> 3. Fill in other fields  <BR> 3. Click Run Job button | Task should fail reporting that parameter requires a string not exceeding maximum | |
+
+
+#### Advanced Options
+See [Integrations 2019.1.x Advanced](#2019-advanced)
 
 
 ### Via CD4PE Module
