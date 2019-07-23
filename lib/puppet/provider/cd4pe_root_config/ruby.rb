@@ -78,11 +78,9 @@ Puppet::Type.type(:cd4pe_root_config).provide(:ruby) do
     resp = save_storage_settings(resource)
     storage_success = resp.code == '200'
     resp = save_ssl_settings(@resource)
-    ssl_success = resp.code == '200'
-    install_shared_job_hardware = @resource[:install_shared_job_hardware]
-    if(install_shared_job_hardware)
-      response = install_shared_job_hardware()
-      puts "\n\n\n#{response}\n\n"
+    ssl_success = true
+    unless resp.nil?
+      ssl_success = resp.code == '200'
     end
 
     if endpoint_success && storage_success && ssl_success
@@ -112,7 +110,10 @@ Puppet::Type.type(:cd4pe_root_config).provide(:ruby) do
     resp = save_storage_settings(resource)
     storage_success = resp.code == '200'
     resp = save_ssl_settings(@resource)
-    ssl_success = resp.code == '200'
+    ssl_success = true
+    unless resp.nil?
+      ssl_success = resp.code == '200'
+    end
 
     if endpoint_success && storage_success && ssl_success
       @resource.original_parameters.each_key do |k|
@@ -156,14 +157,13 @@ Puppet::Type.type(:cd4pe_root_config).provide(:ruby) do
     ssl_server_certificate = resource[:ssl_server_certificate]
     ssl_authority_certificate = resource[:ssl_authority_certificate]
     ssl_server_private_key = resource[:ssl_server_private_key]
-    self.class.api_client.save_ssl_settings(
-      ssl_authority_certificate, ssl_server_certificate, ssl_server_private_key, ssl_enabled
-    )
-  end
+    if(!ssl_server_certificate.nil? && !ssl_authority_certificate.nil? && !ssl_server_private_key.nil?)
+      return self.class.api_client.save_ssl_settings(
+        ssl_authority_certificate, ssl_server_certificate, ssl_server_private_key, ssl_enabled
+      )
+    end
 
-  def install_shared_job_hardware()
-    self.class.api_client.list_agent_credentials()
-
+    return nil
   end
 
   class << self
