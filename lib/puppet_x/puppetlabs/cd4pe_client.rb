@@ -258,17 +258,17 @@ module PuppetX::Puppetlabs
       make_request(:post, SIGNUP_ENDPOINT, payload.to_json)
     end
 
-    def create_agent_credentials()
+    def create_agent_credentials
       endpoint = "#{HW_CONFIG_ENDPOINT}?op=CreateAgentCredentials"
       make_request(:get, endpoint)
     end
 
-    def list_agent_credentials()
+    def list_agent_credentials
       endpoint = "#{HW_CONFIG_ENDPOINT}?op=ListAgentCredentials"
       make_request(:get, endpoint)
     end
 
-    def list_servers()
+    def list_servers
       endpoint = "#{HW_CONFIG_ENDPOINT}?op=ListServers"
       make_request(:get, endpoint)
     end
