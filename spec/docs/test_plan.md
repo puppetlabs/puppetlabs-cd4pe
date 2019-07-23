@@ -240,7 +240,54 @@ See [Integrations 2019.1.x Advanced](#2019-advanced)
 
 
 ### Via CD4PE Module
-TBD
+_Setup_:
+
+1. Deploy PE (version agnostic)
+   * TODO: Detailed steps here
+1. Setup control repo on master
+   * `bolt command run 'yum install -y git' --user root --no-host-key-check --private-key ~/.ssh/id_rsa-acceptance --nodes <pe-master>`
+   * (via [gplt bolt task](https://github.com/puppetlabs/gatling-puppet-load-test/blob/master/docs/tasks.md#gpltcreate_control_repo_from_production_env))  `bolt task run  --user root --no-host-key-check --private-key ~/.ssh/id_rsa-acceptance  gplt::create_control_repo_from_production_env --nodes <pe-master>`
+   * `bolt command run 'git clone /opt/puppet/control-repo.git && cd control-repo /root/control-repo' --user root --no-host-key-check --private-key ~/.ssh/id_rsa-acceptance --nodes <pe-master>`
+   * Create Puppetfile
+   ```
+   cat > puppetfile.pp << PUPPETFILE
+   file { '/root/control-repo/Puppetfile':
+     ensure => present,
+     content => "
+       mod 'puppetlabs-cd4pe', :latest
+       mod 'puppetlabs-concat', '4.2.1'
+       mod 'puppetlabs-hocon', '1.0.1'
+       mod 'puppetlabs-puppet_authorization', '0.5.0'
+       mod 'puppetlabs-stdlib', '4.25.1'
+       mod 'puppetlabs-docker', '3.3.0'
+       mod 'puppetlabs-apt', '6.2.1'
+       mod 'puppetlabs-translate', '1.1.0'
+     ",
+   }
+   PUPPETFILE
+   ```
+   * `bolt apply puppetfile.pp --user root --no-host-key-check --private-key ~/.ssh/id_rsa-acceptance --nodes <pe-master>`
+   * `bolt command run 'cd /root/control-repo && git add Puppetfile' --user root --no-host-key-check --private-key ~/.ssh/id_rsa-acceptance --nodes <pe-master>`
+   * `bolt command run 'cd /root/control-repo && git commit -m "Add Puppetfile"' --user root --no-host-key-check --private-key ~/.ssh/id_rsa-acceptance --nodes <pe-master>`
+   * `bolt command run 'cd /root/control-repo && git push' --user root --no-host-key-check --private-key ~/.ssh/id_rsa-acceptance --nodes <pe-master>`
+   * [Enable code manager](https://puppet.com/docs/pe/2019.1/code_mgr_config.html#enable-code-manager-after-installation)
+     * Add `code_manager_auto_configure` to `true` to `puppet_enterprise::profile::master` class in PE Master group
+     * Add `r10k_remote` to `/opt/puppet/control-repo.git` to `puppet_enterprise::profile::master` class in PE Master group
+     * Run puppet on master
+   * Deploy. SSH to master and perform the following:
+     * `puppet access login`
+     * `puppet code deploy production --wait`
+1. Create CD4PE node group
+1. Provision node to be dedicated to CD4PE to run on
+   * Via VMPooler/VMFloaty: `floaty get redhat-7-x86_64`
+1. Add node to PE; Accept key; run puppet on node
+   * TODO: Detailed steps here
+1. Pin node to CD4PE node group
+1. Add cd4pe class to classification tab of CD4PE node group
+1. Run puppet on cd4pe node
+   * Nodes on vmpooler will fail to install docker due to rhel mirrors not being available. Install docker via `yum -y --enablerepo=localmirror-extras install docker-ce` and re-run puppet.
+
+Test cd4pe class pararameter.  See  [Integrations 2019.1.x Advanced](#2019-advanced)
 
 
 ### Via Docker
