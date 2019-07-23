@@ -157,13 +157,13 @@ Puppet::Type.type(:cd4pe_root_config).provide(:ruby) do
     ssl_server_certificate = resource[:ssl_server_certificate]
     ssl_authority_certificate = resource[:ssl_authority_certificate]
     ssl_server_private_key = resource[:ssl_server_private_key]
-    if(!ssl_server_certificate.nil? && !ssl_authority_certificate.nil? && !ssl_server_private_key.nil?)
+    if !ssl_server_certificate.nil? && !ssl_authority_certificate.nil? && !ssl_server_private_key.nil?
       return self.class.api_client.save_ssl_settings(
         ssl_authority_certificate, ssl_server_certificate, ssl_server_private_key, ssl_enabled
       )
     end
 
-    return nil
+    nil
   end
 
   class << self
