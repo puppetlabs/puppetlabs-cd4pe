@@ -24,7 +24,7 @@ Puppet::Functions.create_function(:'cd4pe::get_agent_credentials') do
         end
       end
     else
-      Puppet.debug('Problem getting agent credentials')
+      Puppet.debug("Problem getting agent credentials, response code #{response.code}", response)
     end
 
     unless has_agent_credentials
@@ -43,7 +43,7 @@ Puppet::Functions.create_function(:'cd4pe::get_agent_credentials') do
         'secret_key' => new_credentials[:secretKey],
       }
     else
-      Puppet.debug('Problem creating new agent credentials')
+      Puppet.debug("Problem creating agent credentials, response code #{response.code}", response)
     end
   rescue => exception
     Puppet.debug("Unable to contact server at #{host} to create agent credentials, moving on.", exception.backtrace)
