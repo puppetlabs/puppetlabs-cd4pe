@@ -143,12 +143,12 @@ RSpec.shared_context 'cd4pe login' do
   let(:login_url) { "#{test_host}/login" }
   let(:hw_config_url) { "#{test_host}/root/hw-config" }
   let(:res_cookie) do
-    'com.puppet.pipelines.pfi.sid=' + '
-    ARVyw81QfSnwTXd1DI8ml3b93SIYSD85XWU2Ymg-wZ_tYrc8SnLz3mK5z0EQRc2NNWCaJeaZWFByCE3-VD4gSCvLnfUSjUuVO9f6HbRT5lbZHUiIn91fMocUVLHJ831rXQ==;Path=/;HttpOnly'
+    'com.puppet.pipelines.pfi.sid='\
+    'ARVyw81QfSnwTXd1DI8ml3b93SIYSD85XWU2Ymg-wZ_tYrc8SnLz3mK5z0EQRc2NNWCaJeaZWFByCE3-VD4gSCvLnfUSjUuVO9f6HbRT5lbZHUiIn91fMocUVLHJ831rXQ==;Path=/;HttpOnly'
   end
   let(:req_cookie) do
-    'com.puppet.pipelines.pfi.sid=' + '
-    ARVyw81QfSnwTXd1DI8ml3b93SIYSD85XWU2Ymg-wZ_tYrc8SnLz3mK5z0EQRc2NNWCaJeaZWFByCE3-VD4gSCvLnfUSjUuVO9f6HbRT5lbZHUiIn91fMocUVLHJ831rXQ=='
+    'com.puppet.pipelines.pfi.sid='\
+    'ARVyw81QfSnwTXd1DI8ml3b93SIYSD85XWU2Ymg-wZ_tYrc8SnLz3mK5z0EQRc2NNWCaJeaZWFByCE3-VD4gSCvLnfUSjUuVO9f6HbRT5lbZHUiIn91fMocUVLHJ831rXQ=='
   end
   let(:req_login) do
     {
