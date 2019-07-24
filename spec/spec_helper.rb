@@ -137,3 +137,40 @@ def sensitive(value)
 end
 
 # 'spec_overrides' from sync.yml will appear below this line
+
+RSpec.shared_context 'cd4pe login' do
+  let(:test_host) { 'http://puppet.test' }
+  let(:login_url) { "#{test_host}/login" }
+  let(:hw_config_url) { "#{test_host}/root/hw-config" }
+  let(:res_cookie) do
+    'com.puppet.pipelines.pfi.sid=' + '
+    ARVyw81QfSnwTXd1DI8ml3b93SIYSD85XWU2Ymg-wZ_tYrc8SnLz3mK5z0EQRc2NNWCaJeaZWFByCE3-VD4gSCvLnfUSjUuVO9f6HbRT5lbZHUiIn91fMocUVLHJ831rXQ==;Path=/;HttpOnly'
+  end
+  let(:req_cookie) do
+    'com.puppet.pipelines.pfi.sid=' + '
+    ARVyw81QfSnwTXd1DI8ml3b93SIYSD85XWU2Ymg-wZ_tYrc8SnLz3mK5z0EQRc2NNWCaJeaZWFByCE3-VD4gSCvLnfUSjUuVO9f6HbRT5lbZHUiIn91fMocUVLHJ831rXQ=='
+  end
+  let(:req_login) do
+    {
+      op: 'PfiLogin',
+      content: {
+        email: 'test@test.com',
+        passwd: 'test',
+      },
+    }
+  end
+  let(:res_login) do
+    {
+      success: true,
+      username: 'root',
+      domain: 'd1',
+      redirectTo: '/root',
+    }
+  end
+
+  before(:each) do
+    stub_request(:post, login_url)
+      .with(body: JSON.generate(req_login))
+      .to_return(headers: { 'Set-Cookie' => res_cookie }, body: JSON.generate(res_login))
+  end
+end

@@ -1,6 +1,6 @@
 require 'puppet_x/puppetlabs/cd4pe_client'
 
-Puppet::Functions.create_function(:'cd4pe::job_hardware?') do
+Puppet::Functions.create_function(:'cd4pe::has_job_hardware') do
   dispatch :job_hardware? do
     param 'String', :host
     param 'String', :root_username
@@ -15,7 +15,7 @@ Puppet::Functions.create_function(:'cd4pe::job_hardware?') do
       response_body = JSON.parse(response.body, symbolize_names: true)
       return !response_body[:rows].empty?
     else
-      Puppet.debug("Unable to find servers, response code #{response.code}")
+      Puppet.debug("Unable to find servers, response code #{response.code}", response)
       return false
     end
   rescue => exception
