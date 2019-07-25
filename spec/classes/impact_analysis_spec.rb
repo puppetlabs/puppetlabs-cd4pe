@@ -25,10 +25,6 @@ RSpec.describe 'cd4pe::impact_analysis' do
       end
 
       it { is_expected.to contain_class('cd4pe::impact_analysis::legacy').with_ensure('present') }
-      it {
-        is_expected.to contain_pe_puppet_authorization__rule('puppetlabs environment')
-          .with_allow(['master.rspec', 'test'])
-      }
 
       context 'ensure => absent' do
         let(:params) do
@@ -56,10 +52,6 @@ RSpec.describe 'cd4pe::impact_analysis' do
 
     context 'using the new code' do
       it { is_expected.to contain_class('cd4pe::impact_analysis::legacy').with_ensure('absent') }
-      it {
-        is_expected.to contain_pe_puppet_authorization__rule('puppetlabs environment')
-          .with_allow(['master.rspec', { 'rbac' => { 'permission' => 'puppetserver:compile_catalog:*' } }])
-      }
     end
   end
 end

@@ -18,6 +18,11 @@ class cd4pe::root_config(
   Optional[Sensitive[String[1]]] $ssl_server_private_key   = undef,
   Optional[String[1]] $ssl_endpoint                        = undef,
   Optional[Integer] $ssl_port                              = 8443,
+  Optional[Boolean] $install_shared_job_hardware           = false,
+  Optional[Boolean] $job_hardware_start_agent              = true,
+  Optional[String] $job_hardware_data_dir                  = '/home/distelli/data',
+  Optional[String] $job_hardware_install_dir               = '/home/distelli/bin',
+  Optional[String] $job_hardware_agent_version             = undef,
 ) inherits cd4pe {
   include cd4pe::anchors
 
@@ -51,4 +56,27 @@ class cd4pe::root_config(
     notify                    => $notify,
   }
 
+  if ($install_shared_job_hardware) {
+    $job_hardware_installed = cd4pe::has_job_hardware($web_ui_endpoint, $root_email, $root_password)
+    if(!$job_hardware_installed) {
+      $creds_hash = cd4pe::get_agent_credentials($web_ui_endpoint, $root_email, $root_password)
+
+      exec { 'wait for CD4PE':
+        require => Cd4pe_root_config[$web_ui_endpoint],
+        before => Class["pipelines::agent"],
+        command => "sleep 5",
+        path => "/usr/bin:/bin"
+      }
+
+      class { 'pipelines::agent':
+        access_token => Sensitive($creds_hash[access_token]),
+        secret_key   => Sensitive($creds_hash[secret_key]),
+        download_url => "${web_ui_endpoint}/download/client",
+        start_agent  => $job_hardware_start_agent,
+        data_dir     => $job_hardware_data_dir,
+        install_dir  => $job_hardware_install_dir,
+        version      => $job_hardware_agent_version,
+      }
+    }
+  }
 }
