@@ -5,7 +5,7 @@ require 'puppet_blacksmith/rake_tasks' if Bundler.rubygems.find_name('puppet-bla
 require 'github_changelog_generator/task' if Bundler.rubygems.find_name('github_changelog_generator').any?
 require 'puppet-strings/tasks' if Bundler.rubygems.find_name('puppet-strings').any?
 require 'json'
-require 'bolt_spec/run'
+require 'bolt_spec/run' if Bundler.rubygems.find_name('bolt_spec/run').any?
 
 ignore_paths = ["checkouts/**/*", "dev/**/*", "dev-resources/**/*", "test/**/*", "src/**/*", "vendor/**/*", "spec/fixtures/**/*"]
 
