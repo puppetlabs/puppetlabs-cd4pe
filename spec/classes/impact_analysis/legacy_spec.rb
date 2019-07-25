@@ -24,10 +24,6 @@ RSpec.describe 'cd4pe::impact_analysis::legacy' do
     end
 
     context 'valid params' do
-      it {
-        is_expected.to contain_pe_puppet_authorization__rule('puppetlabs environment')
-          .with_allow(['master.rspec', 'test'])
-      }
       it { is_expected.to contain_puppet_authorization__rule('CDPE API access') }
       it {
         is_expected.to contain_file('/opt/puppetlabs/server/data/puppetserver/jars/cdpe-api.jar')
