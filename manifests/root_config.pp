@@ -61,21 +61,23 @@ class cd4pe::root_config(
     if(!$job_hardware_installed) {
       $creds_hash = cd4pe::get_agent_credentials($web_ui_endpoint, $root_email, $root_password)
 
-      exec { 'wait for CD4PE':
-        require => Cd4pe_root_config[$web_ui_endpoint],
-        before => Class["pipelines::agent"],
-        command => "sleep 5",
-        path => "/usr/bin:/bin"
-      }
+      if($creds_hash) {
+        exec { 'wait for CD4PE':
+          require => Cd4pe_root_config[$web_ui_endpoint],
+          before => Class["pipelines::agent"],
+          command => "sleep 1",
+          path => "/usr/bin:/bin"
+        }
 
-      class { 'pipelines::agent':
-        access_token => Sensitive($creds_hash[access_token]),
-        secret_key   => Sensitive($creds_hash[secret_key]),
-        download_url => "${web_ui_endpoint}/download/client",
-        start_agent  => $job_hardware_start_agent,
-        data_dir     => $job_hardware_data_dir,
-        install_dir  => $job_hardware_install_dir,
-        version      => $job_hardware_agent_version,
+        class { 'pipelines::agent':
+          access_token => Sensitive($creds_hash[access_token]),
+          secret_key   => Sensitive($creds_hash[secret_key]),
+          download_url => "${web_ui_endpoint}/download/client",
+          start_agent  => $job_hardware_start_agent,
+          data_dir     => $job_hardware_data_dir,
+          install_dir  => $job_hardware_install_dir,
+          version      => $job_hardware_agent_version,
+        }
       }
     }
   }
