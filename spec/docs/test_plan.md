@@ -28,7 +28,6 @@ _Setup_: In the PE console, navigate to Integrations:
 | Verify host field - must be managed host | 1. Fill field with non-managed host value <BR> 2. Fill in other fields <BR> 3. Click Install button | Install button should be disabled | |
 | Verify Administrator email field - must be filled in | 1. Leave field blank <BR> 2. Fill in other fields <BR> 3. Click Install button | Install button should be disabled | |
 | Verify Administrator email field - should accept email address with TLD | 1. Fill field with '!def!xyz%abc@example.org' <BR> 2. Fill in other fields <BR> 3. Click Install button | Install should succeed and account should be accessible via login | https://tools.ietf.org/html/rfc3696 |
-| Verify Administrator email field - should accept email address without TLD | 1. Fill field with '!def!xyz%abc@example' <BR> 2. Fill in other fields <BR> 3. Click Install button | Install should succeed and account should be accessible via login | https://tools.ietf.org/html/rfc3696 | |
 | Verify Administrator email field - should accept UTF-8 in local | 1. Fill field with email '©®@a.b' <BR> 2. Fill in other fields <BR> 3. Click Install button | Install should succeed and account should be accessible via login | https://tools.ietf.org/html/rfc6531 | |
 | Verify Administrator email field - should reject malformed email address | 1. Fill field with "evil'ex" <BR> 2. Fill in other fields <BR> 3. Click Install button | Install button should be disabled | |
 | Verify Administrator email field - should accept local of 64 chars | 1. Fill field with 'MalignPreyOiledPalmFireSomeAddictPygmyEntitlementSpikesEnlis@example.org' <BR> 2. Fill in other fields <BR> 3. Click Install button | Install should succeed and account should be accessible via login | |
@@ -48,7 +47,7 @@ _Setup_: In the PE console, navigate to Integrations:
 | Verify resolvable_hostname parameter - should override certname | 1. Create CD4PE host with unresolvable certname and resolvable altname <BR> 2. Add resolvable_hostname parameter with altname value <BR> 3. Fill in other fields 4. Click Run Job button | Install should succeed | |
 | Verify cd4pe_image parameter - should use specified image | 1. Add cd4pe_image parameter with 'hello-world' value <BR> 2. Fill in other fields <BR> 3. Click Run Job button | Install should fail reporting usage of 'hello-world' docker image | |
 | Verify cd4pe_version parameter - should install older cd4pe version | 1. Add cd4pe_version parameter with '1.1.1' value <BR> 2. Fill in other fields <BR> 3. Click Run Job button | Install should succeed and installed version should be '1.1.1' | |
-| Verify cd4pe_version parameter - should provide understandable errror | 1. Add cd4pe_version parameter with '99.99.99' value <BR> 2. Fill in other fields <BR> 3. Click Run Job button | Install should fail, reporting that specified version cannot be found | |
+| Verify cd4pe_version parameter - should provide understandable error | 1. Add cd4pe_version parameter with '99.99.99' value <BR> 2. Fill in other fields <BR> 3. Click Run Job button | Install should fail, reporting that specified version cannot be found | |
 
 
 ##### Database Options
@@ -111,6 +110,7 @@ _Setup_:
 * Create MySQL instance
   * TODO: Detailed steps here
   * Set db_host=foo
+  * Set db_user=foo
   * Set db_name=cd4pe
   * Set db_pass=bar
   * Set db_port=3306
@@ -125,12 +125,11 @@ _Setup_:
 |  Test Name |  Steps |  Expected Result |  Notes |
 | :--------- | :----- | :--------------- | :----- |
 | Verify manage_database parameter - should only allow true/false | 1. Add manage_database parameter with "evil'ex" value <BR> 2. Fill in other fields <BR> 3. Click Run Job button | Install should fail, reporting that true/false value must be supplied | |
-| Verify manage_database parameter - should provide understandable error (no provider) | 1. Add manage_database parameter with 'true' value <BR> 2. Fill in other fields <BR> 3. Click Run Job button | Install should fail, reporting that `db_provider` must be specified | |
-| Verify manage_database parameter - should provide understandable error (false) | 1. Add manage_database parameter with 'false' value <BR> 2. Add db_provider parameter with 'mysql' value <BR> 3. Fill in other fields <BR> 4. Click Run Job button | Install should fail, reporting that parameter must be `false` wnen `db_provider` is set to 'mysql' | |
-| Verify manage_database parameter - true should enable MySQL when provider set (with `db_provider`; without `db_{host,name,pass,port}`) | 1. Add manage_database parameter with 'true' value <BR> 2. Add db_provider parameter with 'mysql' value <BR> 3. Fill in other fields <BR> 3. Click Run Job button | Install should succeed and MySQL should be used for storage | UX/Docs: Can this be inferred by the `db_provider` value and not have to be set? |
-| Verify db_host parameter - should succeed when available | 1. Add db_host parameter with 'foo' value <BR> 2. Add manage_database parameter with 'true' value <BR> 3. Add db_provider parameter with 'mysql' value <BR> 4. Add db_name parameter with 'cd4pe' value <BR> 5. Add db_pass parameter with 'bar' value <BR> 6. Add db_port parameter with '3306' value <BR> 7. Fill in other fields <BR> 8. Click Run Job button | Install should succeed and MySQL should be used for storage on host 'foo' |
-| Verify db_host parameter - (unset) | | | What is the expected behaviour since this is optional? |
-| Verify db_host parameter - should provide understandable error (unavailable) | 1. Add db_host parameter with 'bogus' value <BR> 2. Add manage_database parameter with 'true' value <BR> 3. Add db_provider parameter with 'mysql' value <BR> 4. Add db_name parameter with 'cd4pe' value <BR> 5. Add db_pass parameter with 'bar' value <BR> 6. Add db_port parameter with '3306' value <BR> 7. Fill in other fields <BR> 8. Click Run Job button | Install should fail, reporting that hostname is unreachable |
+| Verify manage_database parameter - should succeed (true - no provider) | 1. Add manage_database parameter with 'true' value <BR> 2. Fill in other fields <BR> 3. Click Run Job button | Install should succeed defaulting to using postgresql | |
+| Verify manage_database parameter - should provide understandable error (false) | 1. Add manage_database parameter with 'false' value <BR>  2. Fill in other fields <BR> 4. Click Run Job button | Install should fail, reporting cannot connect to an existing db | |
+| Verify db_host parameter - should succeed when available | 1. Add db_host parameter with 'foo' value <BR> 2. Add manage_database parameter with 'true' value <BR>  4. Add db_user parameter with 'foo' value <BR> 4. Add db_name parameter with 'cd4pe' value <BR> 5. Add db_pass parameter with 'bar' value <BR> 6. Add db_port parameter with '3306' value <BR> 7. Fill in other fields <BR> 8. Click Run Job button | Install should succeed and MySQL should be used for storage on host 'foo' |
+| Verify db_host parameter - shou(unset) | | | What is the expected behaviour since this is optional? |
+| Verify db_host parameter - should provide understandable error (unavailable) | 1. Add db_host parameter with 'bogus' value <BR> 2. Add manage_database parameter with 'true' value <BR>  4. Add db_name parameter with 'cd4pe' value <BR> 5. Add db_pass parameter with 'bar' value <BR> 6. Add db_port parameter with '3306' value <BR> 7. Fill in other fields <BR> 8. Click Run Job button | Install should fail, reporting that hostname is unreachable |
 | Verify db_host parameter - should provide understandable error (invalid) | 1. Add db_host parameter with '!@#$%^&?' value <BR> 2. Add manage_database parameter with 'true' value <BR> 3. Add db_provider parameter with 'mysql' value <BR> 4. Add db_name parameter with 'cd4pe' value <BR> 5. Add db_pass parameter with 'bar' value <BR> 6. Add db_port parameter with '3306' value <BR> 7. Fill in other fields <BR> 8. Click Run Job button | Install should fail, reporting that hostname is invalid (support schema) | Do we support internationalized domains (binary) as per https://tools.ietf.org/html/rfc2181#section-11 ?? |
 | Verify db_name parameter - should succeed when available | 1. Add db_name parameter with 'cd4pe' value <BR> 2. Add manage_database parameter with 'true' value <BR> 3. Add db_provider parameter with 'mysql' value <BR> 4. Add db_host parameter with 'foo' value <BR> 5. Add db_pass parameter with 'bar' value <BR> 6. Add db_port parameter with '3306' value <BR> 7. Fill in other fields <BR> 8. Click Run Job button | Install should succeed and MySQL should be used for storage using 'cd4pe' database | |
 | Verify db_name parameter - (unset) | | | What is the expected behaviour since this is optional? |
@@ -188,12 +187,15 @@ _Setup_:
 | Verify agent_service_port parameter - should bind to given port | 1. Add agent_service_port parameter with '7010' value <BR> 2. Fill in other fields <BR> 3. Click Run Job button | Install should succeed and service should be bound to port '7010' | |
 | Verify agent_service_port parameter - should provide understandable error (previously bound) | 1. Add agent_service_port parameter with '22' value <BR> 2. Fill in other fields <BR> 3. Click Run Job button | Install should fail reporting that port is already bound | |
 | Verify agent_service_port parameter - should provide understandable error (invalid) | 1. Add agent_service_port parameter with 'invalid' value <BR> 2. Fill in other fields <BR> 3. Click Run Job button | Install should fail, reporting that parameter only supports port numbers in [specified range] | |
+| Verify agent_service_port parameter - should provide understandable error (out of range) | 1. Add agent_service_port parameter with '65536' value <BR> 2. Fill in other fields <BR> 3. Click Run Job button | Install should fail, reporting that parameter only supports port numbers in specified range (1-65535) | |
 | Verify backend_service_port parameter - should bind to given port | 1. Add backend_service_port parameter with '8010' value <BR> 2. Fill in other fields <BR> 3. Click Run Job button | Install should succeed and service should be bound to port '8010' | |
 | Verify backend_service_port parameter - should provide understandable error (previously bound) | 1. Add backend_service_port parameter with '22' value <BR> 2. Fill in other fields <BR> 3. Click Run Job button | Install should fail reporting that port is already bound | |
 | Verify backent_service_port parameter - should provide understandable error (invalid) | 1. Add backend_service_port parameter with 'invalid' value <BR> 2. Fill in other fields <BR> 3. Click Run Job button | Install should fail, reporting that parameter only supports port numbers in [specified range] | |
+| Verify backend_service_port parameter - should provide understandable error (out of range) | 1. Add backend_service_port parameter with '65536' value <BR> 2. Fill in other fields <BR> 3. Click Run Job button | Install should fail, reporting that parameter only supports port numbers in specified range (1-65535) | |
 | Verify web_ui_port parameter - should bind to given port | 1. Add web_ui_port parameter with '80' value <BR> 2. Fill in other fields <BR> 3. Click Run Job button | Install should succeed and service should be bound to port '80' | |
 | Verify web_ui_port parameter - should provide understandable error (previously bound) | 1. Add web_ui_port parameter with '22' value <BR> 2. Fill in other fields <BR> 3. Click Run Job button | Install should fail reporting that port is already bound | |
 | Verify web_ui_port parameter - should provide understandable error (invalid) | 1. Add web_ui_port parameter with 'invalid' value <BR> 2. Fill in other fields <BR> 3. Click Run Job button | Install should fail, reporting that parameter only supports port numbers in [specified range] | |
+| Verify web_ui_port parameter - should provide understandable error (out of range) | 1. Add web_ui_port parameter with '65536' value <BR> 2. Fill in other fields <BR> 3. Click Run Job button | Install should fail, reporting that parameter only supports port numbers in specified range (1-65535) | |
 
 
 ##### Other Options
@@ -320,8 +322,6 @@ _Setup_:
 
 ## Initial Login
 
-_UX_: The yellow text on the web ui pages evokes link text.  At small sizes, it is also harder to read.  Suggest using bold for emphasis instead.
-
 
 ### Configure endpoint
 
@@ -371,7 +371,6 @@ _Setup_: Navigate to `http://<cd4pe-instance>:<web-ui-port>/signup`
 | Verify Last Name field - valid  | 1. Fill field with 'a' <BR> 2. Fill in other fields <BR> 3. Click Sign Up button | Account creation should succeed and account should be accessible via login | |
 | Verify Email field - must be filled in | 1. Leave field blank <BR> 2. Fill in other fields <BR> 3. Click Sign up button | Account creation should fail, reporting that the field must be populated | |
 | Verify Email field - should accept email address with TLD | 1. Fill field with '!def!xyz%abc@example.org' <BR> 2. Fill in other fields <BR> 3. Click Sign Up button | Account creation should succeed and account should be accessible via login | |
-| Verify Email field - should accept email address without TLD | 1. Fill field with '!def!xyz%abc@example' <BR> 2. Fill in other fields <BR> 3. Click Sign Up button | Account creation should succeed and account should be accessible via login | |
 | Verify Email field - should accept UTF-8 in local | 1. Fill field with email '©®@a.b' <BR> 2. Fill in other fields <BR> 3. Click Sign Up button | Account creation should succeed and account should be accessible via login | |
 | Verify Email field - should reject malformed email address | 1. Fill field with "evil'ex" <BR> 2. Fill in other fields <BR> 3. Click Sign Up button | Account creation should fail, reporting that the field must be valid email | |
 | Verify Email field - should accept local of 64 chars | 1. Fill field with 'MalignPreyOiledPalmFireSomeAddictPygmyEntitlementSpikesEnlis@example.org' <BR> 2. Fill in other fields <BR> 3. Click Sign Up button | Account creation should succeed and account should be accessible via login | |
@@ -483,16 +482,12 @@ but no guidance is provided for the "Homepage URL".
 
 |  Test Name | Steps  |  Expected Result |  Notes |
 | :--------- | :----- | :--------------- | :----- |
-| Verify integration - valid | 1. Fill Client ID field with valid value <BR> 2. Fill Client Secret field with valid value <BR> 3. Click Add link 4. Click Add Integration button | Integration should succeed (How can integration be verified?). | _DOCS_: GitHub authorization follow up does not occur. Terminology in docs does not match current UI.  _UX_: The done button after this interaction seems unnecessary |
+| Verify integration - valid | 1. Fill Client ID field with valid value <BR> 2. Fill Client Secret field with valid value <BR> 3. Click Add link 4. Click Add Integration button | Integration should succeed (How can integration be verified?). | |
 | Verify integration - invalid | 1. Fill Client ID field with invalid value <BR> 2. Fill Client Secret field with invalid value <BR> 3. Click Add link 4. Click Add Integration button | Integration should fail, reporting unable to authenticate with OAuth application | |
 | Verify integration - removal | 1. Fill Client ID field with valid value <BR> 2. Fill Client Secret field with valid value <BR> 3. Click Add link 4. Click Remove link 5. Click Remove Integration button | Integration should be successfully removed | |
 | Verify Client ID field - minimum (1)  | 1. Leave Client ID field blank <BR> 2. Fill Client Secret field with valid value <BR> 3. Click Add link | Add link should be disabled | |
 | Verify Client Secret field - minimum (1)  | 1. Fill Client ID field with valid value <BR> 2. Leave Client Secret field blank <BR> 3. Click Add link | Add link should be disabled | |
 
-_BUG_: Cannot reproduce. The application successfully processes invalid integration values. I was then not able to remove them in a subsequent transaction.
-```
-Please contact the site administrator for support along with errorId=[md5:1271bc29cb3b5fcc912da3c4154673bb 2019-06-10 16:57 06y2xeofaekf30tbgl2xt5qsng]
-```
 
 
 ### GitHub Enterprise
@@ -529,15 +524,14 @@ _Docs_: It should be pointed out in the [docs](https://puppet.com/docs/continuou
 
 _Setup_:
 * Login to CD4PE as a non-root user
-* Navigate to `http://<cd4pe-instance>:<web-ui-port>/<username>/settings/puppet-enterprise`
+* Navigate to `http://<cd4pe-instance>:<web-ui-port>/<workspace>/settings/puppet-enterprise`
 * Click Add Credentials button
 
 |  Test Name | Steps  |  Expected Result |  Notes |
 | :--------- | :----- | :--------------- | :----- |
 | Verify required fields - must be filled in | 1. Leave all fields blank <BR> 2. Click Save Changes button | Credential setting should fail, reporting that the required fields have not been populated | |
 | Verify Name field - minimum (1) | 1. Leave field blank <BR> 2. Fill in other fields <BR> 3. Click Save Changes button | Credential setting should fail, reporting that the field must be populated | |
-| Verify Name field - maximum (?)  | 1. Fill field with string exceeding maximum <BR> 2. Fill in other fields <BR> 3. Click Save Changes button | Credential setting should fail, reporting the maximum acceptable length | |
-| Verify Name field - character set (utf-8)  | 1. Fill field with '©®' <BR> 2. Fill in other fields <BR> 3. Click Save Changes button | Credential setting should proceed to verify PE authentication | |
+| Verify Name field - maximum (2712)  | 1. Fill field with string exceeding maximum <BR> 2. Fill in other fields <BR> 3. Click Save Changes button | Credential setting should fail, reporting the maximum acceptable length | |
 | Verify Name field - valid  | 1. Fill field with 'a' <BR> 2. Fill in other fields <BR> 3. Click Save Changes button | Credential setting should proceed to verify PE authentication | |
 | Verify PE console address field - minimum (1) | 1. Leave field blank <BR> 2. Fill in other fields <BR> 3. Click Save Changes button | Credential setting should fail, reporting that the field must be populated | |
 | Verify PE console address field - invalid url  | 1. Fill field with 'a' <BR> 2. Fill in other fields <BR> 3. Click Save Changes button | Credential setting should fail, reporting that value is an invalid url | _UX_: Recommend help link. _UX_: Strip out echo of "java.net.UnknownHostException" from error notice |
@@ -545,7 +539,7 @@ _Setup_:
 | Verify PE console address field - should protect against semantic url attacks   | 1. Fill field with 'https://my.pe.server.org/evil/endpoint?resetpassord=true&user=admin' <BR> 2. Fill in other fields <BR> 3. Click Save Changes button | Credential setting should fail, reporting that value is an invalid url | |
 | Verify PE console address field - valid  | 1. Fill field with 'https://<pe-console-server>' <BR> 2. Fill in other fields <BR> 3. Click Save Changes button | Credential setting should proceed to verify PE authentication | |
 | Verify Username field - minimum (1) | 1. Leave field blank <BR> 2. Fill in other fields <BR> 3. Click Save Changes button | Credential setting should fail, reporting that the field must be populated | |
-| Verify Username field - maximum (?)  | 1. Fill field with string exceeding maximum <BR> 2. Fill in other fields <BR> 3. Click Save Changes button | Credential setting should fail, reporting the maximum acceptable length | |
+| Verify Username field - maximum (254)  | 1. Fill field with string exceeding maximum <BR> 2. Fill in other fields <BR> 3. Click Save Changes button | Credential setting should fail, reporting the maximum acceptable length | |
 | Verify Username field - character set (utf-8)  | 1. Fill field with '©®' <BR> 2. Fill in other fields <BR> 3. Click Save Changes button | Credential setting should proceed to verify PE authentication | |
 | Verify Username field - valid  | 1. Fill field with 'a' <BR> 2. Fill in other fields <BR> 3. Click Save Changes button | Credential setting should proceed to verify PE authentication | |
 | Verify Password field - minimum (1) | 1. Leave field blank <BR> 2. Fill in other fields <BR> 3. Click Save Changes button | Credential setting should fail, reporting that the field must be populated | |
@@ -587,7 +581,7 @@ about the CD4PE branching and how `production` fits in should be included here.
 _Setup_:
 * Create Azure DevOps control repo
 * Enable source control integration for appropriate Azure DevOps
-* Navigate to `http://<cd4pe-instance>:<web-ui-port>/<username>/repositories`
+* Navigate to `http://<cd4pe-instance>:<web-ui-port>/<workspace>/repositories`
 * Click Add Control Repo button
 
 |  Test Name | Steps  |  Expected Result |  Notes |
@@ -597,8 +591,8 @@ _Setup_:
 | Verify organization selection | 1. Successfully perform 'Verify organization redirect' test <BR> 2. Select username in 'Select organization' list | 'Select repository' selection should appear | |
 | Verify repository selection | 1. Successfully perform 'Verify organization selection' test <BR> 2. Select control repo in 'Select repository' list | 'Create master branch from' selection should appear | _UX_: Should the repos in the list be sorted alphabetically? |
 | Verify create master branch from selection | 1. Successfully perform 'Verify repository selection' test <BR> 2. Select the main branch in 'Select branch' list  | 1. 'Control repo name' field should appear and be pre-populated with the control repo name <BR> 2. 'Add' button should appear | |
-| Verify add control repo | 1. Successfully perform 'Verify create master branch from selection' test <BR> 2. Click Add button | Control repo object should be created in CD4PE and browser should be redirected to `http://<cd4pe-instance>:<web-ui-port>/<username>/repositories/<repo-name>`| |
-| Verify delete control repo | 1. Successfully perform 'Verify add control repo' test <BR> 2. Navigate to `http://<cd4pe-instance>:<web-ui-port>/<username>/repositories` 3. Click trash-can icon for control repo | Deletion confirmation modal should appear
+| Verify add control repo | 1. Successfully perform 'Verify create master branch from selection' test <BR> 2. Click Add button | Control repo object should be created in CD4PE and browser should be redirected to `http://<cd4pe-instance>:<web-ui-port>/<workspace>/repositories/<repo-name>`| |
+| Verify delete control repo | 1. Successfully perform 'Verify add control repo' test <BR> 2. Navigate to `http://<cd4pe-instance>:<web-ui-port>/<workspace>/repositories` 3. Click trash-can icon for control repo | Deletion confirmation modal should appear
 | Verify delete control repo button | 1. Successfully perform 'Verify delete control repo' test <BR> 2. Click Delete button | Control repo should be absent from list | |
 | Verify no control repos | 1. Delete all control repos | 1. Control repo list should be empty <BR> 2. 'Add control repository' step in setup checklist should be unchecked | |
 
@@ -616,8 +610,8 @@ _Setup_:
 | Verify organization selection | 1. Successfully perform 'Verify source control selection' test <BR>  2. Select username in 'Select organization' list | 'Select repository' selection should appear | |
 | Verify repository selection | 1. Successfully perform 'Verify organization selection' test <BR>  2. Select control repo in 'Select repository' list | 'Create master branch from' selection should appear | _UX_: Should the repos in the list be sorted alphabetically? |
 | Verify create master branch from selection | 1. Successfully perform 'Verify repository selection' test <BR> 2. Select the main branch in 'Select branch' list  | 1. 'Control repo name' field should appear and be pre-populated with the control repo name <BR> 2. 'Add' button should appear | |
-| Verify add control repo | 1. Successfully perform 'Verify create master branch from selection' test <BR> 2. Click Add button | Control repo object should be created in CD4PE and browser should be redirected to `http://<cd4pe-instance>:<web-ui-port>/<username>/repositories/<repo-name>`| |
-| Verify delete control repo | 1. Successfully perform 'Verify add control repo' test <BR> 2. Navigate to `http://<cd4pe-instance>:<web-ui-port>/<username>/repositories` 3. Click trash-can icon for control repo | Deletion confirmation modal should appear
+| Verify add control repo | 1. Successfully perform 'Verify create master branch from selection' test <BR> 2. Click Add button | Control repo object should be created in CD4PE and browser should be redirected to `http://<cd4pe-instance>:<web-ui-port>/<workspace>/repositories/<repo-name>`| |
+| Verify delete control repo | 1. Successfully perform 'Verify add control repo' test <BR> 2. Navigate to `http://<cd4pe-instance>:<web-ui-port>/<workspace>/repositories` 3. Click trash-can icon for control repo | Deletion confirmation modal should appear
 | Verify delete control repo button | 1. Successfully perform 'Verify delete control repo' test <BR> 2. Click Delete button | Control repo should be absent from list | |
 | Verify no control repos | 1. Delete all control repos | 1. Control repo list should be empty <BR> 2. 'Add control repository' step in setup checklist should be unchecked | |
 
@@ -627,7 +621,7 @@ _Setup_:
 _Setup_:
 * Create GitHub control repo
 * Enable source control integration for appropriate GitHub
-* Navigate to `http://<cd4pe-instance>:<web-ui-port>/<username>/repositories`
+* Navigate to `http://<cd4pe-instance>:<web-ui-port>/<workspace>/repositories`
 * Click Add Control Repo button
 
 |  Test Name | Steps  |  Expected Result |  Notes |
@@ -637,8 +631,8 @@ _Setup_:
 | Verify organization selection | 1. Successfully perform 'Verify organization redirect' test <BR> 2. Select username in 'Select organization' list | 'Select repository' selection should appear | |
 | Verify repository selection | 1. Successfully perform 'Verify organization selection' test <BR> 2. Select control repo in 'Select repository' list | 'Create master branch from' selection should appear | _UX_: Should the repos in the list be sorted alphabetically? |
 | Verify create master branch from selection | 1. Successfully perform 'Verify repository selection' test <BR> 2. Select the main branch in 'Select branch' list  | 1. 'Control repo name' field should appear and be pre-populated with the control repo name <BR> 2. 'Add' button should appear | |
-| Verify add control repo | 1. Successfully perform 'Verify create master branch from selection' test <BR> 2. Click Add button | Control repo object should be created in CD4PE and browser should be redirected to `http://<cd4pe-instance>:<web-ui-port>/<username>/repositories/<repo-name>`| |
-| Verify delete control repo | 1. Successfully perform 'Verify add control repo' test <BR> 2. Navigate to `http://<cd4pe-instance>:<web-ui-port>/<username>/repositories` 3. Click trash-can icon for control repo | Deletion confirmation modal should appear
+| Verify add control repo | 1. Successfully perform 'Verify create master branch from selection' test <BR> 2. Click Add button | Control repo object should be created in CD4PE and browser should be redirected to `http://<cd4pe-instance>:<web-ui-port>/<workspace>/repositories/<repo-name>`| |
+| Verify delete control repo | 1. Successfully perform 'Verify add control repo' test <BR> 2. Navigate to `http://<cd4pe-instance>:<web-ui-port>/<workspace>/repositories` 3. Click trash-can icon for control repo | Deletion confirmation modal should appear
 | Verify delete control repo button | 1. Successfully perform 'Verify delete control repo' test <BR> 2. Click Delete button | Control repo should be absent from list | |
 | Verify no control repos | 1. Delete all control repos | 1. Control repo list should be empty <BR> 2. 'Add control repository' step in setup checklist should be unchecked | |
 
@@ -646,12 +640,11 @@ _Setup_:
 ### GitHub Enterprise
 TBD
 
-
 ### GitLab
 _Setup_:
 * Create [GitLab server](#vcs-gitlab)
 * Create GitLab control repo
-* Navigate to `http://<cd4pe-instance>:<web-ui-port>/<username>/repositories`
+* Navigate to `http://<cd4pe-instance>:<web-ui-port>/<workspace>/repositories`
 * Click Add Control Repo button
 
 |  Test Name | Steps  |  Expected Result |  Notes |
@@ -660,8 +653,8 @@ _Setup_:
 | Verify organization selection | 1. Successfully perform 'Verify source control selection' test <BR>  2. Select username in 'Select organization' list | 'Select repository' selection should appear | _UX_: This selection is for a Gitlab user not an organization |
 | Verify repository selection | 1. Successfully perform 'Verify organization selection' test <BR>  2. Select control repo in 'Select repository' list | 'Create master branch from' selection should appear | _UX_: Should the repos in the list be sorted alphabetically? |
 | Verify create master branch from selection | 1. Successfully perform 'Verify repository selection' test <BR> 2. Select the main branch in 'Select branch' list  | 1. 'Control repo name' field should appear and be pre-populated with the control repo name <BR> 2. 'Add' button should appear | |
-| Verify add control repo | 1. Successfully perform 'Verify create master branch from selection' test <BR> 2. Click Add button | Control repo object should be created in CD4PE and browser should be redirected to `http://<cd4pe-instance>:<web-ui-port>/<username>/repositories/<repo-name>`| |
-| Verify delete control repo | 1. Successfully perform 'Verify add control repo' test <BR> 2. Navigate to `http://<cd4pe-instance>:<web-ui-port>/<username>/repositories` 3. Click trash-can icon for control repo | Deletion confirmation modal should appear
+| Verify add control repo | 1. Successfully perform 'Verify create master branch from selection' test <BR> 2. Click Add button | Control repo object should be created in CD4PE and browser should be redirected to `http://<cd4pe-instance>:<web-ui-port>/<workspace>/repositories/<repo-name>`| |
+| Verify delete control repo | 1. Successfully perform 'Verify add control repo' test <BR> 2. Navigate to `http://<cd4pe-instance>:<web-ui-port>/<workspace>/repositories` 3. Click trash-can icon for control repo | Deletion confirmation modal should appear
 | Verify delete control repo button | 1. Successfully perform 'Verify delete control repo' test <BR> 2. Click Delete button | Control repo should be absent from list | |
 | Verify no control repos | 1. Delete all control repos | 1. Control repo list should be empty <BR> 2. 'Add control repository' step in setup checklist should be unchecked | |
 
@@ -681,24 +674,45 @@ _DOCS_: Order of configuration docs
 
 _Setup_:
 * Provision linux host
+  * Install git
+  {noformat}
+  yum install -y git
+  {noformat}
+  * Install docker
+  {noformat}
+  yum remove docker \
+             docker-client \
+             docker-client-latest \
+             docker-common \
+             docker-latest \
+             docker-latest-logrotate \
+             docker-logrotate \
+             docker-engine
+  yum install -y yum-utils \
+                 device-mapper-persistent-data \
+                 lvm2
+  yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+  yum install docker-ce docker-ce-cli containerd.io
+  systemctl start docker
+  {noformat}
 * Provision windows host
-* Navigate to `http://<cd4pe-instance>:<web-ui-port>/<username>/job-hardware`
+* Navigate to `http://<cd4pe-instance>:<web-ui-port>/<workspace>/job-hardware`
 
 |  Test Name | Steps  |  Expected Result |  Notes |
 | :--------- | :----- | :--------------- | :----- |
-| Verify Add Job Hardware button (\*nix) | 1. Click Job Hardware button | Modal should appear with shell commands listed for \*nix by default | _UX_: Provide guidance about credentials that should be entered when running `distelli agent install` |
+| Verify Add Job Hardware button (\*nix) | 1. Click Add Job Hardware button | Modal should appear with shell commands listed for \*nix by default | _UX_: Provide guidance about credentials that should be entered when running `distelli agent install` |
 | Verify Add Job Hardware button (windows) | 1. Successfully perform 'Verify Add Job Hardware button (\*nix)' test <BR>  2. Click 'Windows' link | Shell commands listed for windows should appear | _UX_: Instruction for 'SSH' should be 'Remote Desktop' _UX_: Link text is no different than regular text. |
 | Verify distelli install (\*nix) | 1. Successfully perform 'Verify Add Job Hardware button (\*nix)' test <BR>  2. SSH to linux host as root <BR>  3. Run first command displayed in CD4PE | Command should successfully complete;  STDOUT should include `To install the agent, run` | |
 | Verify distelli agent install (\*nix) | 1. Successfully perform 'Verify distelli install (\*nix)' test <BR>  2. SSH to linux host as root <BR>  3. Run second command displayed in CD4PE | Command should successfully complete;  STDOUT should include `Starting Distelli supervisor` | |
-| Verify distelli agent install (\*nix distelli.yml)  | 1. Successfully perform 'Verify distelli install (\*nix)' test <BR>  2. Navigate to `http://<cd4pe-instance>:<web-ui-port>/<username>/settings/agent` <BR>  3. Click 'Create Credential' link <BR>  4. SSH to linux host as root <BR> 5. Create a `distelli.yml` file on the host containing `---\nDistelliAccessToken: <MY_ACCESS_TOKEN>\nDistelliSecretKey: <MY_SECRET_KEY>` where the token and key are copied from the generated credential in step 3 <BR> 6. Run second command displayed in CD4PE, appending `-conf <PATH_TO_DISTELLI.YML_FILE>` to the command | Command should successfully complete;  STDOUT should include `To install the agent, run` | |
+| Verify distelli agent install (\*nix distelli.yml)  | 1. Successfully perform 'Verify distelli install (\*nix)' test <BR>  2. Navigate to `http://<cd4pe-instance>:<web-ui-port>/<workspace>/settings/agent` <BR>  3. Click 'Create Credential' link <BR>  4. SSH to linux host as root <BR> 5. Create a `distelli.yml` file on the host containing `---\nDistelliAccessToken: <MY_ACCESS_TOKEN>\nDistelliSecretKey: <MY_SECRET_KEY>` where the token and key are copied from the generated credential in step 3 <BR> 6. Run second command displayed in CD4PE, appending `-conf <PATH_TO_DISTELLI.YML_FILE>` to the command | Command should successfully complete;  STDOUT should include `To install the agent, run` | |
 | Verify distelli install (windows) | 1. Successfully perform 'Verify Add Job Hardware button (windows)' test <BR>  2. Remote Desktop to windows host as Administrator <BR>  3. Run first command displayed in CD4PE in a command window | Command should successfully complete; STDOUT should include `To install the agent, run` | |
-| Verify distelli agent install (windows) | 1. Successfully perform 'Verify distelli install (windows)' test <BR>  2. Remote Desktop to windows host as Administrator <BR>  3. Run second command displayed in CD4PE in a command window | Command should successfully complete; | _UX_: No indication in output that the command did the needful. |
-| Verify distelli agent install (windows distelli.yml)  | 1. Successfully perform 'Verify distelli install (windows)' test <BR>  2. Navigate to `http://<cd4pe-instance>:<web-ui-port>/<username>/settings/agent` <BR>  3. Click 'Create Credential' link <BR>  4. Remote Desktop to windows host as Administrator <BR> 5. Create a `distelli.yml` file on the host containing `---\r\nDistelliAccessToken: <MY_ACCESS_TOKEN>\r\nDistelliSecretKey: <MY_SECRET_KEY>` where the token and key are copied from the generated credential in step 3 <BR> 6. Run second command displayed in CD4PE, appending `-conf <PATH_TO_DISTELLI.YML_FILE>` to the command | Command should successfully complete; | _UX_: No indication in output that the command did the needful. |
-| Verify Active toggle | 1. Successfully perform 'Verify distelli agent install (\*nix)' test <BR>  2. Reload `http://<cd4pe-instance>:<web-ui-port>/<username>/job-hardware` <BR>  3. Click 'Job Hardware Active' | Toggle should turn green | |
-| Verify Capability field - minimum (1)  | 1. Successfully perform 'Verify distelli agent install (\*nix)' <BR>  2. Reload `http://<cd4pe-instance>:<web-ui-port>/<username>/job-hardware` <BR> 3. Click 'Add Capability' link for hardware <BR>  4. Leave field blank  5. Click Save link | Capability form should remain open | |
-| Verify Capability field - maximum (?)  | 1. Successfully perform 'Verify distelli agent install (\*nix)' <BR>  2. Reload `http://<cd4pe-instance>:<web-ui-port>/<username>/job-hardware` <BR> 3. Click 'Add Capability' link for hardware <BR>  4. Fill field with string exceeding maximum  5. Click Save link | Save should fail,  reporting the maximum acceptable length  | |
-| Verify Capability field - utf-8  | 1. Successfully perform 'Verify distelli agent install (\*nix)' <BR>  2. Reload `http://<cd4pe-instance>:<web-ui-port>/<username>/job-hardware` <BR> 3. Click 'Add Capability' link for hardware <BR>  4. Fill field with '©®@a.b'  5. Click Save link | Save should succeed | |
-| Verify Capability field - db-inject  | 1. Successfully perform 'Verify distelli agent install (\*nix)' <BR>  2. Reload `http://<cd4pe-instance>:<web-ui-port>/<username>/job-hardware` <BR> 3. Click 'Add Capability' link for hardware <BR>  4. Fill field with "evil'ex"  5. Click Save link | Save should succeed  | _UX_: Should the '+Add Capability' link be hidden while the form is open since the form cannot opened multiple times? |
+| Verify distelli agent install (windows) | 1. Successfully perform 'Verify distelli install (windows)' test <BR>  2. Remote Desktop to windows host as Administrator <BR>  3. Run second command displayed in CD4PE in a command window | Command should successfully complete; | |
+| Verify distelli agent install (windows distelli.yml)  | 1. Successfully perform 'Verify distelli install (windows)' test <BR>  2. Navigate to `http://<cd4pe-instance>:<web-ui-port>/<workspace>/settings/agent` <BR>  3. Click 'Create Credential' link <BR>  4. Remote Desktop to windows host as Administrator <BR> 5. Create a `distelli.yml` file on the host containing `---\r\nDistelliAccessToken: <MY_ACCESS_TOKEN>\r\nDistelliSecretKey: <MY_SECRET_KEY>` where the token and key are copied from the generated credential in step 3 <BR> 6. Run second command displayed in CD4PE, appending `-conf <PATH_TO_DISTELLI.YML_FILE>` to the command | Command should successfully complete; | _UX_: No indication in output that the command did the needful. |
+| Verify Active toggle | 1. Successfully perform 'Verify distelli agent install (\*nix)' test <BR>  2. Reload `http://<cd4pe-instance>:<web-ui-port>/<workspace>/job-hardware` <BR>  3. Click 'Job Hardware Active' | Toggle should turn green | |
+| Verify Capability field - minimum (1)  | 1. Successfully perform 'Verify distelli agent install (\*nix)' <BR>  2. Reload `http://<cd4pe-instance>:<web-ui-port>/<workspace>/job-hardware` <BR> 3. Click 'Add Capability' link for hardware <BR>  4. Leave field blank  5. Click Save link | Capability form should remain open | |
+| Verify Capability field - maximum (?)  | 1. Successfully perform 'Verify distelli agent install (\*nix)' <BR>  2. Reload `http://<cd4pe-instance>:<web-ui-port>/<workspace>/job-hardware` <BR> 3. Click 'Add Capability' link for hardware <BR>  4. Fill field with string exceeding maximum  5. Click Save link | Entry should be prevented  | |
+| Verify Capability field - utf-8  | 1. Successfully perform 'Verify distelli agent install (\*nix)' <BR>  2. Reload `http://<cd4pe-instance>:<web-ui-port>/<workspace>/job-hardware` <BR> 3. Click 'Add Capability' link for hardware <BR>  4. Fill field with '©®@a.b'  5. Click Save link | Save should succeed | |
+| Verify Capability field - db-inject  | 1. Successfully perform 'Verify distelli agent install (\*nix)' <BR>  2. Reload `http://<cd4pe-instance>:<web-ui-port>/<workspace>/job-hardware` <BR> 3. Click 'Add Capability' link for hardware <BR>  4. Fill field with "evil'ex"  5. Click Save link | Save should succeed  | _UX_: Should the '+Add Capability' link be hidden while the form is open since the form cannot opened multiple times? |
 
 
 
@@ -707,7 +721,7 @@ _Setup_:
 
 _Setup_:
 * [Setup control repo](#control-repo-setup)
-* Navigate to `http://<cd4pe-instance>:<web-ui-port>/<username>/repositories/<repo-name>`
+* Navigate to `http://<cd4pe-instance>:<web-ui-port>/<workspace>/repositories/<repo-name>`
 
 ### Create Pipeline
 |  Test Name | Steps  |  Expected Result |  Notes |
@@ -784,8 +798,8 @@ _SETUP_:
 | Verify Docker Image Name - valid | 1. Successfully perform 'Verify New Job button' test <BR>  2. Turn on docker container selection <BR>  3. Fill Docker Image field with 'a'  <BR>  4. Fill in other fields <BR>  5. Click Create Job button | Job creation should succeed and job should be accessible in jobs list | |
 | Verify Docker Run Arguments - minimum (0) | 1. Successfully perform 'Verify New Job button' test <BR>  2. Turn on docker container selection <BR>  3. Leave Docker Run Arguments field blank <BR>  4. Fill in other fields <BR>  5. Click Create Job button | Job creation should succeed and job should be accessible in jobs list | |
 | Verify Docker Run Arguments - maximum (?) | 1. Successfully perform 'Verify New Job button' test <BR>  2. Turn on docker container selection <BR>  3. Fill Docker Run Arguments field with string exceeding maximum <BR>  4. Fill in other fields <BR>  5. Click Create Job button | Job creation should fail, reporting that the Docker Image field must be populated when running the job in a container | |
-| Verify Docker Run Arguments - invalid syntax | 1. Successfully perform 'Verify New Job button' test <BR>  2. Turn on docker container selection <BR>  3. Fill Docker Image field with 'foobar'  <BR>  4. Fill in other fields <BR>  5. Click Create Job button | Job creation should fail, reporting that name must conform to --key=value specification |[Ref](https://docs.docker.com/engine/reference/run) |
-| Verify Docker Run Arguments - invalid character set | 1. Successfully perform 'Verify New Job button' test <BR>  2. Turn on docker container selection <BR>  3. Fill Docker Image field with '--☃=y'  <BR>  4. Fill in other fields <BR>  5. Click Create Job button | Job creation should fail, reporting that name must conform to ascii specification |[Ref](https://docs.docker.com/engine/reference/run) |
+| Verify Docker Run Arguments - invalid syntax | 1. Successfully perform 'Verify New Job button' test <BR>  2. Turn on docker container selection <BR>  3. Fill Docker Run Arguments field with 'foobar'  <BR>  4. Fill in other fields <BR>  5. Click Create Job button | Job creation should fail, reporting that name must conform to --key=value specification |[Ref](https://docs.docker.com/engine/reference/run) |
+| Verify Docker Run Arguments - invalid character set | 1. Successfully perform 'Verify New Job button' test <BR>  2. Turn on docker container selection <BR>  3. Fill Docker Run Arguments field with '--☃=y'  <BR>  4. Fill in other fields <BR>  5. Click Create Job button | Job creation should fail, reporting that name must conform to ascii specification |[Ref](https://docs.docker.com/engine/reference/run) |
 | Verify Docker Image Name - valid syntax | 1. Successfully perform 'Verify New Job button' test <BR>  2. Turn on docker container selection <BR>  3. Fill Docker Image field with '--x="no-new-privileges:true\|false"'  <BR>  4. Fill in other fields <BR>  5. Click Create Job button | Job creation should succeed and job should be accessible in jobs list | |
 | Verify Capabilities selection - minimum (1) | 1. Successfully perform 'Verify New Job button' test <BR>  2. Leave Capabilities selection items unselected  <BR>  3. Fill in other fields <BR>  4. Click Create Job button | Job creation should fail, reporting that a capability must be selected | |
 | Verify Capabilities selection - maximum (3) | 1. Successfully perform 'Verify New Job button' test <BR>  2. Select 4 items in Capabilities selection  <BR>  3. Fill in other fields <BR>  4. Click Create Job button | Job creation should fail, reporting the maximum | |
@@ -817,8 +831,7 @@ _Setup_:
           pp_environment: 'testing'
         EOF
         ```
-    * On the master, revoke and clean the previous agent cert: `AGENT_CERT=<agent certname> ; puppetserver ca revoke --certname $AGENT_CERT && puppetserver ca clean --certname $AGENT_CERT`
-      * _UX_: I expected the "Reject" button in PE to do this.
+    * In the PE console, reject the node's certificate
     * On the agent, submit new cert request: `puppet agent -t`
     * On the master, sign cert request
     * On the agent, apply catalog: `puppet agent -t`
@@ -833,16 +846,15 @@ _DOCS_: "Specify the Git branch corresponding to the environment.":  How??  This
 [Docs](https://puppet.com/docs/continuous-delivery/2.x/start_deploying.html#task-3794)
 
 _Setup_:
-* Navigate to `http://<cd4pe-instance>:<web-ui-port>/<username>/repositories`
+* Navigate to `http://<cd4pe-instance>:<web-ui-port>/<workspace>/repositories`
 * Click on appropriate control repo
 
 _DOCS_: s/Select he branch/Select the branch/
 
 |  Test Name | Steps  |  Expected Result |  Notes |
 | :--------- | :----- | :--------------- | :----- |
-| Verify New Deployment button | 1. Click New Deployment button | Modal should appear with all branches listed | _UX_: Without docs, this button is difficult to discover |
-| Verify branch selection | 1. Successfully perform 'Verify New Deployment button' test <BR> 2. Select 'testing' in 'Select a branch' list | 'Select a commit' selection should appear | _UX_: Selection name is not consistent with Job Hardware modal |
-| Verify commit selection | 1. Successfully perform 'Verify branch selection' test <BR> 2. Select commit in 'Select a commit' list | 'Select Puppet Enterprise instance' selection should appear with a default selection <BR> 'Select a node group' selection should appear |  _UX_: Selection names are not internally consistent |
+| Verify New Deployment button | 1. Click New Deployment button | Modal should appear with branch associated with pipeline selected and commit selection open | |
+| Verify commit selection | 1. Successfully perform 'Verify New Deployment button' test <BR> 2. Select commit in 'Select a commit' list | 'Select Puppet Enterprise instance' selection should appear with a default selection <BR> 'Select a node group' selection should appear |  _UX_: Selection names are not internally consistent |
 | Verify node group selection | 1. Successfully perform 'Verify commit selection' test <BR> 2. Select 'All testing' node group in 'Select a node group' list | 'Select a deployment policy' selection should appear | _UX_: Blue text within selection boxes implies a link but does not have that functionality.  Suggest a different color for emphasis. |
 | Verify deployment policy help | 1. Successfully perform 'Verify node group selection' test <BR> 2. Click 'Help me choose' link in 'Select a deployment policy' header | Deployment Policy document should be opened in another browser tab | |
 | Verify Direct Deployment policy selection | 1. Successfully perform 'Verify node group selection' test <BR> 2. Select  'Direct Deployment Policy' in 'Select a deployment policy' list | Policy settings should appear <BR>  All settings _except_ timeout should be disabled <BR> Description field should appear | |
@@ -919,7 +931,7 @@ _Setup_:
 [Doc](https://puppet.com/docs/continuous-delivery/2.x/example_jobs.html)
 
 _Setup_:
-* Navigate to `http://<cd4pe-instance>:<web-ui-port>/<username>/repositories`
+* Navigate to `http://<cd4pe-instance>:<web-ui-port>/<workspace>/repositories`
 * Click on appropriate control repo
 * Click on master branch
 
@@ -932,7 +944,7 @@ _Setup_:
 | Verify puppetfile-syntax-validate job trigger - success | 1. Add and commit a change to the control repo master branch adding a comment to the Puppetfile <BR>  2. Push the change, if necessary, to the git server <BR>  3. Wait 5 seconds | An event for the deployment should appear at the top of the event list.  It should include: <BR> - `master @ <SHA>` where the SHA matches that of the commit. <BR> - A job succeeded notice | |
 | Verify puppetfile-syntax-validate job trigger - failure | 1. Add and commit a change to the control repo master branch that invalidates the Puppetfile <BR>  2. Push the change, if necessary, to the git server <BR>  3. Wait 5 seconds | An event for the deployment should appear at the top of the event list.  It should include: <BR> - `master @ <SHA>` where the SHA matches that of the commit. <BR> - A job failed notice | |
 | Verify puppetfile-syntax-validate job event pipeline detail | 1. Successfully complete 'Verify job trigger - success' test <BR>  2. Click the 'Succeeded' link in the event | The event details should appear with the following: <BR> - A link to the job run <BR> - a 'Rerun Job' button <BR> - A Push webhook | |
-| Verify puppetfile-syntax-validate job details | 1. Successfully complete 'Verify job event pipeline detail' test <BR>  2. Click the link to the job number | The job page should load `http://<cd4pe-instance>:<web-ui-port>/<username>/jobs/<job-number>`.  It should include: <BR> - The completed status of the job. <BR> - Commit `master @ <SHA>` where the SHA matches the commit that triggered the job. <BR> - A log of the distelli build for the job. <BR> - The log should match /Running .\* -m Validate that a control repo's Puppetfile is syntactically correct/ | |
+| Verify puppetfile-syntax-validate job details | 1. Successfully complete 'Verify job event pipeline detail' test <BR>  2. Click the link to the job number | The job page should load `http://<cd4pe-instance>:<web-ui-port>/<workspace>/jobs/<job-number>`.  It should include: <BR> - The completed status of the job. <BR> - Commit `master @ <SHA>` where the SHA matches the commit that triggered the job. <BR> - A log of the distelli build for the job. <BR> - The log should match /Running .\* -m Validate that a control repo's Puppetfile is syntactically correct/ | |
 
 
 ##### Control Repo Template Syntax Validate
@@ -943,7 +955,7 @@ _Setup_:
 | Verify template-syntax-validate job trigger - success | 1. Add and commit a change to the control repo master branch adding a comment to a template <BR>  2. Push the change, if necessary, to the git server <BR>  3. Wait 5 seconds | An event for the deployment should appear at the top of the event list.  It should include: <BR> - `master @ <SHA>` where the SHA matches that of the commit. <BR> - A job succeeded notice | |
 | Verify template-syntax-validate job trigger - failure | 1. Add and commit a change to the control repo master branch that invalidates a template <BR>  2. Push the change, if necessary, to the git server <BR>  3. Wait 5 seconds | An event for the deployment should appear at the top of the event list.  It should include: <BR> - `master @ <SHA>` where the SHA matches that of the commit. <BR> - A job failed notice | |
 | Verify template-syntax-validate job event pipeline detail | 1. Successfully complete 'Verify job trigger - success' test <BR>  2. Click the 'Succeeded' link in the event | The event details should appear with the following: <BR> - A link to the job run <BR> - a 'Rerun Job' button <BR> - A Push webhook | |
-| Verify template-syntax-validate job details | 1. Successfully complete 'Verify job event pipeline detail' test <BR>  2. Click the link to the job number | The job page should load `http://<cd4pe-instance>:<web-ui-port>/<username>/jobs/<job-number>`.  It should include: <BR> - The completed status of the job. <BR> - Commit `master @ <SHA>` where the SHA matches the commit that triggered the job. <BR> - A log of the distelli build for the job. <BR> - The log should match /Running .\* -m Validate that a control repo's templates are syntactically correct/ | |
+| Verify template-syntax-validate job details | 1. Successfully complete 'Verify job event pipeline detail' test <BR>  2. Click the link to the job number | The job page should load `http://<cd4pe-instance>:<web-ui-port>/<workspace>/jobs/<job-number>`.  It should include: <BR> - The completed status of the job. <BR> - Commit `master @ <SHA>` where the SHA matches the commit that triggered the job. <BR> - A log of the distelli build for the job. <BR> - The log should match /Running .\* -m Validate that a control repo's templates are syntactically correct/ | |
 
 
 ##### Control Repo Hiera Syntax Validate
@@ -954,7 +966,7 @@ _Setup_:
 | Verify hiera-syntax-validate job trigger - success | 1. Add and commit a change to the control repo master branch adding a comment to the hiera data <BR>  2. Push the change, if necessary, to the git server <BR>  3. Wait 5 seconds | An event for the deployment should appear at the top of the event list.  It should include: <BR> - `master @ <SHA>` where the SHA matches that of the commit. <BR> - A job succeeded notice | |
 | Verify hiera-syntax-validate job trigger - failure | 1. Add and commit a change to the control repo master branch that invalidates the hiera data <BR>  2. Push the change, if necessary, to the git server <BR>  3. Wait 5 seconds | An event for the deployment should appear at the top of the event list.  It should include: <BR> - `master @ <SHA>` where the SHA matches that of the commit. <BR> - A job failed notice | |
 | Verify hiera-syntax-validate job event pipeline detail | 1. Successfully complete 'Verify job trigger - success' test <BR>  2. Click the 'Succeeded' link in the event | The event details should appear with the following: <BR> - A link to the job run <BR> - a 'Rerun Job' button <BR> - A Push webhook | |
-| Verify hiera-syntax-validate job details | 1. Successfully complete 'Verify job event pipeline detail' test <BR>  2. Click the link to the job number | The job page should load `http://<cd4pe-instance>:<web-ui-port>/<username>/jobs/<job-number>`.  It should include: <BR> - The completed status of the job. <BR> - Commit `master @ <SHA>` where the SHA matches the commit that triggered the job. <BR> - A log of the distelli build for the job. <BR> - The log should match /Running .\* -m Validate that a control repo's Hiera data is syntactically correct/ | |
+| Verify hiera-syntax-validate job details | 1. Successfully complete 'Verify job event pipeline detail' test <BR>  2. Click the link to the job number | The job page should load `http://<cd4pe-instance>:<web-ui-port>/<workspace>/jobs/<job-number>`.  It should include: <BR> - The completed status of the job. <BR> - Commit `master @ <SHA>` where the SHA matches the commit that triggered the job. <BR> - A log of the distelli build for the job. <BR> - The log should match /Running .\* -m Validate that a control repo's Hiera data is syntactically correct/ | |
 
 
 ##### Control Repo Puppet Manifest Syntax Validate
@@ -965,7 +977,7 @@ _Setup_:
 | Verify manifest-syntax-validate job trigger - success | 1. Add and commit a change to the control repo master branch adding a comment to a manifest <BR>  2. Push the change, if necessary, to the git server <BR>  3. Wait 5 seconds | An event for the deployment should appear at the top of the event list.  It should include: <BR> - `master @ <SHA>` where the SHA matches that of the commit. <BR> - A job succeeded notice | |
 | Verify manifest-syntax-validate job trigger - failure | 1. Add and commit a change to the control repo master branch that invalidates a manifest <BR>  2. Push the change, if necessary, to the git server <BR>  3. Wait 5 seconds | An event for the deployment should appear at the top of the event list.  It should include: <BR> - `master @ <SHA>` where the SHA matches that of the commit. <BR> - A job failed notice | |
 | Verify manifest-syntax-validate job event pipeline detail | 1. Successfully complete 'Verify job trigger - success' test <BR>  2. Click the 'Succeeded' link in the event | The event details should appear with the following: <BR> - A link to the job run <BR> - a 'Rerun Job' button <BR> - A Push webhook | |
-| Verify manifest-syntax-validate job details | 1. Successfully complete 'Verify job event pipeline detail' test <BR>  2. Click the link to the job number | The job page should load `http://<cd4pe-instance>:<web-ui-port>/<username>/jobs/<job-number>`.  It should include: <BR> - The completed status of the job. <BR> - Commit `master @ <SHA>` where the SHA matches the commit that triggered the job. <BR> - A log of the distelli build for the job. <BR> - The log should match /Running .\* -m Validate that a control repo's Puppet manifest code is syntactically correct/ | |
+| Verify manifest-syntax-validate job details | 1. Successfully complete 'Verify job event pipeline detail' test <BR>  2. Click the link to the job number | The job page should load `http://<cd4pe-instance>:<web-ui-port>/<workspace>/jobs/<job-number>`.  It should include: <BR> - The completed status of the job. <BR> - Commit `master @ <SHA>` where the SHA matches the commit that triggered the job. <BR> - A log of the distelli build for the job. <BR> - The log should match /Running .\* -m Validate that a control repo's Puppet manifest code is syntactically correct/ | |
 
 
 ##### Module PDK Validate
@@ -976,7 +988,7 @@ _Setup_:
 | Verify pdk-validate job trigger - success | 1. Add and commit a change the module master branch adding a comment to a manifest <BR>  2. Push the change, if necessary, to the git server <BR>  3. Wait 5 seconds | An event for the deployment should appear at the top of the event list.  It should include: <BR> - `master @ <SHA>` where the SHA matches that of the commit. <BR> - A job succeeded notice | |
 | Verify pdk-validate job trigger - failure | 1. Add and commit a change to the module master branch that invalidates a manifest <BR>  2. Push the change, if necessary, to the git server <BR>  3. Wait 5 seconds | An event for the deployment should appear at the top of the event list.  It should include: <BR> - `master @ <SHA>` where the SHA matches that of the commit. <BR> - A job failed notice | |
 | Verify pdk-validate job event pipeline detail | 1. Successfully complete 'Verify job trigger - success' test <BR>  2. Click the 'Succeeded' link in the event | The event details should appear with the following: <BR> - A link to the job run <BR> - a 'Rerun Job' button <BR> - A Push webhook | |
-| Verify pdk-validate job details | 1. Successfully complete 'Verify job event pipeline detail' test <BR>  2. Click the link to the job number | The job page should load `http://<cd4pe-instance>:<web-ui-port>/<username>/jobs/<job-number>`.  It should include: <BR> - The completed status of the job. <BR> - Commit `master @ <SHA>` where the SHA matches the commit that triggered the job. <BR> - A log of the distelli build for the job. <BR> - The log should match /Running .\* -m Validate that a module's Puppet manifest code is syntactically correct/ | |
+| Verify pdk-validate job details | 1. Successfully complete 'Verify job event pipeline detail' test <BR>  2. Click the link to the job number | The job page should load `http://<cd4pe-instance>:<web-ui-port>/<workspace>/jobs/<job-number>`.  It should include: <BR> - The completed status of the job. <BR> - Commit `master @ <SHA>` where the SHA matches the commit that triggered the job. <BR> - A log of the distelli build for the job. <BR> - The log should match /Running .\* -m Validate that a module's Puppet manifest code is syntactically correct/ | |
 
 
 ##### Run Module Unit Test
@@ -987,7 +999,7 @@ _Setup_:
 | Verify rspec-puppet job trigger - success | 1. Add and commit a change to the module master branch adding a comment to an rspec test <BR>  2. Push the change, if necessary, to the git server <BR>  3. Wait 5 seconds | An event for the deployment should appear at the top of the event list.  It should include: <BR> - `master @ <SHA>` where the SHA matches that of the commit. <BR> - A job succeeded notice | |
 | Verify rspec-puppet job trigger - failure | 1. Add and commit a change to the control repo master branch that invalidates an rspec test <BR>  2. Push the change, if necessary, to the git server <BR>  3. Wait 5 seconds | An event for the deployment should appear at the top of the event list.  It should include: <BR> - `master @ <SHA>` where the SHA matches that of the commit. <BR> - A job failed notice | |
 | Verify rspec-puppet job event pipeline detail | 1. Successfully complete 'Verify job trigger - success' test <BR>  2. Click the 'Succeeded' link in the event | The event details should appear with the following: <BR> - A link to the job run <BR> - a 'Rerun Job' button <BR> - A Push webhook | |
-| Verify rspec-puppet job details | 1. Successfully complete 'Verify job event pipeline detail' test <BR>  2. Click the link to the job number | The job page should load `http://<cd4pe-instance>:<web-ui-port>/<username>/jobs/<job-number>`.  It should include: <BR> - The completed status of the job. <BR> - Commit `master @ <SHA>` where the SHA matches the commit that triggered the job. <BR> - A log of the distelli build for the job. <BR> - The log should match /Running .\* -m Run rspec-puppet unit tests on a module/ | |
+| Verify rspec-puppet job details | 1. Successfully complete 'Verify job event pipeline detail' test <BR>  2. Click the link to the job number | The job page should load `http://<cd4pe-instance>:<web-ui-port>/<workspace>/jobs/<job-number>`.  It should include: <BR> - The completed status of the job. <BR> - Commit `master @ <SHA>` where the SHA matches the commit that triggered the job. <BR> - A log of the distelli build for the job. <BR> - The log should match /Running .\* -m Run rspec-puppet unit tests on a module/ | |
 
 
 ##### Custom Job
@@ -1033,18 +1045,15 @@ fi
 | :--------- | :----- | :--------------- | :----- |
 | Verify custom job present | 1. Successfully perform 'Verify Add stage job' test [Pipelines: Create Stage](#create-stage) | 'control-repo-custom' should be present in the 'Select Job' list | |
 | Verify Add custom job | 1. Successfully perform 'Verify Add stage job' test [Pipelines: Create Stage](#create-stage) <BR>  2. Select 'control-repo-custom' job from the 'Select Job' list <BR>  3. Click Add Stage button <BR>  4. Click 'Done' button | The 'control-repo-custom' job should appear as Pipeline stage | |
-| Verify custom job trigger - success | 1. Add and commit a change to the control-repo master branch adding a comment to an rspec test <BR>  2. Push the change, if necessary, to the git server <BR>  3. Wait 5 seconds | An event for the deployment should appear at the top of the event list.  It should include: <BR> - `master @ <SHA>` where the SHA matches that of the commit. <BR> - A job succeeded notice | |
-| Verify custom job trigger - failure | 1. Add and commit a change to the control repo master branch that invalidates an rspec test <BR>  2. Push the change, if necessary, to the git server <BR>  3. Wait 5 seconds | An event for the deployment should appear at the top of the event list.  It should include: <BR> - `master @ <SHA>` where the SHA matches that of the commit. <BR> - A job failed notice | |
+| Verify custom job trigger - success | 1. Add and commit a change to the control-repo master branch adding a comment to manifests/site.pp <BR>  2. Push the change, if necessary, to the git server <BR>  3. Wait 5 seconds | An event for the deployment should appear at the top of the event list.  It should include: <BR> - `master @ <SHA>` where the SHA matches that of the commit. <BR> - A job succeeded notice | |
+| Verify custom job trigger - failure | 1. Add and commit a change to the control repo master branch that invalidates manifests/site.pp ("// Bad comment") <BR>  2. Push the change, if necessary, to the git server <BR>  3. Wait 5 seconds | An event for the deployment should appear at the top of the event list.  It should include: <BR> - `master @ <SHA>` where the SHA matches that of the commit. <BR> - A job failed notice | |
 | Verify custom job event pipeline detail | 1. Successfully complete 'Verify job trigger - success' test <BR>  2. Click the 'Succeeded' link in the event | The event details should appear with the following: <BR> - A link to the job run <BR> - a 'Rerun Job' button <BR> - A Push webhook | |
-| Verify custom job details | 1. Successfully complete 'Verify job event pipeline detail' test <BR>  2. Click the link to the job number | The job page should load `http://<cd4pe-instance>:<web-ui-port>/<username>/jobs/<job-number>`.  It should include: <BR> - The completed status of the job. <BR> - Commit `master @ <SHA>` where the SHA matches the commit that triggered the job. <BR> - A log of the distelli build for the job. <BR> - The log should match /Puppet-lint validation on the Control Repo has/ | |
-
-
-_BUG_:?? Capability requirements for existing stages are not updated after job capabilities are updated when executing re-run.
+| Verify custom job details | 1. Successfully complete 'Verify job event pipeline detail' test <BR>  2. Click the link to the job number | The job page should load `http://<cd4pe-instance>:<web-ui-port>/<workspace>/jobs/<job-number>`.  It should include: <BR> - The completed status of the job. <BR> - Commit `master @ <SHA>` where the SHA matches the commit that triggered the job. <BR> - A log of the distelli build for the job. <BR> - The log should match /Puppet-lint validation on the Control Repo has/ | |
 
 
 #### Deploy
 _Setup_:
-* Navigate to `http://<cd4pe-instance>:<web-ui-port>/<username>/repositories`
+* Navigate to `http://<cd4pe-instance>:<web-ui-port>/<workspace>/repositories`
 * Click on appropriate control repo
 * Click on master branch
 * Create pipeline with deploy stage:
@@ -1055,17 +1064,17 @@ _Setup_:
 
 |  Test Name | Steps  |  Expected Result |  Notes |
 | :--------- | :----- | :--------------- | :----- |
-| Verify commit hook event | 1. Add and commit a change to the control repo master branch <BR>  2. Push the change, if necessary, to the git server <BR>  3. Wait 5 seconds | The 'New Events' button should appear on the `http://<cd4pe-instance>:<web-ui-port>/<username>/repositories/<control-repo>` page | |
+| Verify commit hook event | 1. Add and commit a change to the control repo master branch <BR>  2. Push the change, if necessary, to the git server <BR>  3. Wait 5 seconds | The 'New Events' button should appear on the `http://<cd4pe-instance>:<web-ui-port>/<workspace>/repositories/<control-repo>` page | |
 | Verify deployment trigger | 1. Successfully complete 'Verify commit hook event' test <BR>  2. Click the 'New Events' button | An event for the deployment should appear at the top of the event list.  It should include: <BR> - `master @ <SHA>` where the SHA matches that of the commit. <BR> - A deployment succeeded notice | |
 | Verify deploy event pipeline detail | 1. Successfully complete 'Verify deployment trigger - success' test <BR>  2. Click the 'Succeeded' link in the event | The event details should appear with the following: <BR> - A link to the deployment run <BR> - A Push webhook | |
-| Verify deploy details | 1. Successfully complete 'Verify deploy event pipeline detail' test <BR>  2. Click the link to the deploy number | The job page should load `http://<cd4pe-instance>:<web-ui-port>/<username>/deployments/<deploy-number>`.  It should include: <BR> - The completed status of the job. <BR> - Commit `master @ <SHA>` where the SHA matches the commit that triggered the deploy. <BR> - Update Ref: A commit push to the testing branch <BR> - Code deploy: Indicating the testing environment <BR> - Rolling Deployment: A link to the PE job running puppet on the nodes classified for the testing environment <BR> - Cleanup | _UX_: If puppet run completes with failures, the color of the 'Puppet Run Jobs' should not be green. |
+| Verify deploy details | 1. Successfully complete 'Verify deploy event pipeline detail' test <BR>  2. Click the link to the deploy number | The job page should load `http://<cd4pe-instance>:<web-ui-port>/<workspace>/deployments/<deploy-number>`.  It should include: <BR> - The completed status of the job. <BR> - Commit `master @ <SHA>` where the SHA matches the commit that triggered the deploy. <BR> - Update Ref: A commit push to the testing branch <BR> - Code deploy: Indicating the testing environment <BR> - Rolling Deployment: A link to the PE job running puppet on the nodes classified for the testing environment <BR> - Cleanup | _UX_: If puppet run completes with failures, the color of the 'Puppet Run Jobs' should not be green. |
 
 
 #### Pull Request
 _Setup_:
 * Perform [Code Deploy::Pipelines::Job](#pipeline-job) setup.
 * Enable Pull Request trigger on pipeline
-  1. Navigate to `http://<cd4pe-instance>:<web-ui-port>/<username>/repositories/<control-repo>`
+  1. Navigate to `http://<cd4pe-instance>:<web-ui-port>/<workspace>/repositories/<control-repo>`
   1. Click 'Pipeline Settings' for master pipeline (tool icon)
   1. Enable 'Pull Request' trigger (_UX_: Label 'Pull Request' with space)
   1. Click 'Save Settings' button
@@ -1075,10 +1084,10 @@ _Setup_:
 
 |  Test Name | Steps  |  Expected Result |  Notes |
 | :--------- | :----- | :--------------- | :----- |
-| Verify pull request hook event | 1. Add and commit a change to the control repo foobar branch <BR>  2. Push the change, if necessary, to the git server <BR>  3. Open a request to merge changes from foobar branch to master branch <BR>  4. Wait 5 seconds | The 'New Events' button should appear on the `http://<cd4pe-instance>:<web-ui-port>/<username>/repositories/<control-repo>` page | |
+| Verify pull request hook event | 1. Add and commit a change to the control repo foobar branch <BR>  2. Push the change, if necessary, to the git server <BR>  3. Open a request to merge changes from foobar branch to master branch <BR>  4. Wait 5 seconds | The 'New Events' button should appear on the `http://<cd4pe-instance>:<web-ui-port>/<workspace>/repositories/<control-repo>` page | |
 | Verify pull request trigger - success | 1. Successfully complete 'Verify pull request hook event' test <BR>  2. Click the 'New Events' button | An event for the PR should appear at the top of the event list.  It should include: <BR> - `foobar @ <SHA>` where the SHA matches that of the commit. <BR> - A job succeeded notice | |
 | Verify pull request event pipeline detail | 1. Successfully complete 'Verify pull request trigger - success' test <BR>  2. Click the 'Succeeded' link in the event | The event details should appear with the following: <BR> - A link to the job run <BR> - a 'Rerun Job' button <BR> - A Pull Request webhook | |
-| Verify pull request job details | 1. Successfully complete 'Verify pull request event pipeline detail' test <BR>  2. Click the link to the job number | The job page should load `http://<cd4pe-instance>:<web-ui-port>/<username>/jobs/<job-number>`.  It should include: <BR> - The completed status of the job. <BR> - Commit `foobar @ <SHA>` where the SHA matches the commit that triggered the job. <BR> - A log of the distelli build for the job. | |
+| Verify pull request job details | 1. Successfully complete 'Verify pull request event pipeline detail' test <BR>  2. Click the link to the job number | The job page should load `http://<cd4pe-instance>:<web-ui-port>/<workspace>/jobs/<job-number>`.  It should include: <BR> - The completed status of the job. <BR> - Commit `foobar @ <SHA>` where the SHA matches the commit that triggered the job. <BR> - A log of the distelli build for the job. | |
 | Verify pull request VCS integration | 1. Successfully complete 'Verify pull request hook event' test <BR>  2. Open the VCS UI for the pull request opened | An entry for the pipeline should appear.  It should include: <BR> - A link to the event for the run of the pipeline stage | |
 
 
@@ -1120,7 +1129,7 @@ _Setup_:
 | :--------- | :----- | :--------------- | :----- |
 | Verify protected environments link | 1. Click numeric link under protected environments column for PE classifier under test | 'Puppet Enterprise Protected Environments' modal should appear | |
 | Verify no environments cancel button | 1. Successfully perform 'Verify protected environments link' test <BR> 2. Click Cancel button | 'Puppet Enterprise Protected Environments' modal should close and return user to the PE settings page | |
-| Verify no environments add button | 1. Successfully perform 'Verify protected environments link' test <BR> 2. Click Add button | Select Puppet environment should appear with list of environment | UX: Capitalization of environment inconsistent |
+| Verify no environments add button | 1. Successfully perform 'Verify protected environments link' test <BR> 2. Click Add button | Select Puppet environment should appear with list of environments | |
 | Verify puppet environment selection - minimum (1)  | 1. Successfully perform 'Verify no environments add button' test <BR> 2. Leave field blank <BR> 3. Fill in other fields <BR> 4. Click Add button | Protected environment creation should fail, reporting that the field must be populated | |
 | Verify approval group selection - minimum (1)  | 1. Successfully perform 'Verify no environments add button' test <BR>  2. Leave field blank <BR> 3. Fill in other fields <BR> 4. Click Add button | Protected environment creation should fail, reporting that the field must be populated | |
 | Verify add protected environment | 1. Successfully perform 'Verify no environments add button' test <BR> 2. Select Puppet environment <BR> 3. Enable approval group <BR> 4. Click Add button | Protected environment creation should succeed and the number of protected environments for the PE integration should be incremented | UX: toggle widget seems weird here. Expected checkbox |
@@ -1213,5 +1222,5 @@ _Setup_:
 
 |  Test Name | Steps  |  Expected Result |  Notes |
 | :--------- | :----- | :--------------- | :----- |
-| Verify impact analysis in pipeline events | 1. Click on the most recent event number | The pipeline stage should be revealed and should include the impact analysis logo, a match to /Impact Analysis[Running|Done], and a link to the analysis run | |
+| Verify impact analysis in pipeline events | 1. Click on the most recent event number | The pipeline stage should be revealed and should include the impact analysis logo, a match to /Impact Analysis[Running\|Done], and a link to the analysis run | |
 | Verify impact analysis run link in pipeline events | 1. Successfully complete 'Verify impact analysis in pipeline events' test <BR> 2. Click impact analysis run number | Browser should be directed to `http://<cd4pe-instance>:<web-ui-port>/<workspace>/analysis/<number>` where run number corresponds to the run created (see [Run Results](#impact-analysis-run-results) test section)| |
