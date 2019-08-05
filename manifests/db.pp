@@ -66,7 +66,8 @@ class cd4pe::db(
       ensure  => file,
       owner   => 'root',
       group   => 'root',
-      content => "DB_PASS=${_db_pass}\n",
+      mode    => '0400',
+      content => Sensitive.new("DB_PASS=${_db_pass}\n"),
       replace => false,
     }
 
