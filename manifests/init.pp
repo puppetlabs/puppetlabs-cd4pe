@@ -17,6 +17,8 @@ class cd4pe (
   String $resolvable_hostname                    = "http://${trusted['certname']}",
   Integer $web_ui_port                           = 8080,
   Integer $web_ui_ssl_port                       = 8443,
+  Optional[String[1]] $cd4pe_network_subnet      = undef,
+  Optional[String[1]] $cd4pe_network_gateway     = undef,
 ){
   # Restrict to linux only?
   include docker
@@ -63,7 +65,9 @@ class cd4pe (
   if $effective_db_provider == 'mysql'  {
     $net = 'cd4pe'
     docker_network {$net:
-      ensure => present,
+      ensure  => present,
+      subnet  => $cd4pe_network_subnet,
+      gateway => $cd4pe_network_gateway,
     }
   } else {
     $net = 'bridge'
