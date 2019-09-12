@@ -10,13 +10,25 @@
             "sensitive": true,
             "description": "The password associated with the account."
         },
-        "control_repo_name": {
+        "workspace": {
+            "type": "String[1]",
+            "description": "Designates the workspace that the pipeline will be created in"
+        },
+        "repo_name": {
             "type": "String[1]",
             "description": "The control repository associated with the new pipeline."
         },
-        "control_repo_branch": {
+        "repo_branch": {
             "type": "String[1]",
             "description": "The control repository branch to associate with the new pipeline."
+        },
+        "pipeline_type": {
+            "type": "Enum['module', 'control']",
+            "description": "The type of pipeline to create. Must be one of 'control' or 'module'."
+        },
+        "pipeline_name": {
+            "type": "Optional[String[1]]",
+            "description": "Optional. The friendly name to use for the pipeline as referenced in Continous Delivery For PE. Defaults to 'repo_branch'."
         },
         "resolvable_hostname": {
             "type": "Optional[String[1]]",
