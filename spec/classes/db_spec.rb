@@ -77,6 +77,7 @@ RSpec.describe 'cd4pe::db' do
           db_name: 'cd4pe',
           db_port: 3306,
           db_user: 'cd4pe',
+          effective_db_provider: 'mysql',
           db_pass: sensitive('passw0rd'),
         }
       end
