@@ -22,6 +22,7 @@ RSpec.describe 'cd4pe::db' do
             db_port: 3306,
             db_user: 'cd4pe',
             db_provider: 'mysql',
+            effective_db_provider: 'mysql',
             db_pass: sensitive('passw0rd'),
           }
         end
@@ -41,6 +42,7 @@ RSpec.describe 'cd4pe::db' do
             db_port: 3306,
             db_user: 'cd4pe',
             db_provider: 'postgres',
+            effective_db_provider: 'postgres',
             db_pass: sensitive('passw0rd'),
           }
         end
