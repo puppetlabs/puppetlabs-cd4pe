@@ -17,6 +17,8 @@ class cd4pe (
   String $resolvable_hostname                    = "http://${trusted['certname']}",
   Integer $web_ui_port                           = 8080,
   Integer $web_ui_ssl_port                       = 8443,
+  Optional[String[1]] $cd4pe_network_subnet      = undef,
+  Optional[String[1]] $cd4pe_network_gateway     = undef,
 ){
   # Restrict to linux only?
   include docker
@@ -41,20 +43,47 @@ class cd4pe (
     replace => false,
   }
 
-  docker_network {'cd4pe':
-    ensure => present,
+  if $manage_database  {
+    if $db_provider == undef {
+      # Check if the customer is using a mysql db from a previous install
+      $cd4pe_docker_facts = fact('docker.network.cd4pe.Containers')
+      if !empty($cd4pe_docker_facts) {
+        $cd4pe_mysql = $cd4pe_docker_facts.filter |$k, $v| { $v['Name'] == 'cd4pe_mysql' }.values
+        if !empty($cd4pe_mysql) {
+          $effective_db_provider = 'mysql'
+        } else {
+          $effective_db_provider = 'postgres'
+        }
+      } else {
+        $effective_db_provider = 'postgres'
+      }
+    } else {
+      $effective_db_provider = $db_provider
+    }
+  }
+
+  if $effective_db_provider == 'mysql'  {
+    $net = 'cd4pe'
+    docker_network {$net:
+      ensure  => present,
+      subnet  => $cd4pe_network_subnet,
+      gateway => $cd4pe_network_gateway,
+    }
+  } else {
+    $net = 'bridge'
   }
 
   class { 'cd4pe::db':
-    data_root_dir   => $data_root_dir,
-    db_host         => $db_host,
-    db_name         => $db_name,
-    db_pass         => $db_pass,
-    db_port         => $db_port,
-    db_prefix       => $db_prefix,
-    db_user         => $db_user,
-    db_provider     => $db_provider,
-    manage_database => $manage_database,
+    data_root_dir         => $data_root_dir,
+    db_host               => $db_host,
+    db_name               => $db_name,
+    db_pass               => $db_pass,
+    db_port               => $db_port,
+    db_prefix             => $db_prefix,
+    db_user               => $db_user,
+    db_provider           => $db_provider,
+    effective_db_provider => $effective_db_provider,
+    manage_database       => $manage_database,
   }
 
   $app_data = {
@@ -97,7 +126,7 @@ class cd4pe (
     ports            => $cd4pe_ports,
     pull_on_start    => true,
     volumes          => ['cd4pe-object-store:/disk'],
-    net              => 'cd4pe',
+    net              => $net,
     env_file         => [
       $app_env_path,
       $secret_key_path,
