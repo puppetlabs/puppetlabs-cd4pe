@@ -75,6 +75,28 @@ module CD4PETaskHelper
     new_pipeline_res = client.upsert_pipeline_stages(workspace, repo_name, repo_type, current_pipeline[:id], new_stages)
     JSON.parse(new_pipeline_res.body, symbolize_names: true)
   end
+
+  def self.add_pr_gate_to_stage(client, workspace, repo_name, repo_type, branch_name, stage_name)
+    current_pipeline = get_pipeline_for_branch(client, workspace, repo_name, repo_type, branch_name)
+    current_stages = current_pipeline[:stages]
+    existing_stage_idx = CD4PEPipelineUtils.get_stage_index_by_name(current_stages, stage_name)
+    current_stages[existing_stage_idx][:pipelineGate] = {
+      projectPipelineGateType: 'PULLREQUEST',
+      stageNum: current_stages[existing_stage_idx][:stageNum],
+    }
+    if current_stages[existing_stage_idx].key?(:triggerOn)
+      current_stages[existing_stage_idx][:pipelineGate][:triggerOn] = current_stages[existing_stage_idx][:triggerOn]
+    end
+    if current_stages[existing_stage_idx].key?(:triggerCondition)
+      current_stages[existing_stage_idx][:pipelineGate][:triggerCondition] = current_stages[existing_stage_idx][:triggerCondition]
+    end
+
+    client.upsert_pipeline_stages(workspace, repo_name, repo_type, current_pipeline[:id], current_stages)
+    pr_build_triggers = ['Commit', 'PullRequest']
+    build_trigger_res = client.set_pipeline_auto_build_triggers(workspace, repo_name, repo_type, current_pipeline[:id], current_pipeline[:name], pr_build_triggers)
+    client.set_is_build_pr_allowed(workspace, repo_name, repo_type, false)
+    JSON.parse(build_trigger_res.body, symbolize_names: true)
+  end
   private_class_method def self.get_pipeline_for_branch(client, workspace, repo_name, pipeline_type, branch_name)
     pipelines_by_name_res = client.list_pipelines_by_name(workspace, repo_name, pipeline_type, branch_name)
     puts pipelines_by_name_res
