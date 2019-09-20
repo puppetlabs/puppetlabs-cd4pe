@@ -265,6 +265,46 @@ module PuppetX::Puppetlabs
       make_request(:post, get_ajax_endpoint(workspace), payload.to_json)
     end
 
+    def set_pipeline_auto_build_triggers(workspace, repo_name, pipeline_type, pipeline_id, branch, triggers)
+      payload = {
+        op: 'SetPipelineAutoBuildTriggers',
+        content: {
+          pipelineId: pipeline_id,
+          rule: {
+            autoBuildTriggers: triggers,
+            branch: branch,
+          },
+        },
+      }
+
+      case pipeline_type
+      when 'control'
+        payload[:content][:controlRepoName] = repo_name
+      when 'module'
+        payload[:content][:moduleName] = repo_name
+      else
+        raise Puppet::Error "pipeline_type does not match one of: 'control', 'module'"
+      end
+      make_request(:post, get_ajax_endpoint(workspace), payload.to_json)
+    end
+
+    def set_is_build_pr_allowed(workspace, repo_name, repo_type, is_allowed)
+      payload = {
+        op: 'SetIsBuildPRAllowed',
+        content: {
+          isBuildPRAllowed: is_allowed,
+        },
+      }
+      case repo_type
+      when 'control'
+        payload[:content][:controlRepoName] = repo_name
+      when 'module'
+        payload[:content][:moduleName] = repo_name
+      else
+        raise Puppet::Error "repo_type does not match one of: 'control', 'module'"
+      end
+      make_request(:post, get_ajax_endpoint(workspace), payload.to_json)
+    end
 
     def list_puppet_environments(workspace, creds_name)
       params = {
@@ -386,14 +426,15 @@ module PuppetX::Puppetlabs
         case response
         when Net::HTTPSuccess, Net::HTTPRedirection
           return response
-          # PE-15108 Retry on 500 (Internal Server Error) and 400 (Bad request) errors
-        when Net::HTTPInternalServerError, Net::HTTPBadRequest
+        when Net::HTTPInternalServerError
           if attempts < max_attempts
             Puppet.debug("Received #{response} error from #{service_url}, attempting to retry. (Attempt #{attempts} of #{max_attempts})")
             Kernel.sleep(10)
           else
             raise Puppet::Error, "Received #{attempts} server error responses from the CD4PE service at #{service_url}: #{response.code} #{response.body}"
           end
+        when Net::HTTPBadRequest
+          raise Puppet::Error, "Received failed response: #{response.code} #{response.body}"
         else
           return response
         end
