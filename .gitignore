@@ -24,6 +24,9 @@
 inventory.yaml
 /tmp/
 /vendor/
+.vendor/
+.vscode/
+.ruby-version
 /convert_report.txt
 /update_report.txt
 .DS_Store
