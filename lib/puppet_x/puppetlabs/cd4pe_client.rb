@@ -247,6 +247,51 @@ module PuppetX::Puppetlabs
       end
       make_request(:post, get_ajax_endpoint(workspace), payload.to_json)
     end
+
+    def upsert_pipeline_stages(workspace, repo_name, pipeline_type, pipeline_id, stages)
+      payload = {
+        op: 'UpsertPipelineStages',
+        content: {
+          pipelineId: pipeline_id,
+          stages: stages,
+        },
+      }
+
+      if pipeline_type == 'control'
+        payload[:content][:controlRepoName] = repo_name
+      elsif pipeline_type == 'module'
+        payload[:content][:moduleName] = repo_name
+      end
+      make_request(:post, get_ajax_endpoint(workspace), payload.to_json)
+    end
+
+
+    def list_puppet_environments(workspace, creds_name)
+      params = {
+        op: 'ListPuppetEnterpriseEnvironments',
+        name: creds_name,
+      }
+      api_uri = URI(get_ajax_endpoint(workspace))
+      api_uri.query = URI.encode_www_form(params)
+      make_request(:get, api_uri.to_s)
+    end
+
+    def list_pipelines_by_name(workspace, repo_name, pipeline_type, branch_name)
+      params = {
+        op: 'ListPipelinesByName',
+        pipelineName: branch_name,
+      }
+      case pipeline_type
+      when 'control'
+        params[:controlRepoName] = repo_name
+      when 'module'
+        params[:moduleName] = repo_name
+      else
+        raise Puppet::Error "pipeline_type does not match one of: 'control', 'module'"
+      end
+      api_uri = URI(get_ajax_endpoint(workspace))
+      api_uri.query = URI.encode_www_form(params)
+      make_request(:get, api_uri.to_s)
     end
 
     def post_provider_webhook(workspace, source_repo_name, source_repo_owner, source_repo_provider)
