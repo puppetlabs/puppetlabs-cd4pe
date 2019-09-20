@@ -49,6 +49,32 @@ module CD4PETaskHelper
     JSON.parse(new_pipeline_res.body, symbolize_names: true)
   end
 
+  def self.add_job_to_stage(client,
+                            workspace,
+                            repo_name,
+                            repo_type,
+                            branch_name,
+                            job_name,
+                            stage_name,
+                            add_stage_after,
+                            autopromote,
+                            trigger_condition)
+    current_pipeline = get_pipeline_for_branch(client, workspace, repo_name, repo_type, branch_name)
+    job_template_res = client.list_job_templates(workspace)
+    job_templates = JSON.parse(job_template_res.body, symbolize_names: true)
+
+    matched_job_templates = job_templates[:rows].select { |template| job_name.casecmp(template[:name]).zero? }
+    if matched_job_templates.empty?
+      raise Puppet::Error, "Could not find job for name: #{job_name}"
+    end
+    if matched_job_templates.length > 1
+      raise Puppet::Error, "Found multiple jobs for name: #{job_name}. Give the job a unique name and try again."
+    end
+    new_job_destination = { vmJobTemplateId: matched_job_templates[0][:id] }
+    new_stages = CD4PEPipelineUtils.add_destination_to_stage(current_pipeline[:stages], new_job_destination, stage_name, add_stage_after, autopromote, trigger_condition)
+    new_pipeline_res = client.upsert_pipeline_stages(workspace, repo_name, repo_type, current_pipeline[:id], new_stages)
+    JSON.parse(new_pipeline_res.body, symbolize_names: true)
+  end
   private_class_method def self.get_pipeline_for_branch(client, workspace, repo_name, pipeline_type, branch_name)
     pipelines_by_name_res = client.list_pipelines_by_name(workspace, repo_name, pipeline_type, branch_name)
     puts pipelines_by_name_res
