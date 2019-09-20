@@ -31,6 +31,10 @@ module PuppetX::Puppetlabs
       end
     end
 
+    def get_ajax_endpoint(workspace)
+      "/#{workspace}/ajax"
+    end
+
     def set_cookie
       content = {
         op: 'PfiLogin',
@@ -44,7 +48,6 @@ module PuppetX::Puppetlabs
       if response.code == '200'
         @cookie = response.response['set-cookie'].split(';')[0]
         content = JSON.parse(response.body, symbolize_names: true)
-        @owner_ajax_endpoint = "/#{content[:username]}/ajax"
       elsif response.code == '401'
         begin
           resp = JSON.parse(response.body, symbolize_names: true)
@@ -140,7 +143,7 @@ module PuppetX::Puppetlabs
       make_request(:post, ROOT_AJAX_ENDPOINT, payload.to_json)
     end
 
-    def discover_pe_credentials(creds_name, pe_username, pe_password, pe_token, pe_console_host)
+    def discover_pe_credentials(workspace, creds_name, pe_username, pe_password, pe_token, pe_console_host)
       payload = {
         op: 'DiscoverPuppetEnterpriseCredentials',
         content: {
@@ -154,23 +157,36 @@ module PuppetX::Puppetlabs
           puppetServerPrivateKey: '',
         },
       }
-      make_request(:post, @owner_ajax_endpoint, payload.to_json)
+      make_request(:post, get_ajax_endpoint(workspace), payload.to_json)
     end
 
-    def add_control_repo(repo_provider, repo_org, source_repo_name, control_repo_name)
-      repos_res = search_source_repos(repo_provider, repo_org, source_repo_name)
+    def add_repo(workspace, repo_provider, repo_org, source_repo_name, repo_name, repo_type)
+      repos_res = search_source_repos(workspace, repo_provider, repo_org, source_repo_name)
       if repos_res.code != '200'
         raise Puppet::Error, "Error while searching for repository: #{repos_res.body}"
       end
       source_repos = JSON.parse(repos_res.body, symbolize_names: true)
-      raise Puppet::Error, "Aborting.. Could not find repository for name: #{repo_name}" if source_repos.empty?
-      raise Puppet::Error, "Aborting.. Found multiple repositories for repository name: #{repo_name}" if source_repos.length > 1
+      if source_repos.empty?
+        raise Puppet::Error, "Could not find repository for name: #{repo_name}"
+      end
+      if source_repos.length > 1
+        raise Puppet::Error, "Found multiple repositories for repository name: #{repo_name}"
+      end
       # There should only be one repo from the search
       source_repo = source_repos[0]
+      case repo_type
+      when 'control'
+        repo_op = 'CreateControlRepo'
+      when 'module'
+        repo_op = 'CreateModule'
+      else
+        raise Puppet::Error "repo_type does not match one of: 'control', 'module'"
+      end
+
       payload = {
-        op: 'CreateControlRepo',
+        op: repo_op,
         content: {
-          name: control_repo_name,
+          name: repo_name,
           srcRepoDisplayName: source_repo[:repoDisplayName],
           srcRepoDisplayOwner: source_repo[:ownerDisplayName],
           srcRepoId: source_repo[:repoId],
@@ -180,43 +196,60 @@ module PuppetX::Puppetlabs
           srcRepoProvider: source_repo[:provider].upcase,
         },
       }
-      make_request(:post, @owner_ajax_endpoint, payload.to_json)
+      make_request(:post, get_ajax_endpoint(workspace), payload.to_json)
     end
 
-    def search_source_repos(repo_provider, repo_org, repo_name)
+    def search_source_repos(workspace, repo_provider, repo_org, repo_name)
       params = {
         op: 'SearchSourceRepos',
         provider: repo_provider,
         org: repo_org,
         search: repo_name,
       }
-      api_uri = URI(@owner_ajax_endpoint)
+      api_uri = URI(get_ajax_endpoint(workspace))
       api_uri.query = URI.encode_www_form(params)
       make_request(:get, api_uri.to_s)
     end
 
-    def create_pipeline(pipeline_name, control_repo_name, control_repo_branch)
+    def list_job_templates(workspace)
+      # This does not use pagination because the frontend doesn't so this is consistent.
+      # TODO: Use pagination here or add search functionality (CDPE-2280)
+      params = {
+        op: 'ListVmJobTemplates',
+      }
+      api_uri = URI(get_ajax_endpoint(workspace))
+      api_uri.query = URI.encode_www_form(params)
+      make_request(:get, api_uri.to_s)
+    end
+
+    def create_pipeline(workspace, pipeline_name, repo_name, repo_branch, pipeline_type)
       # Default sources
       sources = [
         {
           autoBuildTriggers: ['Commit'],
-          branch: control_repo_branch,
-          containerName: control_repo_branch,
+          branch: repo_branch,
+          containerName: repo_branch,
           trigger: 'SOURCE_REPOSITORY',
         },
       ]
       payload = {
         op: 'CreatePipeline',
         content: {
-          controlRepoName: control_repo_name,
           pipelineName: pipeline_name,
           sources: sources,
         },
       }
-      make_request(:post, @owner_ajax_endpoint, payload.to_json)
+
+      if pipeline_type == 'control'
+        payload[:content][:controlRepoName] = repo_name
+      elsif pipeline_type == 'module'
+        payload[:content][:moduleName] = repo_name
+      end
+      make_request(:post, get_ajax_endpoint(workspace), payload.to_json)
+    end
     end
 
-    def post_provider_webhook(source_repo_name, source_repo_owner, source_repo_provider)
+    def post_provider_webhook(workspace, source_repo_name, source_repo_owner, source_repo_provider)
       payload = {
         op: 'PostProviderWebhook',
         content: {
@@ -225,7 +258,7 @@ module PuppetX::Puppetlabs
           srcRepoProvider: source_repo_provider,
         },
       }
-      make_request(:post, @owner_ajax_endpoint, payload.to_json)
+      make_request(:post, get_ajax_endpoint(workspace), payload.to_json)
     end
 
     def save_ssl_settings(ssl_authority_certificate, ssl_server_certificate, ssl_server_private_key, ssl_enabled)

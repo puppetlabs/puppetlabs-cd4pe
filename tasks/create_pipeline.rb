@@ -12,23 +12,31 @@ params = JSON.parse(STDIN.read)
 hostname                 = params['resolvable_hostname'] || Puppet[:certname]
 username                 = params['email']
 password                 = params['password']
-control_repo_branch      = params['control_repo_branch']
-control_repo_name        = params['control_repo_name']
+repo_branch              = params['repo_branch']
+repo_name                = params['repo_name']
+pipeline_name            = params['pipeline_name']
+pipeline_type            = params['pipeline_type']
+
 
 uri = URI.parse(hostname)
 hostname = "http://#{hostname}" if uri.scheme.nil?
-
+pipeline_name ||= repo_branch
 web_ui_endpoint = params['web_ui_endpoint'] || "#{hostname}:8080"
 exitcode = 0
+result = {}
 begin
   client = PuppetX::Puppetlabs::CD4PEClient.new(web_ui_endpoint, username, password)
-  pipeline_res = client.create_pipeline(control_repo_branch, control_repo_name, control_repo_branch)
+  pipeline_res = client.create_pipeline(workspace, pipeline_name, repo_name, repo_branch, pipeline_type)
   if pipeline_res.code != '200'
     raise "Error while adding pipeline: #{pipeline_res.body}"
   end
-  puts "Added pipeline: #{control_repo_branch} for control repo: #{control_repo_name}"
+  puts "Added #{pipeline_type} pipeline: #{pipeline_name} for repo: #{repo_name}"
+  result = pipeline_res.body
 rescue => e
-  puts({ status: 'failure', error: e.message }.to_json)
+  result[:_error] = { msg: e.message,
+                      kind: "puppetlabs-cd4pe/create_pipeline_error",
+                      details: e.class.to_s }
   exitcode = 1
 end
+puts result.to_json
 exit exitcode
