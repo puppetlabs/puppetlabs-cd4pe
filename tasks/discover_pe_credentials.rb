@@ -24,6 +24,7 @@ hostname = "http://#{hostname}" if uri.scheme.nil?
 web_ui_endpoint = params['web_ui_endpoint'] || "#{hostname}:8080"
 
 exitcode = 0
+result = {}
 begin
   client = PuppetX::Puppetlabs::CD4PEClient.new(web_ui_endpoint, username, password)
   res = client.discover_pe_credentials(creds_name, pe_username, pe_password, pe_token, pe_console_host)
@@ -31,8 +32,12 @@ begin
     raise "Error while discovering Puppet Enterprise credentials: #{res.body}"
   end
   puts "Added Puppet Enterprise credentials: #{creds_name}"
+  result[:success] = true
 rescue => e
-  puts({ status: 'failure', error: e.message }.to_json)
+  result[:_error] = { msg: e.message,
+    kind: "puppetlabs-cd4pe/discover_pe_credentials_error",
+    details: e.class.to_s }
   exitcode = 1
 end
+puts result.to_json
 exit exitcode
