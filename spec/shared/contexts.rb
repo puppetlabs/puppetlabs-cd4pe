@@ -505,4 +505,132 @@ RSpec.shared_context 'add a job to an existing stage' do
 end
 
 RSpec.shared_context 'add a pr gate to an existing stage' do
+  let(:target_stage) { 'Code Validation stage' }
+  let(:auto_build_triggers) do
+    ['Commit', 'PullRequest']
+  end
+
+  let(:updated_stages) do
+    [
+      {
+        destinations: [
+          {
+            id: '705rtzqjy2vx04fjdswfpma8l',
+            stageNum: 1,
+            vmJobTemplateId: 1,
+            vmJobTemplateName: 'module-pdk-validate',
+          },
+        ],
+        pipelineGate: {
+          projectPipelineGateType: 'PULLREQUEST',
+          stageNum: 1,
+          triggerOn: false,
+        },
+        stageName: 'Code Validation stage',
+        stageNum: 1,
+        triggerOn: false,
+      },
+      {
+        destinations: [
+          {
+            id: '1oafk1z9kn53u098tth10vzowi',
+            stageNum: 2,
+            peModuleDeploymentTemplate: {
+              baseTaskUrl: 'http://localhost:8080/carlsCoolWorkspace/module-deployments',
+              settings: {
+                doCodeDeploy: true,
+                environment: {
+                  nodeGroupBranch: 'production',
+                  nodeGroupId: '5499bcea-06fd-4f46-a3d9-31aeb9b69f6a',
+                  nodeGroupName: 'Production environment',
+                  peCredentialsId: {
+                    domain: 'd3',
+                    name: 'PE-Github',
+                  },
+                },
+                moduleId: {
+                  domain: 'd3',
+                  name: 'puppetlabs-cd4pe_tests',
+                },
+              },
+            },
+          },
+        ],
+        stageNum: 2,
+        stageName: 'Deployment stage',
+        triggerOn: false,
+      },
+    ]
+  end
+
+  let(:updated_pipeline) do
+    [{
+      buildStage: {
+        stageNum: 0,
+      },
+      id: '1riocypice7pm0nko4reah1q9v',
+      name: 'module_deployments_src',
+      projectId: {
+        domain: 'd3',
+        projectName: 'm.puppetlabs-cd4pe_tests',
+      },
+      sources: [
+        {
+          autoBuildTriggers: ['Commit', 'PullRequest'],
+          branch: 'module_deployment_src',
+          containerName: 'default',
+          skipBuild: true,
+          trigger: 'SOURCE_REPOSITORY',
+        },
+      ],
+      stages: [
+        {
+          destinations: [
+            {
+              id: '705rtzqjy2vx04fjdswfpma8l',
+              stageNum: 1,
+              vmJobTemplateId: 1,
+              vmJobTemplateName: 'module-pdk-validate',
+            },
+          ],
+          pipelineGate: {
+            projectPipelineGateType: 'PULLREQUEST',
+          },
+          stageName: 'Code Validation stage',
+          stageNum: 1,
+          triggerOn: false,
+        },
+        {
+          destinations: [
+            {
+              id: '1oafk1z9kn53u098tth10vzowi',
+              stageNum: 2,
+              peModuleDeploymentTemplate: {
+                baseTaskUrl: 'http://localhost:8080/carlsCoolWorkspace/module-deployments',
+                settings: {
+                  doCodeDeploy: true,
+                  environment: {
+                    nodeGroupBranch: 'production',
+                    nodeGroupId: '5499bcea-06fd-4f46-a3d9-31aeb9b69f6a',
+                    nodeGroupName: 'Production environment',
+                    peCredentialsId: {
+                      domain: 'd3',
+                      name: 'PE-Github',
+                    },
+                  },
+                  moduleId: {
+                    domain: 'd3',
+                    name: 'puppetlabs-cd4pe_tests',
+                  },
+                },
+              },
+            },
+          ],
+          stageNum: 2,
+          stageName: 'Deployment stage',
+          triggerOn: false,
+        },
+      ],
+    }]
+  end
 end
