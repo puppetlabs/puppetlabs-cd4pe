@@ -17,7 +17,6 @@ branch_name              = params['branch_name']
 stage_name               = params['stage_name']
 
 require_relative File.join(params['_installdir'], 'cd4pe', 'lib', 'puppet_x', 'puppetlabs', 'cd4pe_client')
-require_relative File.join(params['_installdir'], 'cd4pe', 'lib', 'puppet_x', 'puppetlabs', 'cd4pe_task_helper')
 
 uri = URI.parse(hostname)
 hostname = "http://#{hostname}" if uri.scheme.nil?
@@ -29,7 +28,7 @@ result = {}
 
 begin
   client = PuppetX::Puppetlabs::CD4PEClient.new(web_ui_endpoint, username, password)
-  result = CD4PETaskHelper.add_pr_gate_to_stage(client, workspace, repo_name, repo_type, branch_name, stage_name)
+  result = client.add_pr_gate_to_stage(workspace, repo_name, repo_type, branch_name, stage_name)
 rescue => e
   result[:_error] = {
     msg: "Task failed: #{e.message}",
