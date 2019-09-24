@@ -17,7 +17,6 @@ repo_name                = params['repo_name']
 pipeline_name            = params['pipeline_name']
 pipeline_type            = params['pipeline_type']
 
-
 uri = URI.parse(hostname)
 hostname = "http://#{hostname}" if uri.scheme.nil?
 pipeline_name ||= repo_branch
@@ -34,7 +33,7 @@ begin
   result = pipeline_res.body
 rescue => e
   result[:_error] = { msg: e.message,
-                      kind: "puppetlabs-cd4pe/create_pipeline_error",
+                      kind: 'puppetlabs-cd4pe/create_pipeline_error',
                       details: e.class.to_s }
   exitcode = 1
 end

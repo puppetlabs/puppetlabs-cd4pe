@@ -47,7 +47,7 @@ module PuppetX::Puppetlabs
       response = make_request(:post, LOGIN_ENDPOINT, content.to_json)
       if response.code == '200'
         @cookie = response.response['set-cookie'].split(';')[0]
-        content = JSON.parse(response.body, symbolize_names: true)
+        JSON.parse(response.body, symbolize_names: true)
       elsif response.code == '401'
         begin
           resp = JSON.parse(response.body, symbolize_names: true)

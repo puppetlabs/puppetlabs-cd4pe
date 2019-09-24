@@ -35,8 +35,8 @@ begin
   result[:success] = true
 rescue => e
   result[:_error] = { msg: e.message,
-    kind: "puppetlabs-cd4pe/discover_pe_credentials_error",
-    details: e.class.to_s }
+                      kind: 'puppetlabs-cd4pe/discover_pe_credentials_error',
+                      details: e.class.to_s }
   exitcode = 1
 end
 puts result.to_json
