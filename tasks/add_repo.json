@@ -32,7 +32,7 @@
         },
         "repo_name": {
             "type": "Optional[String[1]]",
-            "description": "Optional. The friendly name to use for the repository as referenced in Continous Delivery For PE. Defaults to 'source_repo_name'."
+            "description": "Optional. The friendly name to use for the repository as referenced in Continous Delivery For PE. Defaults to the value of the 'source_repo_name' parameter."
         },
         "repo_type": {
             "type": "Enum['module', 'control']",
