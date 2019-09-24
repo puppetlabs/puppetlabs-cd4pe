@@ -190,7 +190,7 @@ module PuppetX::Puppetlabs
         content: {
           name: repo_name,
           srcRepoDisplayName: source_repo[:repoDisplayName],
-          srcRepoDisplayOwner: source_repo[:ownerDisplayName],
+          srcRepoDisplayOwner: source_repo[:owner],
           srcRepoId: source_repo[:repoId],
           srcRepoName: source_repo[:repoName],
           srcRepoOwner: source_repo[:owner],
