@@ -1,9 +1,8 @@
 require 'spec_helper'
 require 'webmock/rspec'
-require_relative '../../../../lib/puppet_x/puppetlabs/cd4pe_task_helper'
 require_relative '../../../../lib/puppet_x/puppetlabs/cd4pe_client'
 
-describe CD4PETaskHelper do
+describe PuppetX::Puppetlabs::CD4PEClient do
   describe 'add_deployment_to_stage' do
     context 'add a module deployment to a new pipeline stage' do
       include_context 'cd4pe login'
@@ -25,9 +24,8 @@ describe CD4PETaskHelper do
           .to_return(body: JSON.generate(updated_pipeline))
           .times(1)
 
-        client = PuppetX::Puppetlabs::CD4PEClient.new(test_host, req_login[:content][:email], req_login[:content][:passwd])
-        result = described_class.add_deployment_to_stage(
-          client,
+        client = described_class.new(test_host, req_login[:content][:email], req_login[:content][:passwd])
+        result = client.add_deployment_to_stage(
           test_workspace,
           test_module_repo_name,
           'module',
@@ -65,9 +63,8 @@ describe CD4PETaskHelper do
           .to_return(body: JSON.generate(updated_pipeline))
           .times(1)
 
-        client = PuppetX::Puppetlabs::CD4PEClient.new(test_host, req_login[:content][:email], req_login[:content][:passwd])
-        result = described_class.add_job_to_stage(
-          client,
+        client = described_class.new(test_host, req_login[:content][:email], req_login[:content][:passwd])
+        result = client.add_job_to_stage(
           test_workspace,
           test_module_repo_name,
           'module',
@@ -120,9 +117,8 @@ describe CD4PETaskHelper do
           .to_return(body: JSON.generate(success: true))
           .times(1)
 
-        client = PuppetX::Puppetlabs::CD4PEClient.new(test_host, req_login[:content][:email], req_login[:content][:passwd])
-        result = described_class.add_pr_gate_to_stage(
-          client,
+        client = described_class.new(test_host, req_login[:content][:email], req_login[:content][:passwd])
+        result = client.add_pr_gate_to_stage(
           test_workspace,
           test_module_repo_name,
           'module',

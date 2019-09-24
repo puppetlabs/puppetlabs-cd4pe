@@ -22,7 +22,6 @@ autopromote              = params['autopromote'] || false
 trigger_condition        = params['trigger_condition'] || 'AllSuccess' if autopromote
 
 require_relative File.join(params['_installdir'], 'cd4pe', 'lib', 'puppet_x', 'puppetlabs', 'cd4pe_client')
-require_relative File.join(params['_installdir'], 'cd4pe', 'lib', 'puppet_x', 'puppetlabs', 'cd4pe_task_helper')
 
 uri = URI.parse(hostname)
 hostname = "http://#{hostname}" if uri.scheme.nil?
@@ -34,17 +33,16 @@ result = {}
 
 begin
   client = PuppetX::Puppetlabs::CD4PEClient.new(web_ui_endpoint, username, password)
-  result = CD4PETaskHelper.add_deployment_to_stage(client,
-                                                   workspace,
-                                                   repo_name,
-                                                   repo_type,
-                                                   branch_name,
-                                                   pe_creds_name,
-                                                   node_group_name,
-                                                   stage_name,
-                                                   add_stage_after,
-                                                   autopromote,
-                                                   trigger_condition)
+  result = client.add_deployment_to_stage(workspace,
+                                          repo_name,
+                                          repo_type,
+                                          branch_name,
+                                          pe_creds_name,
+                                          node_group_name,
+                                          stage_name,
+                                          add_stage_after,
+                                          autopromote,
+                                          trigger_condition)
 rescue => e
   result[:_error] = {
     msg: "Task failed: #{e.message}",
