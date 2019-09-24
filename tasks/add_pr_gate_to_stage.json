@@ -1,44 +1,48 @@
 {
   "description": "Adds a Control or Module Repository to the Continuous Delivery for PE account.",
   "parameters": {
-      "email": {
-          "type": "String[1]",
-          "description": "The email address associated with the account."
-        },
-      "password": {
-          "type": "String[1]",
-          "sensitive": true,
-          "description": "The password associated with the account."
-      },
-      "workspace": {
-          "type": "String[1]",
-          "description": "Designates the workspace that the repo and pipeline are associated with"
-      },
-      "repo_name": {
-          "type": "String[1]",
-          "description": "The name of the repo."
-      },
-      "repo_type": {
-          "type": "Enum['module', 'control']",
-          "description": "The type of repository."
-      },
-      "branch_name": {
-          "type": "String[1]",
-          "description": "The name of the branch associated with the pipeline."
-      },
-      "stage_name": {
-        "type": "String[1]",
-        "description": "The name of the pipeline stage that the pr gate should be added to."
-      },
-      "resolvable_hostname": {
-          "type": "Optional[String[1]]",
-          "description": "Optional. A resolvable internet address where the Continuous Delivery for PE server can be reached. Required only if the agent certificate is not the machine's resolvable internet address."
-      },
-      "web_ui_endpoint": {
-          "type": "Optional[String[1]]",
-          "description": "Optional. The endpoint where the web UI can be reached, in the form http://<resolvable_hostname>:<port>. Required if you set the web_ui_port parameter in the cd4pe class during installation."
-      }
+    "email": {
+      "type": "String[1]",
+      "description": "The email address associated with the account."
+    },
+    "password": {
+      "type": "String[1]",
+      "sensitive": true,
+      "description": "The password associated with the account."
+    },
+    "workspace": {
+      "type": "String[1]",
+      "description": "Designates the workspace that the repo and pipeline are associated with"
+    },
+    "repo_name": {
+      "type": "String[1]",
+      "description": "The name of the repo."
+    },
+    "repo_type": {
+      "type": "Enum['module', 'control']",
+      "description": "The type of repository."
+    },
+    "branch_name": {
+      "type": "String[1]",
+      "description": "The name of the branch associated with the pipeline."
+    },
+    "stage_name": {
+      "type": "String[1]",
+      "description": "The name of the pipeline stage that the pr gate should be added to."
+    },
+    "resolvable_hostname": {
+      "type": "Optional[String[1]]",
+      "description": "Optional. A resolvable internet address where the Continuous Delivery for PE server can be reached. Required only if the agent certificate is not the machine's resolvable internet address."
+    },
+    "web_ui_endpoint": {
+      "type": "Optional[String[1]]",
+      "description": "Optional. The endpoint where the web UI can be reached, in the form http://<resolvable_hostname>:<port>. Required if you set the web_ui_port parameter in the cd4pe class during installation."
+    }
   },
-  "files": ["cd4pe/lib/"],
+  "files": [
+    "cd4pe/lib/puppet_x/puppetlabs/cd4pe_client.rb",
+    "cd4pe/lib/puppet_x/puppetlabs/cd4pe_pipeline_utils.rb"
+  ],
+
   "input_method": "stdin"
 }

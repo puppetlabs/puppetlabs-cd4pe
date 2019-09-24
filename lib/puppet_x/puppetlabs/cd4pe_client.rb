@@ -3,6 +3,8 @@ require 'net/http'
 require 'uri'
 require 'json'
 
+require_relative 'cd4pe_pipeline_utils'
+
 module PuppetX::Puppetlabs
   # Provides a class for interacting with CD4PE's API
   class CD4PEClient < Object
