@@ -45,17 +45,17 @@ begin
   puts "Added base pipeline: #{source_repo_branch} for #{repo_type} repo: #{repo_name}"
 rescue => e
   result[:_error] = { msg: e.message,
-    kind: "puppetlabs-cd4pe/add_repo_error",
-    details: e.class.to_s }
+                      kind: 'puppetlabs-cd4pe/add_repo_error',
+                      details: e.class.to_s }
   exitcode = 1
 end
 
 begin
-  webhook_res = client.post_provider_webhook(workspace, created_repo[:name], created_repo[:srcRepoOwner], created_repo[:srcRepoProvider])
+  client.post_provider_webhook(workspace, created_repo[:name], created_repo[:srcRepoOwner], created_repo[:srcRepoProvider])
   puts "Added webhook for #{repo_type} repo: #{created_repo[:name]}"
 rescue => e
   # Just print the error but don't mark the task as failed since the repo and pipeline were created successfully
-  puts "Error while adding webhook for #{repo_type} repo: #{created_repo[:name]}"
+  puts "Error while adding webhook for #{repo_type} repo: #{created_repo[:name]}: #{e.message}"
 end
 
 puts result.to_json
