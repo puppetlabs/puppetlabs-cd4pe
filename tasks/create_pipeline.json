@@ -12,7 +12,7 @@
         },
         "workspace": {
             "type": "String[1]",
-            "description": "Designates the workspace that the pipeline will be created in"
+            "description": "Designates the workspace that the pipeline will be created in."
         },
         "repo_name": {
             "type": "String[1]",
@@ -25,10 +25,6 @@
         "pipeline_type": {
             "type": "Enum['module', 'control']",
             "description": "The type of pipeline to create. Must be one of 'control' or 'module'."
-        },
-        "pipeline_name": {
-            "type": "Optional[String[1]]",
-            "description": "Optional. The friendly name to use for the pipeline as referenced in Continous Delivery For PE. Defaults to 'repo_branch'."
         },
         "resolvable_hostname": {
             "type": "Optional[String[1]]",

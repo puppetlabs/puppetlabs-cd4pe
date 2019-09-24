@@ -11,7 +11,7 @@ hostname                 = params['resolvable_hostname'] || Puppet[:certname]
 username                 = params['email']
 password                 = params['password']
 workspace                = params['workspace']
-repo_provider            = params['repo_provider']
+source_control            = params['source_control']
 repo_org                 = params['source_repo_org']
 source_repo_name         = params['source_repo_name']
 source_repo_branch       = params['source_repo_branch']
@@ -29,7 +29,7 @@ exitcode = 0
 result = {}
 begin
   client = PuppetX::Puppetlabs::CD4PEClient.new(web_ui_endpoint, username, password)
-  repo_res = client.add_repo(workspace, repo_provider, repo_org, source_repo_name, repo_name, repo_type)
+  repo_res = client.add_repo(workspace, source_control, repo_org, source_repo_name, repo_name, repo_type)
   if repo_res.code != '200'
     raise "Error while adding #{repo_type} repository: #{repo_res.body}"
   end
@@ -37,7 +37,7 @@ begin
   created_repo = JSON.parse(repo_res.body, symbolize_names: true)
   result[:repository] = created_repo
   # Create the base pipeline & webhook to mimic the front-end workflow
-  pipeline_res = client.create_pipeline(workspace, source_repo_branch, created_repo[:name], source_repo_branch, repo_type)
+  pipeline_res = client.create_pipeline(workspace, repo_name, source_repo_branch, repo_type)
   if pipeline_res.code != '200'
     raise "Error while adding pipeline: #{pipeline_res.body}"
   end
@@ -55,7 +55,7 @@ begin
   puts "Added webhook for #{repo_type} repo: #{created_repo[:name]}"
 rescue => e
   # Just print the error but don't mark the task as failed since the repo and pipeline were created successfully
-  puts "Error while adding webhook for #{repo_type} repo: #{created_repo[:name]}: #{e.message}"
+  puts "Error while adding webhook for #{repo_type} repo: #{source_repo_name}: #{e.message}"
 end
 
 puts result.to_json

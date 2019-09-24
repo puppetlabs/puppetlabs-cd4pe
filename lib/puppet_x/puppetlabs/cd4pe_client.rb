@@ -162,8 +162,8 @@ module PuppetX::Puppetlabs
       make_request(:post, get_ajax_endpoint(workspace), payload.to_json)
     end
 
-    def add_repo(workspace, repo_provider, repo_org, source_repo_name, repo_name, repo_type)
-      repos_res = search_source_repos(workspace, repo_provider, repo_org, source_repo_name)
+    def add_repo(workspace, source_control, repo_org, source_repo_name, repo_name, repo_type)
+      repos_res = search_source_repos(workspace, source_control, repo_org, source_repo_name)
       if repos_res.code != '200'
         raise Puppet::Error, "Error while searching for repository: #{repos_res.body}"
       end
@@ -201,10 +201,10 @@ module PuppetX::Puppetlabs
       make_request(:post, get_ajax_endpoint(workspace), payload.to_json)
     end
 
-    def search_source_repos(workspace, repo_provider, repo_org, repo_name)
+    def search_source_repos(workspace, source_control, repo_org, repo_name)
       params = {
         op: 'SearchSourceRepos',
-        provider: repo_provider,
+        provider: source_control,
         org: repo_org,
         search: repo_name,
       }
@@ -224,7 +224,7 @@ module PuppetX::Puppetlabs
       make_request(:get, api_uri.to_s)
     end
 
-    def create_pipeline(workspace, pipeline_name, repo_name, repo_branch, pipeline_type)
+    def create_pipeline(workspace, repo_name, repo_branch, pipeline_type)
       # Default sources
       sources = [
         {
@@ -237,7 +237,7 @@ module PuppetX::Puppetlabs
       payload = {
         op: 'CreatePipeline',
         content: {
-          pipelineName: pipeline_name,
+          pipelineName: repo_branch,
           sources: sources,
         },
       }
@@ -443,13 +443,13 @@ module PuppetX::Puppetlabs
       JSON.parse(build_trigger_res.body, symbolize_names: true)
     end
 
-    def post_provider_webhook(workspace, source_repo_name, source_repo_owner, source_repo_provider)
+    def post_provider_webhook(workspace, source_repo_name, source_repo_owner, source_control_provider)
       payload = {
         op: 'PostProviderWebhook',
         content: {
           srcRepoName: source_repo_name,
           srcRepoOwner: source_repo_owner,
-          srcRepoProvider: source_repo_provider,
+          srcRepoProvider: source_control_provider,
         },
       }
       make_request(:post, get_ajax_endpoint(workspace), payload.to_json)

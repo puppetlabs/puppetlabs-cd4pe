@@ -1,9 +1,9 @@
 {
-  "description": "Adds a Control or Module Repository to the Continuous Delivery for PE account.",
+  "description": "Adds a Pull Request Gate to the Continuous Delivery for PE Pipeline Stage.",
   "parameters": {
     "email": {
       "type": "String[1]",
-      "description": "The email address associated with the account."
+      "description": "The email address associated with the Continuous Delivery for PE login."
     },
     "password": {
       "type": "String[1]",
