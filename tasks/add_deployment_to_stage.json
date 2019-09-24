@@ -1,9 +1,9 @@
 {
-  "description": "Adds a deployment to a pipeline stage to a control or module repository in a Continuous Delivery for PE workspace.",
+  "description": "Adds a deployment to a pipeline stage to a module repository in a Continuous Delivery for PE workspace.",
   "parameters": {
     "email": {
       "type": "String[1]",
-      "description": "The email address associated with the account."
+      "description": "The email address associated with the Continuous Delivery for PE login."
     },
     "password": {
       "type": "String[1]",
@@ -16,7 +16,7 @@
     },
     "repo_name": {
       "type": "String[1]",
-      "description": "The name of the repo."
+      "description": "The name used for the repo in Continuous Delivery for PE."
     },
     "repo_type": {
       "type": "Enum['module']",
@@ -40,11 +40,11 @@
     },
     "add_stage_after": {
       "type": "Optional[String[1]]",
-      "description": "Optional. The name of the stage that we should add a new stage after. If not specified then the stage will be added to the end of the pipeline. Only applies if the stage doesn't exist."
+      "description": "Optional. The name of the stage that comes before the desired position of the newly created stage. If not specified then the stage will be added to the end of the pipeline. Only applies if the stage doesn't exist."
     },
     "autopromote": {
       "type": "Optional[Boolean]",
-      "description": "Optional. A boolean to indicate whether or not changes should be auto-promoted through this stage. The default value is false. Will update the existing settings on a stage if set."
+      "description": "Optional. A Boolean to indicate whether or not changes should be auto-promoted through this stage. The default value is false. If set, will update the existing settings on a stage."
     },
     "trigger_condition": {
       "type": "Optional[Enum['AllSuccess', 'AllComplete', 'AnySuccess', 'AnyComplete']]",
