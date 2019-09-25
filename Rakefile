@@ -274,6 +274,11 @@ namespace :test do
         config_data = { 'modulepath' => File.join(Dir.pwd, 'spec', 'fixtures', 'modules') }
         manifest = <<-MANIFEST
           include docker
+
+          docker_network {'cd4pe':
+            ensure => present,
+          }
+
           docker::run { 'cd4pe_postgres':
             image                 => 'postgres:9.6',
             net                   => 'cd4pe',
@@ -296,6 +301,12 @@ namespace :test do
             db_prefix       => 'test',
             analytics       => false,
           }
+
+          Docker::Run <| title == 'cd4pe' |> {
+            net +> 'cd4pe'
+          }
+
+
         MANIFEST
         ret = apply_manifest(manifest, target, execute:true, config: config_data, inventory: inventory_hash)
         puts ret
