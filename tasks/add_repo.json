@@ -1,5 +1,5 @@
 {
-    "description": "Adds a Control Repository to the Continuous Delivery for PE account.",
+    "description": "Adds a Control or Module Repository to the Continuous Delivery for PE account.",
     "parameters": {
         "email": {
             "type": "String[1]",
@@ -10,9 +10,13 @@
             "sensitive": true,
             "description": "The password associated with the account."
         },
-        "repo_provider": {
-            "type": "Enum['github', 'gitlab', 'githubEnterprise', 'bitbucketServer', 'azureDevOps']",
-            "description": "The repository provider. Must be one of 'github', 'gitlab', 'githubEnterprise', 'bitbucketServer', or 'azureDevOps'."
+        "workspace": {
+            "type": "String[1]",
+            "description": "Designates the workspace that the control or module repository will be created in"
+        },
+        "source_control": {
+            "type": "Enum['github', 'gitlab', 'githubEnterprise', 'bitbucketServer', 'azureDevOps', 'bitbucket']",
+            "description": "The source control provider. Must be one of 'github', 'gitlab', 'githubEnterprise', 'bitbucketServer', 'bitbucket' (for Bitbucket Cloud), or 'azureDevOps'."
         },
         "source_repo_org": {
             "type": "String[1]",
@@ -24,11 +28,15 @@
         },
         "source_repo_branch": {
             "type": "String[1]",
-            "description": "The default branch to use for the control repository."
+            "description": "The default branch to use for the repository."
         },
-        "control_repo_name": {
+        "repo_name": {
             "type": "Optional[String[1]]",
-            "description": "Optional. The friendly name to use for the control repository as referenced in Continous Delivery For PE. Defaults to 'source_repo_name'."
+            "description": "Optional. The friendly name to use for the repository as referenced in Continous Delivery For PE. Defaults to the value of the 'source_repo_name' parameter."
+        },
+        "repo_type": {
+            "type": "Enum['module', 'control']",
+            "description": "The type of repository to create. Must be one of 'control' or 'module'."
         },
         "resolvable_hostname": {
             "type": "Optional[String[1]]",
@@ -39,5 +47,6 @@
             "description": "The endpoint where the web UI can be reached, in the form http://<resolvable_hostname>:<port>. Required if you set the web_ui_port parameter in the cd4pe class during installation."
         }
     },
+    "files": ["cd4pe/lib/"],
     "input_method": "stdin"
 }
