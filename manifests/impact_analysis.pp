@@ -24,5 +24,17 @@ class cd4pe::impact_analysis (
     Pe_puppet_authorization::Rule <| title == 'puppetlabs v4 catalog' |> {
       allow +> { 'rbac' => { 'permission' => 'puppetserver:compile_catalog:*' }}
     }
+
+
+    # if > 2019.2, enable hiera tracing
+    if(versioncmp(pe_build_version(), '2019.2.0') >= 0) {
+      hocon_setting { 'enable lookup tracing':
+        ensure  => present,
+        path    => '/etc/puppetlabs/puppetserver/conf.d/pe-puppet-server.conf',
+        setting => 'jruby-puppet.track-lookups',
+        value   => true,
+        notify  => Service['pe-puppetserver']
+      }
+    }
   }
 }
