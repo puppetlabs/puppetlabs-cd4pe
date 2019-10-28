@@ -7,7 +7,7 @@ require 'puppet-strings/tasks' if Bundler.rubygems.find_name('puppet-strings').a
 require 'json'
 require 'bolt_spec/run' if Bundler.rubygems.find_name('bolt_spec/run').any?
 
-ignore_paths = ["checkouts/**/*", "dev/**/*", "dev-resources/**/*", "test/**/*", "src/**/*", "vendor/**/*", "spec/fixtures/**/*"]
+ignore_paths = ["checkouts/**/*", "dev/**/*", "dev-resources/**/*", "test/**/*", "src/**/*", "vendor/**/*", "spec/**/*"]
 
 PuppetSyntax.exclude_paths = ignore_paths
 
