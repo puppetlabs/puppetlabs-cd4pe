@@ -52,6 +52,24 @@ RSpec.describe 'cd4pe::impact_analysis' do
 
     context 'using the new code' do
       it { is_expected.to contain_class('cd4pe::impact_analysis::legacy').with_ensure('absent') }
+      it { is_expected.not_to contain_hocon_setting('enable lookup tracing') }
+    end
+  end
+
+  describe '2019.2.0' do
+    let(:facts) do
+      {
+        pe_build: '2019.2.0',
+      }
+    end
+    before :each do
+      Puppet::Parser::Functions.newfunction(:pe_build_version, type: :rvalue) do |_args|
+        '2019.2.0'
+      end
+    end
+
+    context 'enable hiera tracing' do
+      it { is_expected.to contain_hocon_setting('enable lookup tracing') }
     end
   end
 end
