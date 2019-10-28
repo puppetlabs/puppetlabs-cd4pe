@@ -48,6 +48,9 @@ fixtures:
     puppet_agent:
         repo: "git@github.com:puppetlabs/puppetlabs-puppet_agent.git"
         ref: origin/master
+    hocon:
+        repo: "git@github.com:puppetlabs/puppetlabs-hocon.git"
+        ref: origin/master
   symlinks:
      puppet_enterprise: "#{source_dir}/spec/fixtures/puppet-enterprise-modules/modules/puppet_enterprise"
      pe_concat: "#{source_dir}/spec/fixtures/puppet-enterprise-modules/modules/pe_concat"
