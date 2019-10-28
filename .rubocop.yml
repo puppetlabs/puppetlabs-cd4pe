@@ -10,9 +10,9 @@ AllCops:
   - ".vendor/**/*"
   - "**/Gemfile"
   - "**/Rakefile"
-  - pkg/**/*
-  - spec/fixtures/**/*
-  - vendor/**/*
+  - "pkg/**/*"
+  - "spec/**/*"
+  - "vendor/**/*"
   - "**/Puppetfile"
   - "**/Vagrantfile"
   - "**/Guardfile"
