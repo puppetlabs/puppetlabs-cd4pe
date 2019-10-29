@@ -11,6 +11,7 @@
 class cd4pe::repo::config(
   String  $master = $servername,
   Boolean $manage = true,
+  String $pe_ver  = pe_build_version(),
 ) {
 
   # Variables for configuring the repos to be able to communicate
@@ -23,7 +24,9 @@ class cd4pe::repo::config(
   # On primary, the repo should point to the local directory
   $base_source = "https://${master}:8140/packages"
 
-  $pe_ver = pe_empty($facts['pe_build']) ? { false => $facts['pe_build'], true => pe_build_version() }
+  if(pe_empty($pe_ver)) {
+    fail('pe_ver must be set in cd4pe::repo::config')
+  }
 
   $source = "${base_source}/${pe_ver}/puppet_enterprise"
 
