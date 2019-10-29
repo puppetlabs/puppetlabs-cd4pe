@@ -19,6 +19,7 @@ class cd4pe (
   Integer $web_ui_ssl_port                       = 8443,
   Optional[String[1]] $cd4pe_network_subnet      = undef,
   Optional[String[1]] $cd4pe_network_gateway     = undef,
+  String[1] $cd4pe_host_disk_volume_path         = '/var/lib/docker/volumes/cd4pe-object-store/_data'
 ){
   # Restrict to linux only?
   include docker
@@ -88,6 +89,7 @@ class cd4pe (
 
   $app_data = {
     analytics   => $analytics,
+    host_volume_path => $cd4pe_host_disk_volume_path,
   }
 
   $app_env_path = "${data_root_dir}/env"
@@ -125,7 +127,10 @@ class cd4pe (
     extra_parameters => $extra_params,
     ports            => $cd4pe_ports,
     pull_on_start    => true,
-    volumes          => ['cd4pe-object-store:/disk'],
+    volumes          => [
+      'cd4pe-object-store:/disk',
+      '/var/run/docker.sock:/var/run/docker.sock'
+    ],
     net              => $net,
     env_file         => [
       $app_env_path,
