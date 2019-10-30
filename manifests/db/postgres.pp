@@ -14,7 +14,7 @@ class cd4pe::db::postgres(
   if(pe_compiling_server_version()) {
     # This is being compiled via classification, so we can include
     # the packages class and auto-determine the versioning
-    include puppet_enterprise::packages
+    include cd4pe::repo
     if(versioncmp(pe_compiling_server_version(), '2019.1.0') >= 0) {
       $multimodule_packaging = true
     } else {
@@ -51,7 +51,7 @@ class cd4pe::db::postgres(
   $pg_user = 'pe-postgres'
   $pg_group = 'pe-postgres'
 
-  $ssl_dir = $puppet_enterprise::params::ssl_dir
+  $ssl_dir = "/etc/puppetlabs/puppet/ssl"
   $client_pem_key = "${ssl_dir}/private_keys/${certname}.pem"
   $client_cert    = "${ssl_dir}/certs/${certname}.pem"
   $client_ca_cert    = "${ssl_dir}/certs/ca.pem"
