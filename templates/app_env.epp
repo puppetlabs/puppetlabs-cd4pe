@@ -1,6 +1,4 @@
 <%- |
       Boolean $analytics,
-      String $host_volume_path
 | -%>
 ANALYTICS=<%= $analytics %>
-DOCKER_VOLUME_PATH=<%= $host_volume_path %>
