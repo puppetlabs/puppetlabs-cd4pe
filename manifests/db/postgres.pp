@@ -89,10 +89,23 @@ class cd4pe::db::postgres(
     require => Class['pe_postgresql::server::install'],
     before  => Class['pe_postgresql::server::initdb'],
   }
-  # Ensure /etc/sysconfig/pgsql exists so the module can create and manage
+
+  # Ensure directory exists so the module can create and manage
   # pgsql/postgresql
-  -> file { '/etc/sysconfig/pgsql':
-    ensure => directory,
+  -> case $facts['platform_tag'] {
+    /^(el|redhatfips)-[67]-x86_64$/: {
+      file { '/etc/sysconfig/pgsql':
+        ensure => directory,
+      }
+    }
+    /^ubuntu-(16|18)\.04-amd64$/: {
+      file { '/etc/postgresql':
+        ensure => directory,
+      }
+    }
+    default: {
+      fail("'${facts['platform_tag']}' is an unsupported platform.")
+    }
   }
 
   # get the pg server up and running
