@@ -1,8 +1,8 @@
 {
   "name": "puppetlabs-cd4pe",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "author": "Puppet Labs",
-  "summary": "Module for CD4PE 2.0",
+  "summary": "Module for CD4PE 2.x and 3.x",
   "license": "Apache-2.0",
   "source": "https://forge.puppetlabs.com/puppetlabs/cd4pe",
   "project_page": "https://github.com/puppetlabs/puppetlabs-cd4pe",
