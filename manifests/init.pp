@@ -43,6 +43,12 @@ class cd4pe (
     replace => false,
   }
 
+  # DEPRECATED: 'dynamodb' and 'mysql' db_providers
+  # As part of our effort to streamline the installation process and ensure Continuous Delivery for PE meets
+  # performance standards, support for MySQL and Amazon DynamoDB external databases is deprecated in
+  # Continuous Delivery for PE version 3.1.0, and will be removed in a future release. 
+  # Before support ends, we'll provide information about how to migrate your external database to a supported option.
+  #
   if $manage_database  {
     if $db_provider == undef {
       # Check if the customer is using a mysql db from a previous install
