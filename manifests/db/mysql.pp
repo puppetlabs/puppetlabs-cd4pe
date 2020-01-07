@@ -8,6 +8,11 @@ class cd4pe::db::mysql(
 ) {
   include docker
 
+  # DEPRECATED: 'mysql' db_provider
+  # As part of our effort to streamline the installation process and ensure Continuous Delivery for PE meets
+  # performance standards, support for MySQL and Amazon DynamoDB external databases is deprecated in
+  # Continuous Delivery for PE version 3.1.0, and will be removed in a future release. 
+  # Before support ends, we'll provide information about how to migrate your external database to a supported option.
 
   if $db_pass == undef {
     $_db_pass  = cd4pe::gen_mysql_password()
