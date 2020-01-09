@@ -89,10 +89,14 @@ class cd4pe::db::postgres(
     require => Class['pe_postgresql::server::install'],
     before  => Class['pe_postgresql::server::initdb'],
   }
+
   # Ensure /etc/sysconfig/pgsql exists so the module can create and manage
-  # pgsql/postgresql
-  -> file { '/etc/sysconfig/pgsql':
-    ensure => directory,
+  # pgsql/postgresql on el-7
+  if ($facts['os']['family'] == 'RedHat') and ($facts['os']['release']['major'] !~ '^7') {
+    file { '/etc/sysconfig/pgsql':
+      ensure  => directory,
+      require => File[$pgsqldir, "${pgsqldir}/${pg_version}" ],
+    }
   }
 
   # get the pg server up and running
