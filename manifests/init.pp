@@ -39,7 +39,7 @@ class cd4pe (
     ensure  => file,
     owner   => 'root',
     group   => 'root',
-    content => "PFI_SECRET_KEY=${secret_key}\n",
+    content => Sensitive("PFI_SECRET_KEY=${secret_key}\n"),
     replace => false,
   }
 
