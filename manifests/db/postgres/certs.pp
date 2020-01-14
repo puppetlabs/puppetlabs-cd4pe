@@ -7,16 +7,20 @@ class cd4pe::db::postgres::certs(
   String $client_private_key,
 ){
 
-  $certname           = $trusted['certname']
-  $cert_dir           = "${cd4pe::db::data_root_dir}/certs"
-  $target_ca_cert     = "${cert_dir}/ca.pem"
-  $target_client_cert = "${cert_dir}/client_cert.pem"
-  $pk8_file           = "${cert_dir}/client_private_key.pk8"
-  $ssl_db_env         = "${cd4pe::db::data_root_dir}/ssl_db_env"
+  $certname            = $trusted['certname']
+  $cert_dir            = "${cd4pe::db::data_root_dir}/certs"
+  $target_ca_cert      = "${cert_dir}/ca.pem"
+  $target_client_cert  = "${cert_dir}/client_cert.pem"
+  $pk8_file            = "${cert_dir}/client_private_key.pk8"
+  $ssl_db_env          = "${cd4pe::db::data_root_dir}/ssl_db_env"
+  $volume_mount_suffix = $facts['os'].dig('selinux', 'enabled') ? {
+    true    => ':Z',
+    default => '',
+  }
 
   # Copy the local agent certs for the container to use, and mount them
   Docker::Run <| title == 'cd4pe' |> {
-    volumes    +> ["${cert_dir}:/certs"],
+    volumes    +> ["${cert_dir}:/certs${volume_mount_suffix}"],
     env_file   +> [$ssl_db_env],
   }
 

@@ -1,8 +1,14 @@
+#
+# @param object_store_path The path that should be mounted at /disk in the
+#   container. By default this is the docker volume "object_store_path"
+#  buf if set an absolut path this will allow for mounting local directories.
+#
 class cd4pe (
   Integer $agent_service_port                    = 7000,
   Boolean $analytics                             = true,
   Integer $backend_service_port                  = 8000,
   Array[String] $cd4pe_docker_extra_params       = [],
+  String $object_store_path                      = 'cd4pe-object-store',
   String $cd4pe_image                            = 'puppet/continuous-delivery-for-puppet-enterprise',
   Variant[Enum['latest'], String] $cd4pe_version = 'latest',
   Optional[String[1]] $db_host                   = undef,
@@ -129,12 +135,20 @@ class cd4pe (
     false => [File[$secret_key_path]],
   }
 
+  # If we are running docker on a machine that has SELinux enforcing, we need
+  # to tell docker to relabel the mounts to use the correct SELinux contexts.
+  # This is what the :K flag is for
+  $volume_mount_suffix = $facts['os'].dig('selinux', 'enabled') ? {
+    true    => ':Z',
+    default => '',
+  }
+
   docker::run {'cd4pe':
     image            => "${cd4pe_image}:${cd4pe_version}",
     extra_parameters => $extra_params,
     ports            => $cd4pe_ports,
     pull_on_start    => true,
-    volumes          => ['cd4pe-object-store:/disk'],
+    volumes          => ["${object_store_path}:/disk${volume_mount_suffix}"],
     net              => $net,
     env_file         => [
       $app_env_path,
