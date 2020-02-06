@@ -11,7 +11,7 @@ class cd4pe::db::postgres(
 ) {
 
 
-  if( fact('cd4pe_multimodule_packaging') =~ Undef ) { {
+  if( fact('cd4pe_multimodule_packaging') =~ Undef ) {
     # This is being compiled via classification, so we can include
     # the packages class and auto-determine the versioning
     include cd4pe::repo
