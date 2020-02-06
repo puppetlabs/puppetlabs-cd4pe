@@ -4,7 +4,7 @@ class cd4pe (
   Integer $backend_service_port                  = 8000,
   Array[String] $cd4pe_docker_extra_params       = [],
   String $cd4pe_image                            = 'puppet/continuous-delivery-for-puppet-enterprise',
-  Variant[Enum['latest'], String] $cd4pe_version = 'latest',
+  Variant[Enum['latest','3.x'], String] $cd4pe_version = '3.x',
   Optional[String[1]] $db_host                   = undef,
   Optional[String[1]] $db_name                   = undef,
   Optional[Sensitive[String[1]]] $db_pass        = undef,
