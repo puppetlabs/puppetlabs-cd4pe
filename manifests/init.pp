@@ -126,6 +126,10 @@ class cd4pe (
       "--add-host ${master_server}:${master_ip}",
       "--add-host ${trusted['certname']}:${facts['ipaddress']}"
       ] + $cd4pe_docker_extra_params
+  } elsif $manage_pe_host_mapping {
+    $extra_params = [
+      "--add-host ${trusted['certname']}:${facts['ipaddress']}"
+      ] + $cd4pe_docker_extra_params
   } else {
     $extra_params = $cd4pe_docker_extra_params
   }
