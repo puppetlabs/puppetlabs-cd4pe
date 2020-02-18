@@ -1,0 +1,27 @@
+{
+  "puppet_task_version": 1,
+  "supports_noop": false,
+  "description": "Stops the CD4PE service, backs up (files, object-store & postgres db), cleans up old backups, then starts CD4PE.",
+  "parameters": {
+    "target_dir": {
+      "type": "Optional[String[1]]",
+      "description": "Optional Target backup location.",
+      "default": "/var/cd4pe_backups"
+    },
+    "retention_period_days": {
+      "type": "Optional[Integer]",
+      "description": "Backups in target backup location will be deleted if older than this value (days).",
+      "default": 7
+    },
+    "service_name": {
+      "type": "Optional[String[1]]",
+      "description": "CD4PE service name",
+      "default": "docker-cd4pe"
+    },
+    "manage_puppet_service": {
+      "type": "Optional[Boolean]",
+      "description": "Stops and starts the puppet service if true, to protect against managed cd4pe service from starting.",
+      "default": true
+    }
+  }
+}
