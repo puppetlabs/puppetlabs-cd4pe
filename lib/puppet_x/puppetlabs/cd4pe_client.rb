@@ -163,13 +163,28 @@ module PuppetX::Puppetlabs
     end
 
     def add_repo(workspace, source_control, repo_org, source_repo_name, repo_name, repo_type)
-      repos_res = search_source_repos(workspace, source_control, repo_org, source_repo_name)
+      org_res = list_source_orgs(workspace, source_control)
+      if org_res.code != '200'
+        raise Puppet::Error, "Error while listing source orgs: #{org_res.body}"
+      end
+
+      source_orgs = JSON.parse(org_res.body, symbolize_names: true)
+      matched_source_orgs = source_orgs.select { |org| repo_org.casecmp(org[:organization]).zero? }
+
+      if matched_source_orgs.empty?
+        raise Puppet::Error, "Could not find repo orgs for name: #{repo_org}"
+      end
+      if matched_source_orgs.length > 1
+        raise Puppet::Error, "Found multiple repo orgs for name: #{repo_org}. Org names must be unique when referenced here."
+      end
+
+      repos_res = search_source_repos(workspace, source_control, matched_source_orgs[0], source_repo_name)
       if repos_res.code != '200'
         raise Puppet::Error, "Error while searching for repository: #{repos_res.body}"
       end
       source_repos = JSON.parse(repos_res.body, symbolize_names: true)
       if source_repos.empty?
-        raise Puppet::Error, "Could not find repository for name: #{repo_name}"
+        raise Puppet::Error, "Could not find source repo for name: #{source_repo_name}"
       end
       if source_repos.length > 1
         raise Puppet::Error, "Found multiple repositories for repository name: #{repo_name}"
@@ -205,8 +220,20 @@ module PuppetX::Puppetlabs
       params = {
         op: 'SearchSourceRepos',
         provider: source_control,
-        org: repo_org,
         search: repo_name,
+      }
+      unless repo_org[:personalOrg]
+        params[:org] = repo_org[:organization]
+      end
+      api_uri = URI(get_ajax_endpoint(workspace))
+      api_uri.query = URI.encode_www_form(params)
+      make_request(:get, api_uri.to_s)
+    end
+
+    def list_source_orgs(workspace, provider)
+      params = {
+        op: 'ListSourceOrgs',
+        provider: provider,
       }
       api_uri = URI(get_ajax_endpoint(workspace))
       api_uri.query = URI.encode_www_form(params)
