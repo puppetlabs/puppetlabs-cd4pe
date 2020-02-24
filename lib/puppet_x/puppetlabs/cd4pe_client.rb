@@ -251,6 +251,27 @@ module PuppetX::Puppetlabs
       make_request(:get, api_uri.to_s)
     end
 
+    def set_pipelines_as_code_branch(workspace, repo_type, repo_name, branch_name)
+      payload = {
+        op: 'SetPipelinesAsCodeBranch',
+        content: {
+          get_repo_payload_key(repo_type) => repo_name,
+          branchName: branch_name,
+        },
+      }
+      make_request(:post, get_ajax_endpoint(workspace), payload.to_json)
+    end
+
+    def get_pipelines_as_code_error(workspace, repo_type, repo_name)
+      params = {
+        op: 'GetPipelinesAsCodeError',
+        get_repo_payload_key(repo_type) => repo_name,
+      }
+      api_uri = URI(get_ajax_endpoint(workspace))
+      api_uri.query = URI.encode_www_form(params)
+      make_request(:get, api_uri.to_s)
+    end
+
     def create_pipeline(workspace, repo_name, repo_branch, pipeline_type)
       # Default sources
       sources = [
@@ -533,6 +554,17 @@ module PuppetX::Puppetlabs
     end
 
     private
+
+    def get_repo_payload_key(repo_type)
+      case repo_type
+        when 'control'
+          return 'controlRepoName'
+        when 'module'
+          return 'moduleName'
+        else
+          raise Puppet::Error "repo_type does not match one of: 'control', 'module'"
+        end
+    end
 
     def make_request(type, api_url, payload = '')
       connection = Net::HTTP.new(@config[:server], @config[:port])
