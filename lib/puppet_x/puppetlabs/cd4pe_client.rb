@@ -470,13 +470,18 @@ module PuppetX::Puppetlabs
       JSON.parse(build_trigger_res.body, symbolize_names: true)
     end
 
-    def post_provider_webhook(workspace, source_repo_name, source_repo_owner, source_control_provider)
+    def post_provider_webhook(workspace, repo)
+      repo_name = repo[:srcRepoName]
+      # This is necessary due to business logic living in the UI code
+      if repo[:srcRepoProvider].casecmp?('gitlab')
+        repo_name = repo[:srcRepoId]
+      end
       payload = {
         op: 'PostProviderWebhook',
         content: {
-          srcRepoName: source_repo_name,
-          srcRepoOwner: source_repo_owner,
-          srcRepoProvider: source_control_provider,
+          srcRepoName: repo_name,
+          srcRepoOwner: repo[:srcRepoOwner],
+          srcRepoProvider: repo[:srcRepoProvider],
         },
       }
       make_request(:post, get_ajax_endpoint(workspace), payload.to_json)
