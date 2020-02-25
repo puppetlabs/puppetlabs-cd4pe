@@ -558,13 +558,13 @@ module PuppetX::Puppetlabs
 
     def get_repo_payload_key(repo_type)
       case repo_type
-        when 'control'
-          return 'controlRepoName'
-        when 'module'
-          return 'moduleName'
-        else
-          raise Puppet::Error "repo_type does not match one of: 'control', 'module'"
-        end
+      when 'control'
+        'controlRepoName'
+      when 'module'
+        'moduleName'
+      else
+        raise Puppet::Error "repo_type does not match one of: 'control', 'module'"
+      end
     end
 
     def make_request(type, api_url, payload = '')
