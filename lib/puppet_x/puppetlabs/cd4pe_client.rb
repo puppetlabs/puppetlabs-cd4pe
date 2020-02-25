@@ -186,11 +186,12 @@ module PuppetX::Puppetlabs
       if source_repos.empty?
         raise Puppet::Error, "Could not find source repo for name: #{source_repo_name}"
       end
-      if source_repos.length > 1
+      matched_source_repos = source_repos.select { |repo| source_repo_name.casecmp(repo[:repoName]).zero? }
+      if matched_source_repos.length > 1
         raise Puppet::Error, "Found multiple repositories for repository name: #{repo_name}"
       end
       # There should only be one repo from the search
-      source_repo = source_repos[0]
+      source_repo = matched_source_repos[0]
       case repo_type
       when 'control'
         repo_op = 'CreateControlRepo'
