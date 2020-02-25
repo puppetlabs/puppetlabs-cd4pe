@@ -15,8 +15,8 @@
             "description": "Designates the workspace that the control or module repository will be created in"
         },
         "source_control": {
-            "type": "Enum['github', 'gitlab', 'githubEnterprise', 'bitbucketServer', 'azureDevOps', 'bitbucket']",
-            "description": "The source control provider. Must be one of 'github', 'gitlab', 'githubEnterprise', 'bitbucketServer', 'bitbucket' (for Bitbucket Cloud), or 'azureDevOps'."
+            "type": "Enum['github', 'gitlab', 'githubEnterprise', 'bitbucketServer', 'bitbucket']",
+            "description": "The source control provider. Must be one of 'github', 'gitlab', 'githubEnterprise', 'bitbucketServer', or 'bitbucket' (for Bitbucket Cloud)."
         },
         "source_repo_org": {
             "type": "String[1]",

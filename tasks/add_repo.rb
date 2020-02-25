@@ -72,7 +72,7 @@ rescue => e
     kind: 'puppetlabs-cd4pe/add_repo_error',
     details: e.class.to_s,
   }
-  result[:logs] = logger.get_logs
+  result[:logs] = logger.logs
   puts result.to_json
   exit 1
 end
@@ -92,6 +92,6 @@ rescue => e
     },
   }
 end
-result[:logs] = logger.get_logs
+result[:logs] = logger.logs
 puts result.to_json
 exit exitcode
