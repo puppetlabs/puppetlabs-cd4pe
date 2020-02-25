@@ -634,3 +634,79 @@ RSpec.shared_context 'add a pr gate to an existing stage' do
     }]
   end
 end
+
+RSpec.shared_context 'github repo details' do
+  let(:test_workspace) { 'carlsCoolWorkspace' }
+  let(:repo_provider) { 'github' }
+  let(:source_orgs) do
+    [
+      {
+        orgType: 'GITHUB_ORG',
+        provider: 'github',
+        organization: 'puppetlabs',
+        organizationDisplayName: 'puppetlabs',
+        id: '234268',
+        personalOrg: false,
+      },
+      {
+        orgType: 'GITHUB_USER',
+        provider: 'github',
+        organization: 'Ziaunys',
+        organizationDisplayName: 'Ziaunys',
+        id: '1063949',
+        personalOrg: true,
+      },
+    ]
+  end
+  let(:matched_source_repo_name) { 'control-repo' }
+  let(:source_repo_display_name) { 'control-repo' }
+  let(:source_repo_display_owner) { 'puppetlabs' }
+  let(:source_repo_owner) { 'puppetlabs' }
+  let(:source_repo_id) { '40554625' }
+
+  let(:source_repos) do
+    [
+      {
+        provider: 'github',
+        org: 'puppetlabs',
+        orgDisplayName: 'puppetlabs',
+        orgId: '234268',
+        owner: 'puppetlabs',
+        ownerDisplayName: 'puppetlabs',
+        ownerId: '234268',
+        repoName: 'control-repo',
+        repoDisplayName: 'control-repo',
+        repoId: '40554625',
+        isPublic: true,
+        accessLevel: 'ADMIN',
+      },
+      {
+        provider: 'github',
+        org: 'puppetlabs',
+        orgDisplayName: 'puppetlabs',
+        orgId: '234268',
+        owner: 'puppetlabs',
+        ownerDisplayName: 'puppetlabs',
+        ownerId: '234268',
+        repoName: 'puppetlabs-pe_perf_control_repo',
+        repoDisplayName: 'puppetlabs-pe_perf_control_repo',
+        repoId: '179578828',
+        isPublic: true,
+        accessLevel: 'ADMIN',
+      },
+    ]
+  end
+
+  let(:created_repo) do
+    {
+      name: matched_source_repo_name,
+      srcRepoDisplayName: source_repo_display_name,
+      srcRepoDisplayOwner: source_repo_display_owner,
+      srcRepoId: source_repo_id,
+      srcRepoName: matched_source_repo_name,
+      srcRepoOwner: source_repo_owner,
+      srcRepoProvider: repo_provider.upcase,
+      domain: 'd7',
+    }
+  end
+  end
