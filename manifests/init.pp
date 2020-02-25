@@ -1,6 +1,7 @@
 class cd4pe (
   Integer $agent_service_port                    = 7000,
   Boolean $analytics                             = true,
+  String $puppet_db_connection_timeout_sec       = undef,
   Integer $backend_service_port                  = 8000,
   Array[String] $cd4pe_docker_extra_params       = [],
   String $cd4pe_image                            = 'puppet/continuous-delivery-for-puppet-enterprise',
@@ -93,7 +94,8 @@ class cd4pe (
   }
 
   $app_data = {
-    analytics   => $analytics,
+    analytics                        => $analytics,
+    puppet_db_connection_timeout_sec => $puppet_db_connection_timeout_sec,
   }
 
   $app_env_path = "${data_root_dir}/env"
