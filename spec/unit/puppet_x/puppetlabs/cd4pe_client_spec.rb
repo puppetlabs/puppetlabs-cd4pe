@@ -129,4 +129,50 @@ describe PuppetX::Puppetlabs::CD4PEClient do
       end
     end
   end
+
+  describe 'add_repo' do
+    context 'add a github control repo to a workspace'
+      include_context 'cd4pe login'
+      include_context 'github repo details'
+      let(:repo_name) { 'test-control-repo' }
+      it 'creates a github repo' do
+        stub_request(:get, workspace_url)
+          .with(query: { op: 'ListSourceOrgs', provider: repo_provider }, headers: { 'Cookie' => req_cookie })
+          .to_return(body: JSON.generate(source_orgs))
+          .times(1)
+
+        stub_request(:get, workspace_url)
+        .with(query: { op: 'SearchSourceRepos', provider: repo_provider, org: source_repo_owner, search: matched_source_repo_name })
+        .to_return(body: JSON.generate(source_repos))
+        .times(1)
+
+        stub_request(:post, workspace_url)
+          .with(body:
+            {
+                op: 'CreateControlRepo',
+                content: {
+                    name: repo_name,
+                    srcRepoDisplayName: source_repo_display_name,
+                    srcRepoDisplayOwner: source_repo_display_owner,
+                    srcRepoId: source_repo_id,
+                    srcRepoName: matched_source_repo_name,
+                    srcRepoOwner: source_repo_owner,
+                    srcRepoProvider: repo_provider.upcase,
+                }
+              })
+          .to_return(body: JSON.generate(created_repo))
+          .times(1)
+
+        client = described_class.new(test_host, req_login[:content][:email], req_login[:content][:passwd])
+        result = client.add_repo(
+          test_workspace,
+          repo_provider,
+          source_repo_owner,
+          matched_source_repo_name,
+          repo_name,
+          'control',
+        )
+        expect(JSON.parse(result.body, symbolize_names: true)).to eq(created_repo)
+      end
+    end
 end

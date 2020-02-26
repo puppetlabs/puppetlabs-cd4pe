@@ -15,8 +15,8 @@
             "description": "Designates the workspace that the control or module repository will be created in"
         },
         "source_control": {
-            "type": "Enum['github', 'gitlab', 'githubEnterprise', 'bitbucketServer', 'azureDevOps', 'bitbucket']",
-            "description": "The source control provider. Must be one of 'github', 'gitlab', 'githubEnterprise', 'bitbucketServer', 'bitbucket' (for Bitbucket Cloud), or 'azureDevOps'."
+            "type": "Enum['github', 'gitlab', 'githubEnterprise', 'bitbucketServer', 'bitbucket']",
+            "description": "The source control provider. Must be one of 'github', 'gitlab', 'githubEnterprise', 'bitbucketServer', or 'bitbucket' (for Bitbucket Cloud)."
         },
         "source_repo_org": {
             "type": "String[1]",
@@ -27,8 +27,12 @@
             "description": "The name of the source repository."
         },
         "source_repo_branch": {
-            "type": "String[1]",
-            "description": "The default branch to use for the repository."
+            "type": "Optional[String[1]]",
+            "description": "Optional. The default branch to use for the repository. Not required if pipelines_as_code_branch is set"
+        },
+        "pipelines_as_code_branch": {
+            "type": "Optional[String[1]]",
+            "description": "Optional. The pipelines as code branch. Setting this will enable pipelines as code on the repo."
         },
         "repo_name": {
             "type": "Optional[String[1]]",
