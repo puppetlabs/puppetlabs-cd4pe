@@ -163,19 +163,35 @@ module PuppetX::Puppetlabs
     end
 
     def add_repo(workspace, source_control, repo_org, source_repo_name, repo_name, repo_type)
-      repos_res = search_source_repos(workspace, source_control, repo_org, source_repo_name)
+      org_res = list_source_orgs(workspace, source_control)
+      if org_res.code != '200'
+        raise Puppet::Error, "Error while listing source orgs: #{org_res.body}"
+      end
+
+      source_orgs = JSON.parse(org_res.body, symbolize_names: true)
+      matched_source_orgs = source_orgs.select { |org| repo_org.casecmp(org[:organization]).zero? }
+
+      if matched_source_orgs.empty?
+        raise Puppet::Error, "Could not find repo orgs for name: #{repo_org}"
+      end
+      if matched_source_orgs.length > 1
+        raise Puppet::Error, "Found multiple repo orgs for name: #{repo_org}. Org names must be unique when referenced here."
+      end
+
+      repos_res = search_source_repos(workspace, source_control, matched_source_orgs[0], source_repo_name)
       if repos_res.code != '200'
         raise Puppet::Error, "Error while searching for repository: #{repos_res.body}"
       end
       source_repos = JSON.parse(repos_res.body, symbolize_names: true)
       if source_repos.empty?
-        raise Puppet::Error, "Could not find repository for name: #{repo_name}"
+        raise Puppet::Error, "Could not find source repo for name: #{source_repo_name}"
       end
-      if source_repos.length > 1
+      matched_source_repos = source_repos.select { |repo| source_repo_name.casecmp(repo[:repoName]).zero? }
+      if matched_source_repos.length > 1
         raise Puppet::Error, "Found multiple repositories for repository name: #{repo_name}"
       end
       # There should only be one repo from the search
-      source_repo = source_repos[0]
+      source_repo = matched_source_repos[0]
       case repo_type
       when 'control'
         repo_op = 'CreateControlRepo'
@@ -205,8 +221,20 @@ module PuppetX::Puppetlabs
       params = {
         op: 'SearchSourceRepos',
         provider: source_control,
-        org: repo_org,
         search: repo_name,
+      }
+      unless repo_org[:personalOrg]
+        params[:org] = repo_org[:organization]
+      end
+      api_uri = URI(get_ajax_endpoint(workspace))
+      api_uri.query = URI.encode_www_form(params)
+      make_request(:get, api_uri.to_s)
+    end
+
+    def list_source_orgs(workspace, provider)
+      params = {
+        op: 'ListSourceOrgs',
+        provider: provider,
       }
       api_uri = URI(get_ajax_endpoint(workspace))
       api_uri.query = URI.encode_www_form(params)
@@ -218,6 +246,27 @@ module PuppetX::Puppetlabs
       # TODO: Use pagination here or add search functionality (CDPE-2280)
       params = {
         op: 'ListVmJobTemplates',
+      }
+      api_uri = URI(get_ajax_endpoint(workspace))
+      api_uri.query = URI.encode_www_form(params)
+      make_request(:get, api_uri.to_s)
+    end
+
+    def set_pipelines_as_code_branch(workspace, repo_type, repo_name, branch_name)
+      payload = {
+        op: 'SetPipelinesAsCodeBranch',
+        content: {
+          get_repo_payload_key(repo_type) => repo_name,
+          branchName: branch_name,
+        },
+      }
+      make_request(:post, get_ajax_endpoint(workspace), payload.to_json)
+    end
+
+    def get_pipelines_as_code_error(workspace, repo_type, repo_name)
+      params = {
+        op: 'GetPipelinesAsCodeError',
+        get_repo_payload_key(repo_type) => repo_name,
       }
       api_uri = URI(get_ajax_endpoint(workspace))
       api_uri.query = URI.encode_www_form(params)
@@ -443,13 +492,18 @@ module PuppetX::Puppetlabs
       JSON.parse(build_trigger_res.body, symbolize_names: true)
     end
 
-    def post_provider_webhook(workspace, source_repo_name, source_repo_owner, source_control_provider)
+    def post_provider_webhook(workspace, repo)
+      repo_name = repo[:srcRepoName]
+      # This is necessary due to business logic living in the UI code
+      if repo[:srcRepoProvider].casecmp?('gitlab')
+        repo_name = repo[:srcRepoId]
+      end
       payload = {
         op: 'PostProviderWebhook',
         content: {
-          srcRepoName: source_repo_name,
-          srcRepoOwner: source_repo_owner,
-          srcRepoProvider: source_control_provider,
+          srcRepoName: repo_name,
+          srcRepoOwner: repo[:srcRepoOwner],
+          srcRepoProvider: repo[:srcRepoProvider],
         },
       }
       make_request(:post, get_ajax_endpoint(workspace), payload.to_json)
@@ -501,6 +555,17 @@ module PuppetX::Puppetlabs
     end
 
     private
+
+    def get_repo_payload_key(repo_type)
+      case repo_type
+      when 'control'
+        'controlRepoName'
+      when 'module'
+        'moduleName'
+      else
+        raise Puppet::Error "repo_type does not match one of: 'control', 'module'"
+      end
+    end
 
     def make_request(type, api_url, payload = '')
       connection = Net::HTTP.new(@config[:server], @config[:port])
