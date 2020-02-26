@@ -1,4 +1,8 @@
 <%- |
       Boolean $analytics,
+      Optional[String[1]] $puppet_db_connection_timeout_sec,
 | -%>
 ANALYTICS=<%= $analytics %>
+<% if($puppet_db_connection_timeout_sec) { -%>
+PUPPET_DB_CONNECTION_TIMEOUT_SEC=<%= $puppet_db_connection_timeout_sec %>
+<% } -%>
