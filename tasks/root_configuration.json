@@ -82,6 +82,6 @@
       "description": "SSL Web UI port. Required if SSL is enabled."
     }
   },
-  "input_method": "stdin",
-  "files": ["cd4pe/lib/"]
+  "files": ["cd4pe/lib/"],
+  "input_method": "stdin"
 }
