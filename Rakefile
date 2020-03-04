@@ -1,5 +1,6 @@
 require 'puppetlabs_spec_helper/rake_tasks'
 require 'puppet_litmus/rake_tasks' if Bundler.rubygems.find_name('puppet_litmus').any?
+require 'puppet_litmus/inventory_manipulation' if Bundler.rubygems.find_name('puppet_litmus').any?
 require 'puppet-syntax/tasks/puppet-syntax'
 require 'puppet_blacksmith/rake_tasks' if Bundler.rubygems.find_name('puppet-blacksmith').any?
 require 'github_changelog_generator/task' if Bundler.rubygems.find_name('github_changelog_generator').any?
@@ -200,23 +201,25 @@ end
 
 namespace :ci do
   task :create_inventory_file, [:hostname, :platform] do |t, args|
+    include PuppetLitmus::InventoryManipulation
+
     hostname = args[:hostname] || ENV['CI_HOSTNAME']
     platform = args[:platform] || ENV['CI_PLATFORM']
-    # this method comes from https://github.com/puppetlabs/provision/blob/master/lib/task_helper.rb
-    # should this method be in core litmus?
+
     if File.file?('inventory.yaml')
       inventory_hash = inventory_hash_from_inventory_file('inventory.yaml')
     else
       inventory_hash = {
+        'version' => 2,
         'groups' => [
-          { 'name' => 'docker_nodes', 'nodes' => [] },
-          { 'name' => 'ssh_nodes', 'nodes' => [] },
-          { 'name' => 'winrm_nodes', 'nodes' => [] }
+          { 'name' => 'docker_nodes', 'targets' => [] },
+          { 'name' => 'ssh_nodes', 'targets' => [] },
+          { 'name' => 'winrm_nodes', 'targets' => [] }
         ]}
     end
 
     node = {
-      'name' => hostname,
+      'uri' => hostname,
       'config' => {
         'transport' => 'ssh',
         'ssh' => {
@@ -241,6 +244,8 @@ namespace :test do
   namespace :install do
     namespace :cd4pe do
       task :module, [:image, :version] do |t, args|
+        include PuppetLitmus::InventoryManipulation
+
         image = args[:image] || ENV['CD4PE_IMAGE']
         version = args[:version] || ENV['CD4PE_VERSION']
 
