@@ -8,12 +8,12 @@ require 'open3'
 Puppet.initialize_settings
 $LOAD_PATH.unshift(Puppet[:plugindest])
 
-require_relative File.join(params['_installdir'], 'cd4pe', 'lib', 'puppet_x', 'puppetlabs', 'cd4pe_client')
-
 params = JSON.parse(STDIN.read)
 hostname                 = params['resolvable_hostname'] || Puppet[:certname]
 username                 = params['root_email']
 password                 = params['root_password']
+
+require_relative File.join(params['_installdir'], 'cd4pe', 'lib', 'puppet_x', 'puppetlabs', 'cd4pe_client')
 
 uri = URI.parse(hostname)
 hostname = "http://#{hostname}" if uri.scheme.nil?
