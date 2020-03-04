@@ -8,7 +8,7 @@ require 'open3'
 Puppet.initialize_settings
 $LOAD_PATH.unshift(Puppet[:plugindest])
 
-require 'puppet_x/puppetlabs/cd4pe_client'
+require_relative File.join(params['_installdir'], 'cd4pe', 'lib', 'puppet_x', 'puppetlabs', 'cd4pe_client')
 
 params = JSON.parse(STDIN.read)
 hostname                 = params['resolvable_hostname'] || Puppet[:certname]
