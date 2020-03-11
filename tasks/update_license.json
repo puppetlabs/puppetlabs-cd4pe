@@ -23,5 +23,6 @@
       "description": "The JSON content of the license downloaded from https://licenses.puppet.com/"
     }
   },
+  "files": ["cd4pe/lib/"],
   "input_method": "stdin"
 }
