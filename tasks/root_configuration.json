@@ -1,5 +1,5 @@
 {
-  "description": "Applys the root configuration for Continuous Delivery for PE. Full documentation at https://puppet.com/docs/continuous-delivery/2.x/install_module.html",
+  "description": "Applys the root configuration for Continuous Delivery for PE. Full documentation at https://puppet.com/docs/continuous-delivery/latest/install_module.html",
   "parameters": {
     "resolvable_hostname": {
       "type": "Optional[String[1]]",
