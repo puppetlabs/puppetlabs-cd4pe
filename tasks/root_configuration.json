@@ -11,10 +11,14 @@
     },
     "root_password": {
       "type": "String",
-      "sensitive":true,
+      "sensitive": true,
       "description": "The password to associate with the root account."
     },
-    "web_ui_endpoint": {
+    "generate_trial_license": {
+      "type": "Optional[Boolean]",
+      "description": "Boolean to define whether to create a trial license."
+    },
+     "web_ui_endpoint": {
       "type": "Optional[String[1]]",
       "description": "The endpoint where the web UI can be reached, in the form http://<resolvable_hostname>:<port>. Required if you set the web_ui_port parameter in the cd4pe class during installation."
     },
@@ -48,12 +52,12 @@
     },
     "s3_secret_key": {
       "type": "Optional[String[1]]",
-      "sensitive":true,
+      "sensitive": true,
       "description": "The AWS secret key that has access to the bucket. Required if using Amazon S3."
     },
     "artifactory_access_token": {
       "type": "Optional[String[1]]",
-      "sensitive":true,
+      "sensitive": true,
       "description": "API token for your Artifactory instance. Required if using Artifactory."
     },
     "ssl_enabled": {
@@ -70,7 +74,7 @@
     },
     "ssl_server_private_key": {
       "type": "Optional[String[1]]",
-      "sensitive":true,
+      "sensitive" :true,
       "description": "Server Private Key for your SSL configuration. Required if SSL is enabled."
     },
     "ssl_endpoint": {

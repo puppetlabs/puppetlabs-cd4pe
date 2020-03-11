@@ -14,6 +14,7 @@ username                 = params['root_email']
 password                 = params['root_password']
 
 require_relative File.join(params['_installdir'], 'cd4pe', 'lib', 'puppet_x', 'puppetlabs', 'cd4pe_client')
+require_relative File.join(params['_installdir'], 'cd4pe', 'lib', 'puppet_x', 'puppetlabs', 'cd4pe_pipeline_utils')
 
 uri = URI.parse(hostname)
 hostname = "http://#{hostname}" if uri.scheme.nil?
@@ -21,6 +22,7 @@ hostname = "http://#{hostname}" if uri.scheme.nil?
 web_ui_endpoint           = params['web_ui_endpoint'] || "#{hostname}:8080"
 backend_service_endpoint  = params['backend_service_endpoint'] || "#{hostname}:8000"
 agent_service_endpoint    = params['agent_service_endpoint'] || "#{hostname}:7000"
+generate_trial_license    = params['generate_trial_license'] || false
 provider                  = params['storage_provider'] || :DISK
 endpoint                  = params['storage_endpoint']
 bucket                    = params['storage_bucket'] || 'cd4pe'
@@ -66,6 +68,14 @@ exitcode = 0
 begin
   client = PuppetX::Puppetlabs::CD4PEClient.new(web_ui_endpoint, username, password)
   restart_after_configuration = false
+
+  if generate_trial_license
+    res = client.generate_trial_license
+    if res.code != '200'
+      raise "Error while generating trial license: #{res.body}"
+    end
+  end
+  
   res = client.save_storage_settings(provider, endpoint, bucket, prefix, access_key, secret_key)
 
   if res.code != '200'
