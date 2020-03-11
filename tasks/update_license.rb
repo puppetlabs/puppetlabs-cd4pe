@@ -6,13 +6,13 @@ require 'uri'
 Puppet.initialize_settings
 $LOAD_PATH.unshift(Puppet[:plugindest])
 
-require 'puppet_x/puppetlabs/cd4pe_client'
-
 params = JSON.parse(STDIN.read)
 hostname                 = params['resolvable_hostname'] || Puppet[:certname]
 username                 = params['root_email']
 password                 = params['root_password']
 license                  = params['license']
+
+require_relative File.join(params['_installdir'], 'cd4pe', 'lib', 'puppet_x', 'puppetlabs', 'cd4pe_client')
 
 uri = URI.parse(hostname)
 hostname = "http://#{hostname}" if uri.scheme.nil?
