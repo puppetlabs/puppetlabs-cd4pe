@@ -99,7 +99,7 @@ module PuppetX::Puppetlabs
     def generate_trial_license
       # generate the trial license
       response = make_request(:get, "/generate-trial-license?op=GenerateTrialLicense")
-      license = JSON.parse(response.body).to_json
+      license = JSON.parse(response.body)
 
        # save the trial license
        payload = {
