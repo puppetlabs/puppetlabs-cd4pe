@@ -82,6 +82,12 @@ begin
     raise "Error while saving storage settings: #{res.body}"
   end
 
+  res = client.save_endpoint_settings(web_ui_endpoint, backend_service_endpoint, agent_service_endpoint)
+
+  if res.code != '200'
+    raise "Error while saving endpoint settings: #{res.body}"
+  end
+
   if all_ssl_params_provided(ssl_enabled, ssl_server_certificate, ssl_authority_certificate, ssl_server_private_key)
     if ssl_enabled
       if ssl_enabled_requirements_satisfied(ssl_port, ssl_endpoint)
@@ -100,12 +106,6 @@ begin
     restart_after_configuration = true
   elsif any_ssl_params_provided(ssl_enabled, ssl_server_certificate, ssl_authority_certificate, ssl_server_private_key)
     raise 'To enable SSL, the following must be specified: ssl_enabled, ssl_server_certificate, ssl_authority_certificate, ssl_server_private_key.'
-  end
-
-  res = client.save_endpoint_settings(web_ui_endpoint, backend_service_endpoint, agent_service_endpoint)
-
-  if res.code != '200'
-    raise "Error while saving endpoint settings: #{res.body}"
   end
 
   if restart_after_configuration
