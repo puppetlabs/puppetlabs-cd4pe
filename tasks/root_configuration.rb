@@ -75,7 +75,7 @@ begin
       raise "Error while generating trial license: #{res.body}"
     end
   end
-  
+
   res = client.save_storage_settings(provider, endpoint, bucket, prefix, access_key, secret_key)
 
   if res.code != '200'
