@@ -3,8 +3,6 @@ require 'net/http'
 require 'uri'
 require 'json'
 
-require_relative 'cd4pe_pipeline_utils'
-
 module PuppetX::Puppetlabs
   # Provides a class for interacting with CD4PE's API
   class CD4PEClient < Object
@@ -96,6 +94,19 @@ module PuppetX::Puppetlabs
         content: license,
       }
       make_request(:post, ROOT_AJAX_ENDPOINT, payload.to_json)
+    end
+
+    def generate_trial_license
+      # generate the trial license
+      response = make_request(:get, '/generate-trial-license?op=GenerateTrialLicense')
+      license = JSON.parse(response.body)
+
+      # save the trial license
+      payload = {
+        op: 'SavePfiLicense', # Note: endpoint is different from the save_license endpoint
+        content: license,
+      }
+      make_request(:post, '/root/license', payload.to_json)
     end
 
     def save_endpoint_settings(webui, backend, agent)
