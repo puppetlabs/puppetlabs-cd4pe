@@ -1,6 +1,7 @@
 require 'spec_helper'
 require 'webmock/rspec'
 require_relative '../../../../lib/puppet_x/puppetlabs/cd4pe_client'
+require_relative '../../../../lib/puppet_x/puppetlabs/cd4pe_pipeline_utils'
 
 describe PuppetX::Puppetlabs::CD4PEClient do
   describe 'add_deployment_to_stage' do

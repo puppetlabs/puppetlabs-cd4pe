@@ -34,5 +34,7 @@
             "type": "Optional[String[1]]",
             "description": "The endpoint where the web UI can be reached, in the form http://<resolvable_hostname>:<port>. Required if you set the web_ui_port parameter in the cd4pe class during installation."
         }
-    }
+    },
+    "files": ["cd4pe/lib/"],
+    "input_method": "stdin"
 }
