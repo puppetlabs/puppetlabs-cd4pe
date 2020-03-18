@@ -2,7 +2,6 @@
 set -e
 
 install_module() {
-  # TODO: check for param?
   local __result=${1}
   local tmpdir=$(mktemp -d)
   mkdir -p ${tmpdir}/Boltdir
@@ -11,7 +10,7 @@ install_module() {
 # mod 'puppetlabs-cd4pe', '1.4.1'
 
 # git
-mod 'puppetlabs-cd4pe', git: 'git@github.com:puppetlabs/puppetlabs-cd4pe.git', ref: 'master'
+mod 'puppetlabs-cd4pe', git: 'git@github.com:puppetlabs/puppetlabs-cd4pe.git', ref: '${DEV_BRANCH:-master}'
 !
   (cd ${tmpdir}; bolt --modulepath . puppetfile install)
   eval ${__result}="'$tmpdir'"
@@ -64,7 +63,7 @@ PARAMS=""
 while (( "$#" )); do
   case "$1" in
     -o|--object-store)
-      objectStorageType=$2
+      objectStorageType="$2"
       shift 2
       ;;
     -s|--ssl)
@@ -74,6 +73,10 @@ while (( "$#" )); do
     -p|--no-po-check)
       skipPoCheck="true"
       shift
+      ;;
+    -b|--base)
+      baseName="$2"
+      shift 2
       ;;
     --) # end argument parsing
       shift
@@ -105,9 +108,9 @@ bundle exec rake "test:install:cd4pe:module[${CD4PE_IMAGE},${CD4PE_VERSION}]"
 target=$(yaml2json inventory.yaml | jq -r '.groups[1].targets[0].uri')
 waitUntilCd4peUp ${target}
 
-./genParams.rb ${objectStorageType:-disk} ${sslEnabled:-disabled} ${target}
+./genParams.rb ${objectStorageType:-disk} ${sslEnabled:-disabled} ${target} ${baseName:-default}
 
-bolt task run --targets all --modulepath ${moduledir} --inventoryfile inventory.yaml cd4pe::root_configuration --params @params.json
+bolt plan run --targets all --modulepath ${moduledir} --inventoryfile inventory.yaml cd4pe::configure_test_vm --params @params.json
 
 # TODO: make cleanup an option?
 rm -f params.json

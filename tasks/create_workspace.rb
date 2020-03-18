@@ -8,10 +8,10 @@ $LOAD_PATH.unshift(Puppet[:plugindest])
 
 params = JSON.parse(STDIN.read)
 hostname  = params['resolvable_hostname'] || Puppet[:certname]
-emailname = params['email']
-password  = params['password']
-username  = params['username']
-workspace = params['workspace']
+auth_name = params['cws_auth_name']
+password  = params['cws_password']
+username  = params['cws_username']
+workspace = params['cws_workspace']
 
 require_relative File.join(params['_installdir'], 'cd4pe', 'lib', 'puppet_x', 'puppetlabs', 'cd4pe_client')
 
@@ -24,7 +24,7 @@ exitcode = 0
 result = {}
 
 begin
-  client = PuppetX::Puppetlabs::CD4PEClient.new(web_ui_endpoint, emailname, password)
+  client = PuppetX::Puppetlabs::CD4PEClient.new(web_ui_endpoint, auth_name, password)
   result = client.create_workspace(workspace, username)
 
   if result.code != '200'

@@ -3,30 +3,32 @@
 require 'json'
 
 usage = "
-Usage: genParams.rb <storageType> <enableSSL> <ssl_endpoint>
+Usage => genParams.rb <storageType> <enableSSL> <ssl_endpoint> <workspace_root>
   where <storageType> is one of
   'disk', 's3', or 'artifactory'
 
   <enableSSL> is 'enabled' and requires
   <ssl_endpoint> to be set to a valid FQDN
+  <workspace_root> is the root name for adding a user/workspace pair
 "
 
-unless ARGV.length == 3
+unless ARGV.length == 4
   abort(usage)
 end
 
 object_storage_type = ARGV[0]
 ssl_enabled = ARGV[1] == 'enabled'
 ssl_endpoint = ARGV[2]
+workspace_root = ARGV[3]
 
-# keys needed everywhere
+# keys needed for root_config
 base_params = {
   'root_email'             => 'noreply@puppet.com',
   'root_password'          => 'puppetlabs',
   'generate_trial_license' => true,
 }
 
-# keys needed for S3 access
+## for S3 access
 s3_constants = {
   'storage_provider' => 'S3',
 }
@@ -38,7 +40,7 @@ storage_s3 = {
   's3_secret_key'    => '.storage.S3.secretKey',
 }
 
-# keys needed for Artifactory access
+## for Artifactory access
 artifactory_constants = {
   'storage_provider' => 'ARTIFACTORY',
 }
@@ -49,7 +51,7 @@ storage_artifactory = {
   'artifactory_access_token' => '.storage.Artifactory.artifactoryAccessToken',
 }
 
-# keys needed for SSL
+## for SSL
 ssl_constants = {
   'ssl_enabled' => ssl_enabled,
   'ssl_endpoint' => ssl_endpoint,
@@ -59,6 +61,31 @@ ssl_keys = {
   'ssl_server_certificate'    => '.ssl.serverCertificate',
   'ssl_authority_certificate' => '.ssl.authorityCertificate',
   'ssl_server_private_key'    => '.ssl.serverPrivateKey',
+}
+
+derived_email = "#{workspace_root}_mail@reply.com"
+derived_username = "#{workspace_root}_username"
+derived_workspace = "#{workspace_root}_workspace"
+
+# keys needed for create_user
+user_params = {
+  'user_config' => {
+    'email'      => derived_email,
+    'username'   => derived_username,
+    'password'   => 'puppetlabs',
+    'first_name' => 'first',
+    'last_name'  => 'last',
+  }
+}
+
+# keys needed for create_workspace
+workspace_params = {
+  'workspace_config' => {
+    'auth_name'  => derived_email,
+    'password'   => 'puppetlabs',
+    'username'   => derived_username,
+    'workspace'  => derived_workspace,
+  }
 }
 
 def extract_key_values(_json_blob, the_keys)
@@ -95,8 +122,10 @@ else
   ssl_params = {}
 end
 
-bolt_key_set = [*base_params, *storage_params, *ssl_params].to_h
+root_config_params = {'root_config' => [*base_params, *storage_params, *ssl_params].to_h}
+
+full_set = [*root_config_params, *user_params, *workspace_params].to_h
 
 File.open('params.json', 'w') do |f|
-  f.write(JSON.pretty_generate(bolt_key_set))
+  f.write(JSON.pretty_generate(full_set))
 end
