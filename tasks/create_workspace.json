@@ -1,9 +1,9 @@
 {
   "description": "Adds a workspace in CD4PE.",
   "parameters": {
-    "emailname": {
+    "auth_name": {
       "type": "String[1]",
-      "description": "The email address associated with the Continuous Delivery for PE login."
+      "description": "The email address associated with the Continuous Delivery for PE account."
     },
     "password": {
       "type": "String[1]",
