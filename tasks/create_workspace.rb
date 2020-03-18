@@ -8,10 +8,10 @@ $LOAD_PATH.unshift(Puppet[:plugindest])
 
 params = JSON.parse(STDIN.read)
 hostname  = params['resolvable_hostname'] || Puppet[:certname]
-auth_name = params['cws_auth_name']
-password  = params['cws_password']
-username  = params['cws_username']
-workspace = params['cws_workspace']
+auth_name = params['auth_name']
+password  = params['password']
+username  = params['username']
+workspace = params['workspace']
 
 require_relative File.join(params['_installdir'], 'cd4pe', 'lib', 'puppet_x', 'puppetlabs', 'cd4pe_client')
 
