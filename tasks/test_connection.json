@@ -2,8 +2,8 @@
   "description": "Tests the specified HTTP/S connection for the specified status code.",
   "parameters": {
     "http_port": {
-      "type": "String[1]",
-      "description": "The port on the host to connect to."
+      "type": "Optional[String[1]]",
+      "description": "The port on the host to connect to (default 8080)."
     },
     "use_ssl": {
       "type": "Optional[Boolean]",
