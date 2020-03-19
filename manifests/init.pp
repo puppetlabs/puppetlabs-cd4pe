@@ -21,6 +21,10 @@ class cd4pe (
   Optional[String[1]] $cd4pe_network_subnet                   = undef,
   Optional[String[1]] $cd4pe_network_gateway                  = undef,
 ){
+
+  if ( $facts['os']['family'] == 'RedHat' and $facts['os']['release']['major'] == '8' ){
+    fail('You cannot use the cd4pe module to install on EL 8')
+  }
   # Restrict to linux only?
   include docker
   include cd4pe::anchors
