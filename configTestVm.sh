@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-install_module() {
+function install_module() {
   local __result=${1}
   local tmpdir=$(mktemp -d)
   mkdir -p ${tmpdir}/Boltdir
@@ -16,7 +16,7 @@ mod 'puppetlabs-cd4pe', git: 'git@github.com:puppetlabs/puppetlabs-cd4pe.git', r
   eval ${__result}="'$tmpdir'"
 }
 
-waitUntilCd4peUp() {
+function waitUntilCd4peUp() {
   attempt_counter=0
   max_attempts=60
   echo "Waiting up to 5 minutes for CD4PE to come up"

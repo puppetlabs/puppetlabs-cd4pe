@@ -75,7 +75,7 @@ user_params = {
     'password'   => 'puppetlabs',
     'first_name' => 'first',
     'last_name'  => 'last',
-  }
+  },
 }
 
 # keys needed for create_workspace
@@ -85,7 +85,7 @@ workspace_params = {
     'password'   => 'puppetlabs',
     'username'   => derived_username,
     'workspace'  => derived_workspace,
-  }
+  },
 }
 
 def extract_key_values(_json_blob, the_keys)
@@ -122,7 +122,7 @@ else
   ssl_params = {}
 end
 
-root_config_params = {'root_config' => [*base_params, *storage_params, *ssl_params].to_h}
+root_config_params = { 'root_config' => [*base_params, *storage_params, *ssl_params].to_h }
 
 full_set = [*root_config_params, *user_params, *workspace_params].to_h
 

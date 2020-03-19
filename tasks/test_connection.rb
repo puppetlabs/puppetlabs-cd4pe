@@ -9,7 +9,7 @@ $LOAD_PATH.unshift(Puppet[:plugindest])
 
 params = JSON.parse(STDIN.read)
 http_server   = params['resolvable_hostname'] || Puppet[:certname]
-http_port     = params['http_port']
+http_port     = params['http_port']     || '8080'
 use_ssl       = params['use_ssl']       || false
 test_path     = params['test_path']     || '/'
 expected_code = params['expected_code'] || 200
@@ -17,9 +17,6 @@ verify_peer   = params['verify_peer']   || true
 
 # derived from https://github.com/voxpupuli/puppet-healthcheck/blob/master/lib/puppet_x/puppet-community/http_validator.rb
 # and .../puppet/provider/http_conn_validator/http_conn_validator.rb
-
-timeout = 30
-try_sleep = 5
 
 # Utility method; attempts to make an http/https connection to a server.
 # This is abstracted out into a method so that it can be called multiple times
@@ -66,8 +63,11 @@ validator = HttpValidator.new(
   use_ssl,
   test_path,
   expected_code,
-  verify_peer
+  verify_peer,
 )
+
+timeout = 30
+try_sleep = 5
 
 exitcode = 0
 result = {}
@@ -80,7 +80,7 @@ begin
   while success == false && ((Time.now - start_time) < timeout)
     # It can take several seconds for an HTTP  service to start up;
     # especially on the first install.  Therefore, our first connection attempt
-    # may fail.  Here we have somewhat arbitrarily chosen to retry every 2
+    # may fail.  Here we have somewhat arbitrarily chosen to retry every #{try_sleep}
     # seconds until the configurable timeout has expired.
     Puppet.notice("Failed to make an HTTP connection; sleeping #{try_sleep} seconds before retry")
     sleep try_sleep
