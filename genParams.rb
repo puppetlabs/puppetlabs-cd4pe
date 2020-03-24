@@ -28,7 +28,7 @@ base_params = {
   'generate_trial_license' => true,
 }
 
-## for S3 access
+# for S3 access
 s3_constants = {
   'storage_provider' => 'S3',
 }
@@ -40,7 +40,7 @@ storage_s3 = {
   's3_secret_key'    => '.storage.S3.secretKey',
 }
 
-## for Artifactory access
+# for Artifactory access
 artifactory_constants = {
   'storage_provider' => 'ARTIFACTORY',
 }
@@ -51,7 +51,7 @@ storage_artifactory = {
   'artifactory_access_token' => '.storage.Artifactory.artifactoryAccessToken',
 }
 
-## for SSL
+# for SSL
 ssl_constants = {
   'ssl_enabled' => ssl_enabled,
   'ssl_endpoint' => ssl_endpoint,
@@ -63,7 +63,7 @@ ssl_keys = {
   'ssl_server_private_key'    => '.ssl.serverPrivateKey',
 }
 
-derived_email = "#{workspace_root}_mail@reply.com"
+derived_email = "#{workspace_root}_mail@example.com"
 derived_username = "#{workspace_root}_username"
 derived_workspace = "#{workspace_root}_workspace"
 
@@ -81,10 +81,10 @@ user_params = {
 # keys needed for create_workspace
 workspace_params = {
   'workspace_config' => {
-    'auth_name'  => derived_email,
-    'password'   => 'puppetlabs',
-    'username'   => derived_username,
-    'workspace'  => derived_workspace,
+    'email'     => derived_email,
+    'password'  => 'puppetlabs',
+    'username'  => derived_username,
+    'workspace' => derived_workspace,
   },
 }
 
@@ -100,7 +100,7 @@ end
 # TODO: check exit status from x%(); parameterize secret object being fetched?
 raw_json = JSON.parse(`op get item cdpe-workflow-tests-config.json | jq -r '.details.notesPlain'`.delete('`'), object_class: OpenStruct)
 
-## storage type
+# storage type
 case object_storage_type
 when 'disk'
   storage_params = {}
@@ -114,7 +114,7 @@ else
   abort("Unrecognized storage type '#{object_storage_type}' specified")
 end
 
-## enable SSL
+# enable SSL
 if ssl_enabled
   ssl_params = extract_key_values(raw_json, ssl_keys)
   ssl_params = [*ssl_constants, *ssl_params].to_h
