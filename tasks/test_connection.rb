@@ -10,10 +10,10 @@ $LOAD_PATH.unshift(Puppet[:plugindest])
 params = JSON.parse(STDIN.read)
 http_server   = params['resolvable_hostname'] || Puppet[:certname]
 http_port     = params['http_port']     || '8080'
-use_ssl       = params['use_ssl']       || false
+use_ssl       = params['use_ssl']       || (params['use_ssl'].nil? ? false : params['use_ssl'])
 test_path     = params['test_path']     || '/'
 expected_code = params['expected_code'] || 200
-verify_peer   = params['verify_peer']   || true
+verify_peer   = params['verify_peer']   || (params['verify_peer'].nil? ? true : params['verify_peer'])
 
 # derived from https://github.com/voxpupuli/puppet-healthcheck/blob/master/lib/puppet_x/puppet-community/http_validator.rb
 # and .../puppet/provider/http_conn_validator/http_conn_validator.rb
