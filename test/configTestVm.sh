@@ -102,15 +102,17 @@ set -e
 install_module moduledir
 
 # TODO: make cleanup an option?
-rm -f inventory.yaml
+rm -f ../inventory.yaml
 bundle exec rake "test:install:cd4pe:module[${CD4PE_IMAGE},${CD4PE_VERSION}]"
 
-target=$(yaml2json inventory.yaml | jq -r '.groups[1].targets[0].uri')
+target=$(yaml2json ../inventory.yaml | jq -r '.groups[1].targets[0].uri')
 waitUntilCd4peUp ${target}
 
-./genParams.rb ${objectStorageType:-disk} ${sslEnabled:-disabled} ${target} ${baseName:-default}
+./genParams.rb ${objectStorageType:-disk} ${sslEnabled:-disabled} ${target} ${baseName:-otto}
 
-bolt plan run --targets all --modulepath ${moduledir} --inventoryfile inventory.yaml cd4pe::configure_test_vm --params @params.json
+bolt plan run --targets all --modulepath ${moduledir}/cd4pe/spec/fixtures/modules:${moduledir} --inventoryfile ../inventory.yaml cd4pe_test_tasks::configure_test_vm --params @params.json
 
 # TODO: make cleanup an option?
 rm -f params.json
+
+echo "Your VM is available at http://${target}:8080 with a login of ${baseName:-otto}@example.com and the usual password :)"

@@ -63,9 +63,9 @@ ssl_keys = {
   'ssl_server_private_key'    => '.ssl.serverPrivateKey',
 }
 
-derived_email = "#{workspace_root}_mail@example.com"
-derived_username = "#{workspace_root}_username"
-derived_workspace = "#{workspace_root}_workspace"
+derived_email = "#{workspace_root}@example.com"
+derived_username = "#{workspace_root}"
+derived_workspace = "#{workspace_root}_ws"
 
 # keys needed for create_user
 user_params = {
@@ -73,8 +73,8 @@ user_params = {
     'email'      => derived_email,
     'username'   => derived_username,
     'password'   => 'puppetlabs',
-    'first_name' => 'first',
-    'last_name'  => 'last',
+    'first_name' => workspace_root,
+    'last_name'  => 'Smith',
   },
 }
 
