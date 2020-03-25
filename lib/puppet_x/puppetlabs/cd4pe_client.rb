@@ -109,6 +109,16 @@ module PuppetX::Puppetlabs
       make_request(:post, '/root/license', payload.to_json)
     end
 
+    def create_workspace(workspace, for_user)
+      payload = {
+        op: 'CreateWorkspace',
+        content: {
+          workspaceName: workspace,
+        },
+      }
+      make_request(:post, "/#{for_user}/ajax", payload.to_json)
+    end
+
     def save_endpoint_settings(webui, backend, agent)
       payload = {
         op: 'SaveEndpointSettings',

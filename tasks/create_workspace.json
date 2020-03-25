@@ -1,0 +1,24 @@
+{
+  "description": "Adds a workspace in CD4PE.",
+  "parameters": {
+    "email": {
+      "type": "String[1]",
+      "description": "The email address associated with the Continuous Delivery for PE account."
+    },
+    "password": {
+      "type": "String[1]",
+      "sensitive": true,
+      "description": "The password associated with the account."
+    },
+    "username": {
+      "type": "String[1]",
+      "description": "The username under which the workspace is created."
+    },
+    "workspace": {
+      "type": "String[1]",
+      "description": "Designates the workspace to be created."
+    }
+  },
+  "files": ["cd4pe/lib/"],
+  "input_method": "stdin"
+}
