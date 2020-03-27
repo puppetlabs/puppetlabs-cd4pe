@@ -119,6 +119,17 @@ module PuppetX::Puppetlabs
       make_request(:post, "/#{for_user}/ajax", payload.to_json)
     end
 
+    def add_vcs_integration(username, workspace, host, token)
+      payload = {
+        op: 'ConnectGitLab',
+        content: {
+          host: host,
+          token: token,
+        },
+      }
+      make_request(:post, get_ajax_endpoint(workspace), payload.to_json)
+    end
+
     def save_endpoint_settings(webui, backend, agent)
       payload = {
         op: 'SaveEndpointSettings',

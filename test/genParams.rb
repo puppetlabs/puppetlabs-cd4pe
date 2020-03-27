@@ -3,16 +3,18 @@
 require 'json'
 
 usage = "
-Usage => genParams.rb <storageType> <enableSSL> <ssl_endpoint> <workspace_root>
+Usage => genParams.rb <storageType> <enableSSL> <ssl_endpoint> <workspace_root> <provider>
   where <storageType> is one of
   'disk', 's3', or 'artifactory'
 
   <enableSSL> is 'enabled' and requires
   <ssl_endpoint> to be set to a valid FQDN
   <workspace_root> is the root name for adding a user/workspace pair
+  <provider> is one of
+  'gitlab', ...
 "
 
-unless ARGV.length == 4
+unless ARGV.length == 5
   abort(usage)
 end
 
@@ -20,6 +22,7 @@ object_storage_type = ARGV[0]
 ssl_enabled = ARGV[1] == 'enabled'
 ssl_endpoint = ARGV[2]
 workspace_root = ARGV[3]
+provider = ARGV[4]
 
 # keys needed for root_config
 base_params = {
@@ -88,6 +91,20 @@ workspace_params = {
   },
 }
 
+# keys needed for adding vcs integration
+vcs_constants = {
+  'email'     => derived_email,
+  'password'  => 'puppetlabs',
+  'username'  => derived_username,
+  'workspace' => derived_workspace,
+}
+
+# for gitlab
+vcs_gitlab = {
+  'host'  => '.integrations.Gitlab.host',
+  'token' => '.integrations.Gitlab.token',
+}
+
 def extract_key_values(_json_blob, the_keys)
   the_keys.each do |key, value|
     the_keys[key] = eval('_json_blob' + value) # rubocop:disable Security/Eval
@@ -124,7 +141,16 @@ end
 
 root_config_params = { 'root_config' => [*base_params, *storage_params, *ssl_params].to_h }
 
-full_set = [*root_config_params, *user_params, *workspace_params].to_h
+# vcs provider
+case provider
+when 'gitlab'
+  vcs_params = extract_key_values(raw_json, vcs_gitlab)
+  vcs_params = { 'vcs_config' => [*vcs_constants, *vcs_params].to_h }
+else
+  abort("Unrecognized vcs provider '#{provider}' specified")
+end
+
+full_set = [*root_config_params, *user_params, *workspace_params, *vcs_params].to_h
 
 File.open('params.json', 'w') do |f|
   f.write(JSON.pretty_generate(full_set))

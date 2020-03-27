@@ -1,6 +1,17 @@
 #!/usr/bin/env bash
 set -e
 
+function usage() {
+  echo "No arguments are required. By default, create a VM using the disk object-store,"
+  echo "not enable SSL and create a default user & workspace. To modify this behaviour,"
+  echo "use the following switches (default values):"
+  echo
+  echo "  -o|--object-store disk|artifactory|s3   specify the object-store (${objectStorageType})"
+  echo "  -s|--ssl                                configure SSL (${sslEnabled})"
+  echo "  -p|--no-po-check                        disable the 1Password op tool sanity check (enabled)"
+  echo "  -b|--base <base>                        specify base name of workspace, email & username (${baseName})"
+}
+
 function install_module() {
   local __result=${1}
   local tmpdir=$(mktemp -d)
@@ -56,6 +67,10 @@ function poStatusCheck() {
 CD4PE_IMAGE=${CD4PE_IMAGE:-artifactory.delivery.puppetlabs.net/cd4pe-dev}
 [ -z "${CD4PE_VERSION}" ] && { echo "Please export CD4PE_VERSION to the desired version on Artifactory"; exit 1; }
 
+objectStorageType="disk"
+sslEnabled="disabled"
+baseName="otto"
+
 ## most parameters are qualified by the genParams.rb script, not in here
 ## derived from https://medium.com/@Drew_Stokes/bash-argument-parsing-54f3b81a6a8f
 ##
@@ -77,6 +92,10 @@ while (( "$#" )); do
     -b|--base)
       baseName="$2"
       shift 2
+      ;;
+    -h|--help)
+      usage
+      exit 1
       ;;
     --) # end argument parsing
       shift
@@ -108,11 +127,12 @@ bundle exec rake "test:install:cd4pe:module[${CD4PE_IMAGE},${CD4PE_VERSION}]"
 target=$(yaml2json ../inventory.yaml | jq -r '.groups[1].targets[0].uri')
 waitUntilCd4peUp ${target}
 
-./genParams.rb ${objectStorageType:-disk} ${sslEnabled:-disabled} ${target} ${baseName:-otto}
+./genParams.rb ${objectStorageType} ${sslEnabled} ${target} ${baseName}
 
 bolt plan run --targets all --modulepath ${moduledir}/cd4pe/spec/fixtures/modules:${moduledir} --inventoryfile ../inventory.yaml cd4pe_test_tasks::configure_test_vm --params @params.json
 
 # TODO: make cleanup an option?
 rm -f params.json
 
+echo
 echo "Your VM is available at http://${target}:8080 with a login of ${baseName:-otto}@example.com and the usual password :)"
