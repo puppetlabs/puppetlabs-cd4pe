@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 
 require 'json'
+require 'set'
 
 usage = "
 Usage => genParams.rb <storageType> <enableSSL> <ssl_endpoint> <workspace_root> <provider>
@@ -11,7 +12,7 @@ Usage => genParams.rb <storageType> <enableSSL> <ssl_endpoint> <workspace_root> 
   <ssl_endpoint> to be set to a valid FQDN
   <workspace_root> is the root name for adding a user/workspace pair
   <provider> is one of
-  'none', gitlab', ...
+  'none', gitlab', 'GHE', ...
 "
 
 unless ARGV.length == 5
@@ -95,7 +96,7 @@ workspace_params = {
 vcs_constants = {
   'email'     => derived_email,
   'password'  => 'puppetlabs',
-  'username'  => derived_username,
+  'provider'  => provider,
   'workspace' => derived_workspace,
 }
 
@@ -103,6 +104,13 @@ vcs_constants = {
 vcs_gitlab = {
   'host'  => '.integrations.Gitlab.host',
   'token' => '.integrations.Gitlab.token',
+}
+
+# for GHE
+vcs_GHE = {
+  'host'          => '.integrations.GithubEnterprise.host',
+  'token'         => '.integrations.GithubEnterprise.token',
+  'caCertificate' => '.integrations.GithubEnterprise.caCertificate',
 }
 
 def extract_key_values(_json_blob, the_keys)
@@ -142,15 +150,18 @@ end
 root_config_params = { 'root_config' => [*base_params, *storage_params, *ssl_params].to_h }
 
 # vcs provider
-case provider
-when 'none'
+vcs_providers = ['gitlab','GHE']
+
+if provider == 'none'
   vcs_params = { 'vcs_config' => {} }
-when 'gitlab'
-  vcs_params = extract_key_values(raw_json, vcs_gitlab)
-  vcs_params = { 'vcs_config' => [*vcs_constants, *vcs_params].to_h }
+elsif vcs_providers.include?(provider)
+  vcs_params = extract_key_values(raw_json, eval('vcs_' + provider)) # rubocop:disable Security/Eval
+  vcs_params = { 'provider_specific' => vcs_params }
 else
   abort("Unrecognized vcs provider '#{provider}' specified")
 end
+
+vcs_params = { 'vcs_config' => [*vcs_constants, *vcs_params].to_h } unless provider == 'none'
 
 full_set = [*root_config_params, *user_params, *workspace_params, *vcs_params].to_h
 

@@ -10,17 +10,17 @@
       "sensitive": true,
       "description": "The password associated with the account."
     },
+    "provider": {
+      "type": "String[1]",
+      "description": "The name of the provider to configure."
+    },
     "workspace": {
       "type": "String[1]",
       "description": "The workspace to be configured."
     },
-    "host": {
-      "type": "String[1]",
-      "description": "The IP or hostname of the VCS."
-    },
-    "token": {
-      "type": "String[1]",
-      "description": "The access token to use."
+    "provider_specific": {
+      "type": "Hash",
+      "description": "The set of provider specific parameters."
     }
   },
   "files": ["cd4pe/lib/"],

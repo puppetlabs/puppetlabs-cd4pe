@@ -10,9 +10,9 @@ params = JSON.parse(STDIN.read)
 hostname  = params['resolvable_hostname'] || Puppet[:certname]
 email     = params['email']
 password  = params['password']
+provider  = params['provider']
 workspace = params['workspace']
-host      = params['host']
-token     = params['token']
+provider_specific = params['provider_specific']
 
 require_relative File.join(params['_installdir'], 'cd4pe', 'lib', 'puppet_x', 'puppetlabs', 'cd4pe_client')
 
@@ -26,13 +26,13 @@ result = {}
 
 begin
   client = PuppetX::Puppetlabs::CD4PEClient.new(web_ui_endpoint, email, password)
-  result = client.add_vcs_integration(workspace, host, token)
+  result = client.add_vcs_integration(provider, workspace, provider_specific)
 
   if result.code != '200'
     raise "Error while adding VCS integration: #{result.body}"
   end
 
-  puts "Added integration."
+  puts "Added integration for #{provider}."
   result[:success] = true
 rescue => e
   result[:_error] = {

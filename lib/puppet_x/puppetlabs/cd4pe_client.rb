@@ -119,13 +119,17 @@ module PuppetX::Puppetlabs
       make_request(:post, "/#{for_user}/ajax", payload.to_json)
     end
 
-    def add_vcs_integration(workspace, host, token)
+    def add_vcs_integration(provider, workspace, provider_specific)
+      case provider
+      when 'gitlab'
+        op = 'ConnectGitLab'
+      when 'GHE'
+        op = 'ConnectGitHubEnterprise'
+      end
+
       payload = {
-        op: 'ConnectGitLab',
-        content: {
-          host: host,
-          token: token,
-        },
+        op: op,
+        content: provider_specific,
       }
       make_request(:post, "/#{workspace}/ajax", payload.to_json)
     end
