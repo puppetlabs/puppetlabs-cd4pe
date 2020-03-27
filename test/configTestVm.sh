@@ -8,8 +8,9 @@ function usage() {
   echo
   echo "  -o|--object-store disk|artifactory|s3   specify the object-store (${objectStorageType})"
   echo "  -s|--ssl                                configure SSL (${sslEnabled})"
-  echo "  -p|--no-po-check                        disable the 1Password op tool sanity check (enabled)"
+  echo "  -p|--no-op-check                        disable the 1Password op tool sanity check (enabled)"
   echo "  -b|--base <base>                        specify base name of workspace, email & username (${baseName})"
+  echo "  -v|--vcs-provider <vcs>                 specify the VCS provider (${vcsProvider})"
 }
 
 function install_module() {
@@ -51,12 +52,12 @@ function yaml2json() {
   ruby -ryaml -rjson -e 'puts JSON.pretty_generate(YAML.load(ARGF))' $*
 }
 
-function poStatusCheck() {
-  poStatus=$(op confirm --all 2>&1)
+function opStatusCheck() {
+  opStatus=$(op confirm --all 2>&1)
   if [ ! $? == 0 ]; then
     echo "Issue with 'op' utility. Have you started a session?"
     echo
-    echo "${poStatus}"
+    echo "${opStatus}"
     exit 1
   fi
 }
@@ -70,6 +71,7 @@ CD4PE_IMAGE=${CD4PE_IMAGE:-artifactory.delivery.puppetlabs.net/cd4pe-dev}
 objectStorageType="disk"
 sslEnabled="disabled"
 baseName="otto"
+vcsProvider="none"
 
 ## most parameters are qualified by the genParams.rb script, not in here
 ## derived from https://medium.com/@Drew_Stokes/bash-argument-parsing-54f3b81a6a8f
@@ -85,12 +87,16 @@ while (( "$#" )); do
       sslEnabled="enabled"
       shift
       ;;
-    -p|--no-po-check)
+    -p|--no-op-check)
       skipPoCheck="true"
       shift
       ;;
     -b|--base)
       baseName="$2"
+      shift 2
+      ;;
+    -v|--vcs-provider)
+      vcsProvider="$2"
       shift 2
       ;;
     -h|--help)
@@ -115,7 +121,7 @@ done
 eval set -- "$PARAMS"
 
 set +e
-  [ -z "${skipPoCheck}" ] && poStatusCheck
+  [ -z "${skipPoCheck}" ] && opStatusCheck
 set -e
 
 install_module moduledir
@@ -127,7 +133,7 @@ bundle exec rake "test:install:cd4pe:module[${CD4PE_IMAGE},${CD4PE_VERSION}]"
 target=$(yaml2json ../inventory.yaml | jq -r '.groups[1].targets[0].uri')
 waitUntilCd4peUp ${target}
 
-./genParams.rb ${objectStorageType} ${sslEnabled} ${target} ${baseName}
+./genParams.rb ${objectStorageType} ${sslEnabled} ${target} ${baseName} ${vcsProvider}
 
 bolt plan run --targets all --modulepath ${moduledir}/cd4pe/spec/fixtures/modules:${moduledir} --inventoryfile ../inventory.yaml cd4pe_test_tasks::configure_test_vm --params @params.json
 

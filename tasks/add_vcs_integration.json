@@ -1,5 +1,5 @@
 {
-  "description": "Adds a workspace in CD4PE.",
+  "description": "Adds a VCS provider in CD4PE.",
   "parameters": {
     "email": {
       "type": "String[1]",
@@ -10,20 +10,16 @@
       "sensitive": true,
       "description": "The password associated with the account."
     },
-    "username": {
-      "type": "String[1]",
-      "description": "The username under which the workspace is located."
-    },
     "workspace": {
       "type": "String[1]",
       "description": "The workspace to be configured."
     },
-      "type": "String[1]",
     "host": {
       "type": "String[1]",
       "description": "The IP or hostname of the VCS."
     },
     "token": {
+      "type": "String[1]",
       "description": "The access token to use."
     }
   },

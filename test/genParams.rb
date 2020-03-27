@@ -11,7 +11,7 @@ Usage => genParams.rb <storageType> <enableSSL> <ssl_endpoint> <workspace_root> 
   <ssl_endpoint> to be set to a valid FQDN
   <workspace_root> is the root name for adding a user/workspace pair
   <provider> is one of
-  'gitlab', ...
+  'none', gitlab', ...
 "
 
 unless ARGV.length == 5
@@ -143,6 +143,8 @@ root_config_params = { 'root_config' => [*base_params, *storage_params, *ssl_par
 
 # vcs provider
 case provider
+when 'none'
+  vcs_params = { 'vcs_config' => {} }
 when 'gitlab'
   vcs_params = extract_key_values(raw_json, vcs_gitlab)
   vcs_params = { 'vcs_config' => [*vcs_constants, *vcs_params].to_h }

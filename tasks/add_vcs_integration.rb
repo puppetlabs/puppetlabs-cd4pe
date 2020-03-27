@@ -10,7 +10,6 @@ params = JSON.parse(STDIN.read)
 hostname  = params['resolvable_hostname'] || Puppet[:certname]
 email     = params['email']
 password  = params['password']
-username  = params['username']
 workspace = params['workspace']
 host      = params['host']
 token     = params['token']
@@ -27,13 +26,13 @@ result = {}
 
 begin
   client = PuppetX::Puppetlabs::CD4PEClient.new(web_ui_endpoint, email, password)
-  result = client.add_vcs_integration(username, workspace, host, token)
+  result = client.add_vcs_integration(workspace, host, token)
 
   if result.code != '200'
     raise "Error while adding VCS integration: #{result.body}"
   end
 
-  puts "Added integration: #{provider}"
+  puts "Added integration."
   result[:success] = true
 rescue => e
   result[:_error] = {

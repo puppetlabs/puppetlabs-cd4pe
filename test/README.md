@@ -18,10 +18,10 @@ No arguments are required. By default, it will create a VM using the disk object
 
     -o|--object-store disk|artifactory|s3   specify the object-store (disk)
     -s|--ssl                                configure SSL (not configured)
-    -p|--no-po-check                        disable the 1Password op tool sanity check (enabled)
+    -p|--no-op-check                        disable the 1Password op tool sanity check (enabled)
     -b|--base <base>                        specify base name of workspace, email & username (otto)
 
-For `--no-po-check`, the `op` tool uses a 30 minute token, and occasionally gets confused when checking token status; this short-circuits the check, but a valid token is still required for the tool itself to work. You can create the following Bash alias to make it simpler to re-up the token:
+For `--no-op-check`, the `op` tool uses a 30 minute token, and occasionally gets confused when checking token status; this short-circuits the check, but a valid token is still required for the tool itself to work. You can create the following Bash alias to make it simpler to re-up the token:
 
     alias optoken='eval $(op signin puppet)'
 
