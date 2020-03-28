@@ -12,7 +12,7 @@ Usage => genParams.rb <storageType> <enableSSL> <ssl_endpoint> <workspace_root> 
   <ssl_endpoint> to be set to a valid FQDN
   <workspace_root> is the root name for adding a user/workspace pair
   <provider> is one of
-  'none', gitlab', 'GHE', ...
+  'none', gitlab', 'GHE', 'bbs', ...
 "
 
 unless ARGV.length == 5
@@ -113,6 +113,14 @@ vcs_GHE = {
   'caCertificate' => '.integrations.GithubEnterprise.caCertificate',
 }
 
+# for bbs
+vcs_bbs = {
+  'host'     => '.integrations.BitbucketServer.bitbucketServerHost',
+  'username' => '.integrations.BitbucketServer.username',
+  'password' => '.integrations.BitbucketServer.password',
+  'sshPort'  => '.integrations.BitbucketServer.sshPort',
+}
+
 def extract_key_values(_json_blob, the_keys)
   the_keys.each do |key, value|
     the_keys[key] = eval('_json_blob' + value) # rubocop:disable Security/Eval
@@ -150,7 +158,7 @@ end
 root_config_params = { 'root_config' => [*base_params, *storage_params, *ssl_params].to_h }
 
 # vcs provider
-vcs_providers = ['gitlab','GHE']
+vcs_providers = ['gitlab','GHE','bbs']
 
 if provider == 'none'
   vcs_params = { 'vcs_config' => {} }

@@ -125,6 +125,8 @@ module PuppetX::Puppetlabs
         op = 'ConnectGitLab'
       when 'GHE'
         op = 'ConnectGitHubEnterprise'
+      when 'bbs'
+        op = 'ConnectBitbucketServer'
       end
 
       payload = { op: op }

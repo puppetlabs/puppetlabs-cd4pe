@@ -1,6 +1,6 @@
 **Introduction**
 
-This tooling configures object storage, can enable SSL, and creates a default user and workspace for freshly provisioned CD4PE VMs. It also creates the root account and sets a trial license.
+This tooling configures object storage, can enable SSL, creates a default user and workspace, and can set up a VCS for a freshly provisioned CD4PE VMs. It also creates the root account and sets a trial license.
 
 Use of this script requires local installation of the 1Password `op` utility, here: https://support.1password.com/command-line-getting-started/, and full docs are here: https://support.1password.com/command-line/
 
@@ -28,7 +28,7 @@ For `--no-op-check`, the `op` tool uses a 30 minute token, and occasionally gets
 
 For `--base <base>`, the default names are `<base>@example.com`, `<base>_ws` and `<base>` (email, workspace, username).
 
-For `--vcs-provider <vcs>`, supported providers include Gitlab and GitHub Enterprise.
+For `--vcs-provider <vcs>`, supported providers include Gitlab (gitlab), GitHub Enterprise (GHE) and Bitbucker Server (bbs).
 
 **Caveats & implementation notes**
 
