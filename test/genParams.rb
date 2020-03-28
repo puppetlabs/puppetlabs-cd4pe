@@ -156,6 +156,12 @@ if provider == 'none'
   vcs_params = { 'vcs_config' => {} }
 elsif vcs_providers.include?(provider)
   vcs_params = extract_key_values(raw_json, eval('vcs_' + provider)) # rubocop:disable Security/Eval
+  if provider == 'GHE'
+    constructedCertificate = {
+      certificate: vcs_params['caCertificate'],
+    }
+    vcs_params['caCertificate'] = constructedCertificate
+  end
   vcs_params = { 'provider_specific' => vcs_params }
 else
   abort("Unrecognized vcs provider '#{provider}' specified")

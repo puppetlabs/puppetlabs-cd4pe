@@ -127,10 +127,9 @@ module PuppetX::Puppetlabs
         op = 'ConnectGitHubEnterprise'
       end
 
-      payload = {
-        op: op,
-        content: provider_specific,
-      }
+      payload = { op: op }
+      payload['content'] = provider_specific
+
       make_request(:post, "/#{workspace}/ajax", payload.to_json)
     end
 
