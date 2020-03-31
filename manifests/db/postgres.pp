@@ -8,6 +8,9 @@ class cd4pe::db::postgres(
   String $ip_mask_allow_all_users         = '0.0.0.0/0',
   String $ip_mask_allow_all_users_ssl     = '0.0.0.0/0',
   String $ipv6_mask_allow_all_users_ssl   = '::/0',
+  Array[String] $ssl_ciphers              = [ 'ECDHE-ECDSA-AES256-GCM-SHA384', 'ECDHE-RSA-AES256-GCM-SHA384', 'ECDHE-ECDSA-CHACHA20-POLY1305',
+                                              'ECDHE-RSA-CHACHA20-POLY1305', 'ECDHE-ECDSA-AES128-GCM-SHA256', 'ECDHE-RSA-AES128-GCM-SHA256',
+                                              'ECDHE-ECDSA-AES256-SHA384', 'ECDHE-RSA-AES256-SHA384', 'ECDHE-ECDSA-AES128-SHA256', 'ECDHE-RSA-AES128-SHA256' ],
 ) {
 
 
@@ -182,6 +185,10 @@ class cd4pe::db::postgres(
 
   pe_postgresql::server::config_entry { 'ssl' :
     value => 'on',
+  }
+
+  pe_postgresql::server::config_entry { 'ssl_ciphers':
+    value => pe_join($ssl_ciphers, ':'),
   }
 
   pe_postgresql::server::config_entry { 'ssl_ca_file' :
