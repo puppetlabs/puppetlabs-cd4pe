@@ -110,7 +110,9 @@ vcs_gitlab = {
 vcs_GHE = {
   'host'          => '.integrations.GithubEnterprise.host',
   'token'         => '.integrations.GithubEnterprise.token',
-  'caCertificate' => '.integrations.GithubEnterprise.caCertificate',
+  'caCertificate' => {
+    'certificate' => '.integrations.GithubEnterprise.caCertificate',
+  }
 }
 
 # for bbs
@@ -123,7 +125,9 @@ vcs_bbs = {
 
 def extract_key_values(_json_blob, the_keys)
   the_keys.each do |key, value|
-    the_keys[key] = eval('_json_blob' + value) # rubocop:disable Security/Eval
+    the_keys[key] = value.respond_to?(:to_hash) ?
+      extract_key_values(_json_blob, value) :
+      eval('_json_blob' + value) # rubocop:disable Security/Eval
   end
 end
 
@@ -164,12 +168,6 @@ if provider == 'none'
   vcs_params = { 'vcs_config' => {} }
 elsif vcs_providers.include?(provider)
   vcs_params = extract_key_values(raw_json, eval('vcs_' + provider)) # rubocop:disable Security/Eval
-  if provider == 'GHE'
-    constructedCertificate = {
-      certificate: vcs_params['caCertificate'],
-    }
-    vcs_params['caCertificate'] = constructedCertificate
-  end
   vcs_params = { 'provider_specific' => vcs_params }
 else
   abort("Unrecognized vcs provider '#{provider}' specified")
