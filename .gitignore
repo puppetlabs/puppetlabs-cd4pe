@@ -31,3 +31,5 @@ inventory.yaml
 /update_report.txt
 .DS_Store
 target/*
+test/params.json
+params.json
