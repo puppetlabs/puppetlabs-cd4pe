@@ -14,9 +14,9 @@ This was developed and tested using Ruby 2.4.1 (because thats what we use in Jen
 
 To specify the repo and version of the image to install, set the same environment vars as the build system, `CD4PE_IMAGE` and `CD4PE_VERSION`; the image repo defaults to `artifactory.delivery.puppetlabs.net/cd4pe-dev` and the currently supported database is `postgres`.
 
-No arguments are required. By default, it will create a VM using the disk object-store, not enable SSL and create a default user & workspace. To modify this behaviour, use the following switches (default values):
+No arguments are required. By default, it will create a VM using the Artifactory object-store, not enable SSL and create a default user & workspace. To modify this behaviour, use the following switches (default values):
 
-    -o|--object-store disk|artifactory|s3   specify the object-store (disk)
+    -o|--object-store disk|artifactory      specify the object-store (artifactory)
     -s|--ssl                                configure SSL (not configured)
     -p|--no-op-check                        disable the 1Password op tool sanity check (enabled)
     -b|--base <base>                        specify base name of workspace, email & username (otto)

@@ -2,11 +2,12 @@
 set -e
 
 function usage() {
-  echo "No arguments are required. By default, create a VM using the disk object-store,"
-  echo "not enable SSL and create a default user & workspace. To modify this behaviour,"
+  echo
+  echo "No arguments are required. By default, create a VM using the Artifactory object-store,"
+  echo "not enable SSL, create a default user & workspace, and no VCS. To modify this behaviour,"
   echo "use the following switches (default values):"
   echo
-  echo "  -o|--object-store disk|artifactory|s3   specify the object-store (${objectStorageType})"
+  echo "  -o|--object-store disk|artifactory      specify the object-store (${objectStorageType})"
   echo "  -s|--ssl                                configure SSL (${sslEnabled})"
   echo "  -p|--no-op-check                        disable the 1Password op tool sanity check (enabled)"
   echo "  -b|--base <base>                        specify base name of workspace, email & username (${baseName})"
@@ -53,7 +54,7 @@ function opStatusCheck() {
 CD4PE_IMAGE=${CD4PE_IMAGE:-artifactory.delivery.puppetlabs.net/cd4pe-dev}
 [ -z "${CD4PE_VERSION}" ] && { echo "Please export CD4PE_VERSION to the desired version on Artifactory"; exit 1; }
 
-objectStorageType="disk"
+objectStorageType="artifactory"
 sslEnabled="disabled"
 baseName="otto"
 vcsProvider="none"
@@ -94,6 +95,7 @@ while (( "$#" )); do
       ;;
     -*|--*=) # unsupported flags
       echo "Error: Unsupported flag $1" >&2
+      usage
       exit 1
       ;;
     *) # preserve positional arguments

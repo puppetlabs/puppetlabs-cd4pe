@@ -6,7 +6,7 @@ require 'set'
 usage = "
 Usage => genParams.rb <storageType> <enableSSL> <ssl_endpoint> <workspace_root> <provider>
   where <storageType> is one of
-  'disk', 's3', or 'artifactory'
+  'disk' or 'artifactory'
 
   <enableSSL> is 'enabled' and requires
   <ssl_endpoint> to be set to a valid FQDN
@@ -141,9 +141,13 @@ raw_json = JSON.parse(`op get item cdpe-workflow-tests-config.json | jq -r '.det
 case object_storage_type
 when 'disk'
   storage_params = {}
-when 's3'
-  storage_params = extract_key_values(raw_json, storage_s3)
-  storage_params = [*s3_constants, *storage_params].to_h
+#
+# disabling until we determine how make s3 access frictionless
+#
+# when 's3'
+#   storage_params = extract_key_values(raw_json, storage_s3)
+#   storage_params = [*s3_constants, *storage_params].to_h
+#
 when 'artifactory'
   storage_params = extract_key_values(raw_json, storage_artifactory)
   storage_params = [*artifactory_constants, *storage_params].to_h
