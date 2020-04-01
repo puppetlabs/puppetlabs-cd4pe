@@ -32,8 +32,8 @@ For `--vcs-provider <vcs>`, supported providers include Gitlab (gitlab), GitHub 
 
 **Caveats & implementation notes**
 
-This script will create local `inventory.yaml` and `params.json` files in the `.../puppetlabs-cd4pe/test` directory, and remove any existing ones. The `inventory.yaml` file is left for further bolt runs; the `params.json` file contains sensitive information and is removed upon a successful run.
+This script will create local `inventory.yaml` and `params.json` files, and remove any existing ones. The `../inventory.yaml` file is left for further bolt runs; the `params.json` file contains sensitive information and is removed upon a successful run.
 
-In order to get a current version of the puppetlabs-cd4pe module, it pulls from the `master` branch in Github. This can be overidden by pointing the environment variable `DEV_BRANCH` to the desired branch name.
+This uses the dev version of the puppetlabs-cd4pe module; in other words, it runs what you are currently working on.
 
 BOLT 2.x is required.

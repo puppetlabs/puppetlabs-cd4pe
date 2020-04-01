@@ -13,21 +13,6 @@ function usage() {
   echo "  -v|--vcs-provider <vcs>                 specify the VCS provider (${vcsProvider})"
 }
 
-function install_module() {
-  local __result=${1}
-  local tmpdir=$(mktemp -d)
-  mkdir -p ${tmpdir}/Boltdir
-  cat <<! >${tmpdir}/Boltdir/Puppetfile
-# forge
-# mod 'puppetlabs-cd4pe', '1.4.1'
-
-# git
-mod 'puppetlabs-cd4pe', git: 'git@github.com:puppetlabs/puppetlabs-cd4pe.git', ref: '${DEV_BRANCH:-master}'
-!
-  (cd ${tmpdir}; bolt --modulepath . puppetfile install)
-  eval ${__result}="'$tmpdir'"
-}
-
 function waitUntilCd4peUp() {
   attempt_counter=0
   max_attempts=60
@@ -124,9 +109,8 @@ set +e
   [ -z "${skipPoCheck}" ] && opStatusCheck
 set -e
 
-install_module moduledir
+moduledir='..'
 
-# TODO: make cleanup an option?
 rm -f ../inventory.yaml
 bundle exec rake "test:install:cd4pe:module[${CD4PE_IMAGE},${CD4PE_VERSION}]"
 
@@ -135,9 +119,8 @@ waitUntilCd4peUp ${target}
 
 ./genParams.rb ${objectStorageType} ${sslEnabled} ${target} ${baseName} ${vcsProvider}
 
-bolt plan run --targets all --modulepath ${moduledir}/cd4pe/spec/fixtures/modules:${moduledir} --inventoryfile ../inventory.yaml cd4pe_test_tasks::configure_test_vm --params @params.json
+bolt plan run --targets all --modulepath ${moduledir}/spec/fixtures/modules:${moduledir} --inventoryfile ../inventory.yaml cd4pe_test_tasks::configure_test_vm --params @params.json
 
-# TODO: make cleanup an option?
 rm -f params.json
 
 echo
