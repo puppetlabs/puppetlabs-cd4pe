@@ -9,7 +9,6 @@ function usage() {
   echo
   echo "  -o|--object-store disk|artifactory      specify the object-store (${objectStorageType})"
   echo "  -s|--ssl                                configure SSL (${sslEnabled})"
-  echo "  -p|--no-op-check                        disable the 1Password op tool sanity check (enabled)"
   echo "  -b|--base <base>                        specify base name of workspace, email & username (${baseName})"
   echo "  -v|--vcs-provider <vcs>                 specify the VCS provider (${vcsProvider})"
 }
@@ -38,21 +37,13 @@ function yaml2json() {
   ruby -ryaml -rjson -e 'puts JSON.pretty_generate(YAML.load(ARGF))' $*
 }
 
-function opStatusCheck() {
-  opStatus=$(op confirm --all 2>&1)
-  if [ ! $? == 0 ]; then
-    echo "Issue with 'op' utility. Have you started a session?"
-    echo
-    echo "${opStatus}"
-    exit 1
-  fi
-}
-
 # main
 #
 
 CD4PE_IMAGE=${CD4PE_IMAGE:-artifactory.delivery.puppetlabs.net/cd4pe-dev}
 [ -z "${CD4PE_VERSION}" ] && { echo "Please export CD4PE_VERSION to the desired version on Artifactory"; exit 1; }
+
+[ ! -r ${HOME}/.cdpe-workflow-tests-config.json ] && { echo "Please put ~/.cdpe-workflow-tests-config.json in place from 1Password" >&2; exit 1; }
 
 objectStorageType="artifactory"
 sslEnabled="disabled"
@@ -106,10 +97,6 @@ while (( "$#" )); do
 done
 # set positional arguments
 eval set -- "$PARAMS"
-
-set +e
-  [ -z "${skipPoCheck}" ] && opStatusCheck
-set -e
 
 moduledir='..'
 

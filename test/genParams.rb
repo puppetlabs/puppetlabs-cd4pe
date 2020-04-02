@@ -134,8 +134,8 @@ end
 # main
 #
 
-# TODO: check exit status from x%(); parameterize secret object being fetched?
-raw_json = JSON.parse(`op get item cdpe-workflow-tests-config.json | jq -r '.details.notesPlain'`.delete('`'), object_class: OpenStruct)
+raw_json = JSON.parse(File.read("#{Dir.home}/.cdpe-workflow-tests-config.json"),
+                      object_class: OpenStruct)
 
 # storage type
 case object_storage_type

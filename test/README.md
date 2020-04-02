@@ -2,7 +2,7 @@
 
 This tooling configures object storage, can enable SSL, creates a default user and workspace, and can set up a VCS for a freshly provisioned CD4PE VMs. It also creates the root account and sets a trial license.
 
-Use of this script requires local installation of the 1Password `op` utility, here: https://support.1password.com/command-line-getting-started/, and full docs are here: https://support.1password.com/command-line/
+Use of this script requires a local copy of the `.cdpe-workflow-tests-config.json` file, which you can get from 1Password, and save it in your ${HOME} directory.
 
 **Environmental setup**
 
@@ -18,13 +18,8 @@ No arguments are required. By default, it will create a VM using the Artifactory
 
     -o|--object-store disk|artifactory      specify the object-store (artifactory)
     -s|--ssl                                configure SSL (not configured)
-    -p|--no-op-check                        disable the 1Password op tool sanity check (enabled)
     -b|--base <base>                        specify base name of workspace, email & username (otto)
     -v|--vcs-provider <vcs>                 specify the VCS provider (none)
-
-For `--no-op-check`, the `op` tool uses a 30 minute token, and occasionally gets confused when checking token status; this short-circuits the check, but a valid token is still required for the tool itself to work. You can create the following Bash alias to make it simpler to re-up the token:
-
-    alias optoken='eval $(op signin puppet)'
 
 For `--base <base>`, the default names are `<base>@example.com`, `<base>_ws` and `<base>` (email, workspace, username).
 
