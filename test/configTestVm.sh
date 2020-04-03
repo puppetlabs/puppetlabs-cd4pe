@@ -1,19 +1,16 @@
 #!/usr/bin/env bash
 set -e
 
-function install_module() {
-  local __result=${1}
-  local tmpdir=$(mktemp -d)
-  mkdir -p ${tmpdir}/Boltdir
-  cat <<! >${tmpdir}/Boltdir/Puppetfile
-# forge
-# mod 'puppetlabs-cd4pe', '1.4.1'
-
-# git
-mod 'puppetlabs-cd4pe', git: 'git@github.com:puppetlabs/puppetlabs-cd4pe.git', ref: '${DEV_BRANCH:-master}'
-!
-  (cd ${tmpdir}; bolt --modulepath . puppetfile install)
-  eval ${__result}="'$tmpdir'"
+function usage() {
+  echo
+  echo "No arguments are required. By default, create a VM using the Artifactory object-store,"
+  echo "not enable SSL, create a default user & workspace, and no VCS. To modify this behaviour,"
+  echo "use the following switches (default values):"
+  echo
+  echo "  -o|--object-store disk|artifactory      specify the object-store (${objectStorageType})"
+  echo "  -s|--ssl                                configure SSL (${sslEnabled})"
+  echo "  -b|--base <base>                        specify base name of workspace, email & username (${baseName})"
+  echo "  -v|--vcs-provider <vcs>                 specify the VCS provider (${vcsProvider})"
 }
 
 function waitUntilCd4peUp() {
@@ -40,21 +37,18 @@ function yaml2json() {
   ruby -ryaml -rjson -e 'puts JSON.pretty_generate(YAML.load(ARGF))' $*
 }
 
-function poStatusCheck() {
-  poStatus=$(op confirm --all 2>&1)
-  if [ ! $? == 0 ]; then
-    echo "Issue with 'op' utility. Have you started a session?"
-    echo
-    echo "${poStatus}"
-    exit 1
-  fi
-}
-
 # main
 #
 
 CD4PE_IMAGE=${CD4PE_IMAGE:-artifactory.delivery.puppetlabs.net/cd4pe-dev}
 [ -z "${CD4PE_VERSION}" ] && { echo "Please export CD4PE_VERSION to the desired version on Artifactory"; exit 1; }
+
+[ ! -r ${HOME}/.cdpe-workflow-tests-config.json ] && { echo "Please put ~/.cdpe-workflow-tests-config.json in place from 1Password" >&2; exit 1; }
+
+objectStorageType="artifactory"
+sslEnabled="disabled"
+baseName="otto"
+vcsProvider="none"
 
 ## most parameters are qualified by the genParams.rb script, not in here
 ## derived from https://medium.com/@Drew_Stokes/bash-argument-parsing-54f3b81a6a8f
@@ -70,7 +64,7 @@ while (( "$#" )); do
       sslEnabled="enabled"
       shift
       ;;
-    -p|--no-po-check)
+    -p|--no-op-check)
       skipPoCheck="true"
       shift
       ;;
@@ -78,12 +72,21 @@ while (( "$#" )); do
       baseName="$2"
       shift 2
       ;;
+    -v|--vcs-provider)
+      vcsProvider="$2"
+      shift 2
+      ;;
+    -h|--help)
+      usage
+      exit 1
+      ;;
     --) # end argument parsing
       shift
       break
       ;;
     -*|--*=) # unsupported flags
       echo "Error: Unsupported flag $1" >&2
+      usage
       exit 1
       ;;
     *) # preserve positional arguments
@@ -95,24 +98,19 @@ done
 # set positional arguments
 eval set -- "$PARAMS"
 
-set +e
-  [ -z "${skipPoCheck}" ] && poStatusCheck
-set -e
+moduledir='..'
 
-install_module moduledir
-
-# TODO: make cleanup an option?
 rm -f ../inventory.yaml
 bundle exec rake "test:install:cd4pe:module[${CD4PE_IMAGE},${CD4PE_VERSION}]"
 
 target=$(yaml2json ../inventory.yaml | jq -r '.groups[1].targets[0].uri')
 waitUntilCd4peUp ${target}
 
-./genParams.rb ${objectStorageType:-disk} ${sslEnabled:-disabled} ${target} ${baseName:-otto}
+./genParams.rb ${objectStorageType} ${sslEnabled} ${target} ${baseName} ${vcsProvider}
 
-bolt plan run --targets all --modulepath ${moduledir}/cd4pe/spec/fixtures/modules:${moduledir} --inventoryfile ../inventory.yaml cd4pe_test_tasks::configure_test_vm --params @params.json
+bolt plan run --targets all --modulepath ${moduledir}/spec/fixtures/modules:${moduledir} --inventoryfile ../inventory.yaml cd4pe_test_tasks::configure_test_vm --params @params.json
 
-# TODO: make cleanup an option?
 rm -f params.json
 
+echo
 echo "Your VM is available at http://${target}:8080 with a login of ${baseName:-otto}@example.com and the usual password :)"

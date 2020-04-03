@@ -1,0 +1,28 @@
+{
+  "description": "Adds a VCS provider in CD4PE.",
+  "parameters": {
+    "email": {
+      "type": "String[1]",
+      "description": "The email address associated with the Continuous Delivery for PE account."
+    },
+    "password": {
+      "type": "String[1]",
+      "sensitive": true,
+      "description": "The password associated with the account."
+    },
+    "provider": {
+      "type": "String[1]",
+      "description": "The name of the provider to configure."
+    },
+    "workspace": {
+      "type": "String[1]",
+      "description": "The workspace to be configured."
+    },
+    "provider_specific": {
+      "type": "Hash",
+      "description": "The set of provider specific parameters."
+    }
+  },
+  "files": ["cd4pe/lib/"],
+  "input_method": "stdin"
+}
