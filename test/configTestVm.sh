@@ -8,8 +8,7 @@ docker pull $test_image
 
 docker run -ti --rm \
        --volume "$PWD"/..:/app \
-       --volume "$HOME"/.ssh:/root/.ssh \
-       --env SSH_KEY="$ssh_key" \
+       --volume "$HOME"/.ssh/$ssh_key:/root/.ssh/ssh_key \
        --env CD4PE_IMAGE="$CD4PE_IMAGE" \
        --env CD4PE_VERSION="$CD4PE_VERSION" \
        $test_image \
