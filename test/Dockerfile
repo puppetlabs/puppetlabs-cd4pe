@@ -3,10 +3,11 @@ RUN apt-get update && \
     apt-get install -y jq && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
+ENV SSH_KEY id_rsa
 RUN { \
     echo "#!/bin/bash"; \
     echo "eval \$(ssh-agent) >/dev/null"; \
-    echo "ssh-add /root/.ssh/id_rsa"; \
+    echo "ssh-add /root/.ssh/\$SSH_KEY"; \
     echo "exec \"\$@\""; \
     } > /entrypoint.sh && chmod 755 /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]
