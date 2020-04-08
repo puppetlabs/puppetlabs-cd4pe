@@ -2,7 +2,7 @@
 
 This tooling configures object storage, can enable SSL, creates a default user and workspace, and can set up a VCS for a freshly provisioned CD4PE VMs. It also creates the root account and sets a trial license.
 
-Use of this script requires a local copy of the `.cdpe-workflow-tests-config.json` file, which you can get from 1Password, and save it in your ${HOME} directory.
+Use of the `configTestVm.sh` script requires nothing but Docker. By default your `~/.ssh/id_rsa` SSH key will be used to clone dependencies from private GitHub repositories, but a different key can be specified.
 
 **Environmental setup**
 
@@ -13,6 +13,8 @@ This was developed and tested using Ruby 2.4.1 (because thats what we use in Jen
     ./configTestVm.sh
 
 To specify the repo and version of the image to install, set the same environment vars as the build system, `CD4PE_IMAGE` and `CD4PE_VERSION`; the image repo defaults to `artifactory.delivery.puppetlabs.net/cd4pe-dev` and the currently supported database is `postgres`.
+
+To use a different SSH key other than `id_rsa`, set the `SSH_KEY` environment variable to the appropriate file under your ~/.ssh directory. For example, `SSH_KEY=id_dsa ./configTestVm.sh`.
 
 No arguments are required. By default, it will create a VM using the Artifactory object-store, not enable SSL and create a default user & workspace. To modify this behaviour, use the following switches (default values):
 
