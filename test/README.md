@@ -27,6 +27,15 @@ For `--base <base>`, the default names are `<base>@example.com`, `<base>_ws` and
 
 For `--vcs-provider <vcs>`, supported providers include Gitlab (gitlab), GitHub Enterprise (GHE) and Bitbucker Server (bbs).
 
+**Troubleshooting**
+
+If you get an error from Ruby/Bundler like:
+
+    Could not find tzinfo-1.2.6 in any of the sources
+    Run `bundle install` to install missing gems.
+
+You need to remove the `Gemfile.lock` from the root of the repository.
+
 **Caveats & implementation notes**
 
 This script will create local `inventory.yaml` and `params.json` files, and remove any existing ones. The `../inventory.yaml` file is left for further bolt runs; the `params.json` file contains sensitive information and is removed upon a successful run.

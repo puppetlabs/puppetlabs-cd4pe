@@ -3,11 +3,13 @@ RUN apt-get update && \
     apt-get install -y jq && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
-ENV SSH_KEY id_rsa
+RUN mkdir -p /root/.ssh && \
+    echo "StrictHostKeyChecking no" > /root/.ssh/config
+
 RUN { \
     echo "#!/bin/bash"; \
     echo "eval \$(ssh-agent) >/dev/null"; \
-    echo "ssh-add /root/.ssh/\$SSH_KEY"; \
+    echo "ssh-add /root/.ssh/ssh_key"; \
     echo "exec \"\$@\""; \
     } > /entrypoint.sh && chmod 755 /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]
