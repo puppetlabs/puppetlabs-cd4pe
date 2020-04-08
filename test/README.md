@@ -2,7 +2,7 @@
 
 This tooling configures object storage, can enable SSL, creates a default user and workspace, and can set up a VCS for a freshly provisioned CD4PE VMs. It also creates the root account and sets a trial license.
 
-Use of this script requires a local copy of the `.cdpe-workflow-tests-config.json` file, which you can get from 1Password, and save it in your ${HOME} directory.
+Use of the `configTestVm.sh` script requires nothing but Docker. Your `~/.ssh/id_rsa` SSH key will be used to clone dependencies from private GitHub repositories.
 
 **Environmental setup**
 
