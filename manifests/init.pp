@@ -25,6 +25,14 @@ class cd4pe (
   if ( $facts['os']['family'] == 'RedHat' and $facts['os']['release']['major'] == '8' ){
     fail('You cannot use the cd4pe module to install on EL 8')
   }
+
+  $compiling_server_osfamily = cd4pe::compiling_server_osfamily()
+  $compiling_server_operatingsystemmajrelease = cd4pe::compiling_server_operatingsystemmajrelease()
+  if ( $compiling_server_osfamily != $facts['os']['family'] or
+      $compiling_server_operatingsystemmajrelease != $facts['os']['release']['major']){
+    fail("The PE Master OS '${compiling_server_osfamily} ${compiling_server_operatingsystemmajrelease}' must match the cd4pe agent node OS '${facts['os']['family']} ${facts['os']['release']['major']}'")
+  }
+
   # Restrict to linux only?
   include docker
   include cd4pe::anchors
