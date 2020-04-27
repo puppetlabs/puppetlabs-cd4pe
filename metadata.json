@@ -10,7 +10,7 @@
   "dependencies": [
     {
       "name": "puppetlabs-stdlib",
-      "version_requirement": ">= 4.19.0 < 6.0.0"
+      "version_requirement": ">= 4.19.0 < 7.0.0"
     },
     {
       "name": "puppetlabs-puppet_authorization",
@@ -19,10 +19,6 @@
     {
       "name":"puppetlabs-docker",
       "version_requirement": ">= 3.0.0 < 4.0.0"
-    },
-    {
-      "name": "puppetlabs-pipelines",
-      "version_requirement": ">= 1.0.1 < 2.0.0"
     },
     {
       "name":"puppetlabs-hocon",
