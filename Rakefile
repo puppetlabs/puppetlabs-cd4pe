@@ -258,6 +258,9 @@ namespace :test do
           targets = nil
         end
 
+        # Facter override for osfamily, since we are testing against a Centos agent
+        ENV['FACTER_osfamily'] = 'RedHat'
+        ENV['FACTER_operatingsystemmajrelease'] = '7'
         if targets.nil? or targets.empty?
           Rake::Task['litmus:provision'].invoke('vmpooler', 'centos-7-x86_64')
           inventory_hash = inventory_hash_from_inventory_file
