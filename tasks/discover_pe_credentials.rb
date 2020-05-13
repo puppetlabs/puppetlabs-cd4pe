@@ -15,6 +15,7 @@ pe_username              = params['pe_username']
 pe_password              = params['pe_password']
 pe_token                 = params['pe_token']
 pe_console_host          = params['pe_console_host']
+workspace                = params['workspace']
 
 require_relative File.join(params['_installdir'], 'cd4pe', 'lib', 'puppet_x', 'puppetlabs', 'cd4pe_client')
 
@@ -27,7 +28,7 @@ exitcode = 0
 result = {}
 begin
   client = PuppetX::Puppetlabs::CD4PEClient.new(web_ui_endpoint, username, password)
-  res = client.discover_pe_credentials(creds_name, pe_username, pe_password, pe_token, pe_console_host)
+  res = client.discover_pe_credentials(workspace, creds_name, pe_username, pe_password, pe_token, pe_console_host)
   if res.code != '200'
     raise "Error while discovering Puppet Enterprise credentials: #{res.body}"
   end
