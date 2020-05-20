@@ -35,7 +35,7 @@ group :acceptance_tests do
 end
 
 puppet_version = ENV['PUPPET_GEM_VERSION']
-facter_version = ENV['FACTER_GEM_VERSION']
+facter_version = ENV['FACTER_GEM_VERSION'] || '2.5.7'
 hiera_version = ENV['HIERA_GEM_VERSION']
 
 gems = {}
