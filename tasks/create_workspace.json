@@ -17,6 +17,10 @@
     "workspace": {
       "type": "String[1]",
       "description": "Designates the workspace to be created."
+    },
+    "resolvable_hostname": {
+      "type": "Optional[String[1]]",
+      "description": "A resolvable internet address where the Continuous Delivery for PE server can be reached. Required only if the agent certificate is not the machine's resolvable internet address."
     }
   },
   "files": ["cd4pe/lib/"],
