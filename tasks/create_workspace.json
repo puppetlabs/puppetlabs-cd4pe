@@ -21,6 +21,10 @@
     "resolvable_hostname": {
       "type": "Optional[String[1]]",
       "description": "A resolvable internet address where the Continuous Delivery for PE server can be reached. Required only if the agent certificate is not the machine's resolvable internet address."
+    },
+    "web_ui_endpoint": {
+      "type": "Optional[String[1]]",
+      "description": "The endpoint where the web UI can be reached, in the form http://<resolvable_hostname>:<port>. Required if you set the web_ui_port parameter in the cd4pe class during installation."
     }
   },
   "files": ["cd4pe/lib/"],
