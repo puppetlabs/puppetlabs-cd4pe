@@ -3,6 +3,7 @@ class cd4pe (
   Boolean $analytics                                          = true,
   Optional[Integer[1]] $puppetdb_connection_timeout_sec       = undef,
   Integer $backend_service_port                               = 8000,
+  Integer $query_service_port                                 = 8888,
   Array[String] $cd4pe_docker_extra_params                    = [],
   String $cd4pe_image                                         = 'puppet/continuous-delivery-for-puppet-enterprise',
   Variant[Enum['latest','3.x'], String] $cd4pe_version        = '3.x',
@@ -123,6 +124,7 @@ class cd4pe (
     "${web_ui_ssl_port}:8443",
     "${web_ui_port}:8080",
     "${backend_service_port}:8000",
+    "${query_service_port}:8888",
     "${agent_service_port}:7000",
   ]
 
