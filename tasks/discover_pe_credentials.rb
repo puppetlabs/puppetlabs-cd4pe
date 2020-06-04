@@ -10,6 +10,7 @@ params = JSON.parse(STDIN.read)
 hostname                 = params['resolvable_hostname'] || Puppet[:certname]
 username                 = params['email']
 password                 = params['password']
+workspace                = params['workspace']
 creds_name               = params['creds_name']
 pe_username              = params['pe_username']
 pe_password              = params['pe_password']
@@ -27,7 +28,7 @@ exitcode = 0
 result = {}
 begin
   client = PuppetX::Puppetlabs::CD4PEClient.new(web_ui_endpoint, username, password)
-  res = client.discover_pe_credentials(creds_name, pe_username, pe_password, pe_token, pe_console_host)
+  res = client.discover_pe_credentials(workspace, creds_name, pe_username, pe_password, pe_token, pe_console_host)
   if res.code != '200'
     raise "Error while discovering Puppet Enterprise credentials: #{res.body}"
   end
