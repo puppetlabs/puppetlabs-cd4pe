@@ -12,6 +12,7 @@ username                 = params['email']
 password                 = params['password']
 workspace                = params['workspace']
 creds_name               = params['creds_name']
+token_lifetime           = params['token_lifetime'] || '180d'
 pe_username              = params['pe_username']
 pe_password              = params['pe_password']
 pe_token                 = params['pe_token']
@@ -28,7 +29,7 @@ exitcode = 0
 result = {}
 begin
   client = PuppetX::Puppetlabs::CD4PEClient.new(web_ui_endpoint, username, password)
-  res = client.discover_pe_credentials(workspace, creds_name, pe_username, pe_password, pe_token, pe_console_host)
+  res = client.discover_pe_credentials(workspace, creds_name, pe_username, pe_password, pe_token, pe_console_host, token_lifetime)
   if res.code != '200'
     raise "Error while discovering Puppet Enterprise credentials: #{res.body}"
   end

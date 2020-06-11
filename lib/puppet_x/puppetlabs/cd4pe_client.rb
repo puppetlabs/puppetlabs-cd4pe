@@ -182,7 +182,7 @@ module PuppetX::Puppetlabs
       make_request(:post, ROOT_AJAX_ENDPOINT, payload.to_json)
     end
 
-    def discover_pe_credentials(workspace, creds_name, pe_username, pe_password, pe_token, pe_console_host)
+    def discover_pe_credentials(workspace, creds_name, pe_username, pe_password, pe_token, pe_console_host, token_lifetime)
       payload = {
         op: 'DiscoverPuppetEnterpriseCredentials',
         content: {
@@ -191,6 +191,7 @@ module PuppetX::Puppetlabs
           username: pe_username,
           password: pe_password,
           token: pe_token,
+          lifetime: token_lifetime,
           puppetServerCertificate: '',
           puppetServerEndpoint: '',
           puppetServerPrivateKey: '',
