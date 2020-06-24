@@ -1,6 +1,6 @@
 {
   "name": "puppetlabs-cd4pe",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "author": "Puppet Labs",
   "summary": "Module for CD4PE 2.x and 3.x",
   "license": "Apache-2.0",
