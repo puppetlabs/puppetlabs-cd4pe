@@ -13,6 +13,7 @@ password                 = params['password']
 repo_branch              = params['repo_branch']
 repo_name                = params['repo_name']
 pipeline_type            = params['pipeline_type']
+workspace                = params['workspace']
 
 require_relative File.join(params['_installdir'], 'cd4pe', 'lib', 'puppet_x', 'puppetlabs', 'cd4pe_client')
 
