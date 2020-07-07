@@ -25,7 +25,7 @@ fixtures:
         ref: origin/master
     pe_xl:
         repo: "git@github.com:reidmv/reidmv-pe_xl.git"
-        ref: origin/master
+        ref: origin/main
     provision:
         repo: "git@github.com:puppetlabs/provision.git"
         ref: origin/master
