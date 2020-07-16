@@ -1,6 +1,7 @@
 class cd4pe (
   Integer $agent_service_port                                 = 7000,
   Boolean $analytics                                          = true,
+  Boolean $enable_repo_caching                                = false,
   Optional[Integer[1]] $puppetdb_connection_timeout_sec       = undef,
   Integer $backend_service_port                               = 8000,
   Integer $query_service_port                                 = 8888,
@@ -107,8 +108,9 @@ class cd4pe (
   }
 
   $app_data = {
-    analytics                        => $analytics,
+    analytics                       => $analytics,
     puppetdb_connection_timeout_sec => $puppetdb_connection_timeout_sec,
+    enable_repo_caching             => $enable_repo_caching,
   }
 
   $app_env_path = "${data_root_dir}/env"
