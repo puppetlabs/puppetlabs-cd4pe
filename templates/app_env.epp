@@ -1,8 +1,10 @@
 <%- |
       Boolean $analytics,
       Optional[Integer[1]] $puppetdb_connection_timeout_sec,
+      Boolean $enable_repo_caching,
 | -%>
 ANALYTICS=<%= $analytics %>
 <% if($puppetdb_connection_timeout_sec) { -%>
 PUPPETDB_CONNECTION_TIMEOUT_SEC=<%= $puppetdb_connection_timeout_sec %>
 <% } -%>
+CD4PE_ENABLE_REPO_CACHING=<%= $enable_repo_caching %>
