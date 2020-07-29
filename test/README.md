@@ -2,7 +2,7 @@
 
 This tooling configures object storage, can enable SSL, creates a default user and workspace, and can set up a VCS for a freshly provisioned CD4PE VMs. It also creates the root account and sets a trial license.
 
-Use of the `configTestVm.sh` script requires nothing but Docker. By default your `~/.ssh/id_rsa` SSH key will be used to clone dependencies from private GitHub repositories, but a different key can be specified.
+Use of the `configTestVm.sh` script requires a local copy of the `.cdpe-workflow-tests-config.json` file, which you can get from 1Password, and save it in your $HOME directory.
 
 **Environmental setup**
 
@@ -26,15 +26,6 @@ No arguments are required. By default, it will create a VM using the Artifactory
 For `--base <base>`, the default names are `<base>@example.com`, `<base>_ws` and `<base>` (email, workspace, username).
 
 For `--vcs-provider <vcs>`, supported providers include Gitlab (gitlab), GitHub Enterprise (GHE) and Bitbucker Server (bbs).
-
-**Troubleshooting**
-
-If you get an error from Ruby/Bundler like:
-
-    Could not find tzinfo-1.2.6 in any of the sources
-    Run `bundle install` to install missing gems.
-
-You need to remove the `Gemfile.lock` from the root of the repository.
 
 **Caveats & implementation notes**
 
