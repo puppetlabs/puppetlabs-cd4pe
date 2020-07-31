@@ -28,11 +28,11 @@ class cd4pe (
     fail('You cannot use the cd4pe module to install on EL 8')
   }
 
-  $compiling_server_osfamily = cd4pe::compiling_server_osfamily()
+  $compiling_server_osname = cd4pe::compiling_server_osname()
   $compiling_server_operatingsystemmajrelease = cd4pe::compiling_server_operatingsystemmajrelease()
-  if ( $compiling_server_osfamily != $facts['os']['family'] or
+  if ( $compiling_server_osname != $facts['os']['name'] or
       $compiling_server_operatingsystemmajrelease != $facts['os']['release']['major']){
-    fail("The PE Master OS '${compiling_server_osfamily} ${compiling_server_operatingsystemmajrelease}' must match the cd4pe agent node OS '${facts['os']['family']} ${facts['os']['release']['major']}'")
+    fail("The PE Master OS '${compiling_server_osname} ${compiling_server_operatingsystemmajrelease}' must match the cd4pe agent node OS '${facts['os']['name']} ${facts['os']['release']['major']}'")
   }
 
   # Restrict to linux only?
