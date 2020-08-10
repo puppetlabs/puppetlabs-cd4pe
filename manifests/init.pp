@@ -1,3 +1,8 @@
+# @summary Init class for puppetlabs-cd4pe. As of version 3.0.0, installation and configuration of CD4PE 
+#   and its parts are no longer supported, this module only serves to configure Impact Analysis on PE and cleanup older CD4PE installations.
+# @param cleanup
+#   When set to true, runs through all resources created by the cd4pe module (version < 2.0.1) and makes sure
+#   they are no longer present.
 class cd4pe (
   Integer $agent_service_port                                 = 7000,
   Boolean $analytics                                          = true,
@@ -22,6 +27,7 @@ class cd4pe (
   Integer $web_ui_ssl_port                                    = 8443,
   Optional[String[1]] $cd4pe_network_subnet                   = undef,
   Optional[String[1]] $cd4pe_network_gateway                  = undef,
+  Boolean $cleanup                                            = false,
 ){
 
   if ( $facts['os']['family'] == 'RedHat' and $facts['os']['release']['major'] == '8' ){
@@ -37,33 +43,11 @@ class cd4pe (
 
   # Restrict to linux only?
   include docker
-  include cd4pe::anchors
+
+  warning('Beginning with version 3.0.0 of this module, we no longer support the installation of CD4PE or management of databases.')
 
   $data_root_dir = '/etc/puppetlabs/cd4pe'
 
-  file { $data_root_dir:
-    ensure => directory,
-    owner  => 'root',
-    group  => 'root',
-    mode   => '0700',
-  }
-
-  $secret_key = cd4pe::secret_key()
-  $secret_key_path = "${data_root_dir}/secret_key"
-  file { $secret_key_path:
-    ensure  => file,
-    owner   => 'root',
-    group   => 'root',
-    content => Sensitive("PFI_SECRET_KEY=${secret_key}\n"),
-    replace => false,
-  }
-
-  # DEPRECATED: 'dynamodb' and 'mysql' db_providers
-  # As part of our effort to streamline the installation process and ensure Continuous Delivery for PE meets
-  # performance standards, support for MySQL and Amazon DynamoDB external databases is deprecated in
-  # Continuous Delivery for PE version 3.1.0, and will be removed in a future release. 
-  # Before support ends, we'll provide information about how to migrate your external database to a supported option.
-  #
   if $manage_database  {
     if $db_provider == undef {
       # Check if the customer is using a mysql db from a previous install
@@ -83,96 +67,146 @@ class cd4pe (
     }
   }
 
-  if $effective_db_provider == 'mysql'  {
-    $net = 'cd4pe'
-    docker_network {$net:
-      ensure  => present,
-      subnet  => $cd4pe_network_subnet,
-      gateway => $cd4pe_network_gateway,
+  if($cleanup) {
+    debug('Doing cleanup of CD4PE resources.')
+
+    file { [$data_root_dir,
+            "${data_root_dir}/secret_key",
+            "${data_root_dir}/env",
+            "${data_root_dir}/cd4pe_db_password",
+            "${data_root_dir}/db_env"] :
+      ensure => absent,
     }
-  } else {
-    $net = 'bridge'
-  }
+    if($effective_db_provider == 'mysql'){
+      docker_network { 'cd4pe':
+        ensure  => absent,
+        subnet  => $cd4pe_network_subnet,
+        gateway => $cd4pe_network_gateway,
+      }
 
-  class { 'cd4pe::db':
-    data_root_dir         => $data_root_dir,
-    db_host               => $db_host,
-    db_name               => $db_name,
-    db_pass               => $db_pass,
-    db_port               => $db_port,
-    db_prefix             => $db_prefix,
-    db_user               => $db_user,
-    db_provider           => $db_provider,
-    effective_db_provider => $effective_db_provider,
-    manage_database       => $manage_database,
-  }
+      file{["${data_root_dir}/mysql_password", "${data_root_dir}/mysql_env"]:
+        ensure => absent,
+      }
 
-  $app_data = {
-    analytics                       => $analytics,
-    puppetdb_connection_timeout_sec => $puppetdb_connection_timeout_sec,
-    enable_repo_caching             => $enable_repo_caching,
-  }
+      if($db_host == undef){
+        $host = 'cd4pe_mysql'
+      } else {
+        $host = $db_host
+      }
 
-  $app_env_path = "${data_root_dir}/env"
-  file { $app_env_path:
-    ensure    => file,
-    owner     => 'root',
-    group     => 'root',
-    show_diff => false,
-    content   => epp('cd4pe/app_env.epp', $app_data),
-  }
+      # docker::run { $host:
+      #   ensure => absent
+      # }
+    } elsif($effective_db_provider == 'postgres'){
+      $pgsqldir    = '/opt/puppetlabs/server/data/postgresql'
+      $pg_version   = '9.6'
+      $pgsql_data_dir = "${pgsqldir}/${pg_version}/data"
+      $certname           = $trusted['certname']
+      $cert_dir           = "${cd4pe::db::data_root_dir}/certs"
+      $target_ca_cert     = "${cert_dir}/ca.pem"
+      $target_client_cert = "${cert_dir}/client_cert.pem"
+      $pk8_file           = "${cert_dir}/client_private_key.pk8"
+      $ssl_db_env         = "${cd4pe::db::data_root_dir}/ssl_db_env"
+      $pg_ident_conf_path = "${pgsql_data_dir}/pg_ident.conf"
+      $postgres_cert_dir = "${pgsql_data_dir}/certs"
 
-  $cd4pe_ports = [
-    "${web_ui_ssl_port}:8443",
-    "${web_ui_port}:8080",
-    "${backend_service_port}:8000",
-    "${query_service_port}:8888",
-    "${agent_service_port}:7000",
-  ]
+      if ($facts['os']['family'] == 'RedHat') and ($facts['os']['release']['major'] !~ '^7') {
+        file { '/etc/sysconfig/pgsql':
+          ensure  => absent,
+        }
+      }
 
-  $master_server = $::settings::server
-  $master_ip     = getvar('serverip')
+      file {[$pgsqldir, "${pgsqldir}/${pg_version}" ]:
+        ensure  => absent,
+      }
 
-  if $master_ip and $manage_pe_host_mapping {
-    $extra_params = [
-      "--add-host ${master_server}:${master_ip}",
-      "--add-host ${trusted['certname']}:${facts['ipaddress']}"
-      ] + $cd4pe_docker_extra_params
-  } else {
-    $extra_params = $cd4pe_docker_extra_params
-  }
+      class { 'pe_postgresql::server':
+        package_ensure => absent,
+      }
+      class { 'pe_postgresql::client':
+        package_ensure => absent,
+      }
 
-  $container_require = $manage_database ? {
-    true => [Docker::Run[$db_host], File[$secret_key_path]],
-    false => [File[$secret_key_path]],
-  }
+      file { [$cert_dir,
+              $target_ca_cert,
+              $target_client_cert,
+              $pk8_file, $ssl_db_env,
+              $postgres_cert_dir]:
+        ensure => absent,
+      }
+    }
+    docker::run {'cd4pe':
+      ensure  => absent,
+      image   => "${cd4pe_image}:${cd4pe_version}",
+      volumes => ['cd4pe-object-store:/disk'],
+    }
 
-  docker::run {'cd4pe':
-    image            => "${cd4pe_image}:${cd4pe_version}",
-    extra_parameters => $extra_params,
-    ports            => $cd4pe_ports,
-    pull_on_start    => true,
-    volumes          => ['cd4pe-object-store:/disk'],
-    net              => $net,
-    env_file         => [
-      $app_env_path,
-      $secret_key_path,
-      "${data_root_dir}/db_env",
-    ],
-    subscribe        => File[$app_env_path],
-    require          => $container_require,
-    before           => Anchor['cd4pe-service-install'],
-  }
+    $repo_name = 'cd4pe'
 
-  # This exec is provided as a handle for root_config, which needs to refresh
-  # the service AFTER it's already been ensured running. Because the
-  # root_config class is optional and doesn't always exist (and when it does,
-  # THIS class doesn't always exist), the actual refresh will be handled
-  # through a constant anchor resource.
-  exec { 'cd4pe-service-refresh':
-    refreshonly => true,
-    path        => '/usr/bin:/bin',
-    command     => 'systemctl restart docker-cd4pe',
-    subscribe   => Anchor['cd4pe-service-refresh'],
+    case $facts['platform_tag'] {
+      /^(el|redhatfips)-[67]-x86_64$/: {
+        yumrepo { $repo_name:
+          ensure  => absent,
+          descr   => 'Puppet Labs PE Packages $releasever - $basearch', # don't want to interoplate those - they are yum strings
+          enabled => true,
+        }
+      }
+      /^ubuntu-(12|14|16|18)\.04-amd64$/: {
+
+        # File resource defaults from the master class are getting applied here due to PUP-3692,
+        # need to be explicit with owner/group, otherwise they get set to pe-puppet.
+        file { "/etc/apt/apt.conf.d/90${repo_name}":
+          ensure => absent,
+          notify => Exec['pe_apt_update'],
+        }
+
+        file { "/etc/apt/sources.list.d/${repo_name}.list":
+          ensure => file,
+          notify => Exec['pe_apt_update'],
+        }
+
+        exec { 'pe_apt_update':
+          command     => '/usr/bin/apt-get update',
+          logoutput   => 'on_failure',
+          refreshonly => true,
+        }
+      }
+      /^sles-(11|12)-x86_64$/: {
+        $repo_file = "/etc/zypp/repos.d/${repo_name}.repo"
+
+        # In Puppet Enterprise, agent packages are served by the same server
+        # as the master, which can be using either a self signed CA, or an external CA.
+        # Zypper has issues with validating a self signed CA, so for now disable ssl verification.
+        $repo_settings = {
+          'name'        => $repo_name,
+          'enabled'     => '1',
+          'autorefresh' => '0',
+          'baseurl'     => '',
+          'type'        => 'rpm-md',
+        }
+
+        $repo_settings.each |String $setting, String $value| {
+          pe_ini_setting { "zypper ${repo_name} ${setting}":
+            ensure  => present,
+            path    => $repo_file,
+            section => $repo_name,
+            setting => $setting,
+            value   => $value,
+            notify  => Exec['pe_zyp_update'],
+          }
+        }
+
+        # the repo should be refreshed on any change so that new artifacts
+        # will be recognized
+        exec { 'pe_zyp_update':
+          command     => "/usr/bin/zypper ref ${repo_name}",
+          logoutput   => 'on_failure',
+          refreshonly => true,
+        }
+      }
+      default: {
+        fail("Unable to cleanup package repository configuration. Platform described by facts['platform_tag'] '${facts['platform_tag']}' is not a known master platform.")
+      }
+    }
   }
 }

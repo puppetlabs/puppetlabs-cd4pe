@@ -13,7 +13,15 @@ RSpec.describe 'cd4pe::root_config' do
 
   context 'install_shared_job_hardware is false' do
     let(:facts) do
-      { cd4pe_multimodule_packaging: true }
+          { cd4pe_multimodule_packaging: true, 
+            os: { 
+                'family' => 'RedHat',
+                'name' => 'CentOS',
+                release: { 
+                    'major' => '7'
+                    } 
+                }
+          }
     end
 
     let(:params) do
@@ -26,7 +34,7 @@ RSpec.describe 'cd4pe::root_config' do
     end
 
     it do
-      is_expected.to contain_cd4pe_root_config('test.com:8080')
+      is_expected.to_not contain_cd4pe_root_config('test.com:8080')
         .with_root_email('test@test.com')
         .with_root_password('test')
     end
