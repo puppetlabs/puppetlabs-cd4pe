@@ -94,19 +94,19 @@ class cd4pe (
         $host = $db_host
       }
 
-      # docker::run { $host:
-      #   ensure => absent
-      # }
+      docker::run { $host:
+        ensure => absent
+      }
     } elsif($effective_db_provider == 'postgres'){
       $pgsqldir    = '/opt/puppetlabs/server/data/postgresql'
       $pg_version   = '9.6'
       $pgsql_data_dir = "${pgsqldir}/${pg_version}/data"
       $certname           = $trusted['certname']
-      $cert_dir           = "${cd4pe::db::data_root_dir}/certs"
+      $cert_dir           = "${data_root_dir}/certs"
       $target_ca_cert     = "${cert_dir}/ca.pem"
       $target_client_cert = "${cert_dir}/client_cert.pem"
       $pk8_file           = "${cert_dir}/client_private_key.pk8"
-      $ssl_db_env         = "${cd4pe::db::data_root_dir}/ssl_db_env"
+      $ssl_db_env         = "${data_root_dir}/ssl_db_env"
       $pg_ident_conf_path = "${pgsql_data_dir}/pg_ident.conf"
       $postgres_cert_dir = "${pgsql_data_dir}/certs"
 
@@ -120,13 +120,6 @@ class cd4pe (
         ensure  => absent,
       }
 
-      class { 'pe_postgresql::server':
-        package_ensure => absent,
-      }
-      class { 'pe_postgresql::client':
-        package_ensure => absent,
-      }
-
       file { [$cert_dir,
               $target_ca_cert,
               $target_client_cert,
@@ -134,79 +127,16 @@ class cd4pe (
               $postgres_cert_dir]:
         ensure => absent,
       }
+
+      docker::run {'cd4pe_postgres':
+        ensure => absent,
+      }
     }
+
     docker::run {'cd4pe':
       ensure  => absent,
       image   => "${cd4pe_image}:${cd4pe_version}",
       volumes => ['cd4pe-object-store:/disk'],
-    }
-
-    $repo_name = 'cd4pe'
-
-    case $facts['platform_tag'] {
-      /^(el|redhatfips)-[67]-x86_64$/: {
-        yumrepo { $repo_name:
-          ensure  => absent,
-          descr   => 'Puppet Labs PE Packages $releasever - $basearch', # don't want to interoplate those - they are yum strings
-          enabled => true,
-        }
-      }
-      /^ubuntu-(12|14|16|18)\.04-amd64$/: {
-
-        # File resource defaults from the master class are getting applied here due to PUP-3692,
-        # need to be explicit with owner/group, otherwise they get set to pe-puppet.
-        file { "/etc/apt/apt.conf.d/90${repo_name}":
-          ensure => absent,
-          notify => Exec['pe_apt_update'],
-        }
-
-        file { "/etc/apt/sources.list.d/${repo_name}.list":
-          ensure => file,
-          notify => Exec['pe_apt_update'],
-        }
-
-        exec { 'pe_apt_update':
-          command     => '/usr/bin/apt-get update',
-          logoutput   => 'on_failure',
-          refreshonly => true,
-        }
-      }
-      /^sles-(11|12)-x86_64$/: {
-        $repo_file = "/etc/zypp/repos.d/${repo_name}.repo"
-
-        # In Puppet Enterprise, agent packages are served by the same server
-        # as the master, which can be using either a self signed CA, or an external CA.
-        # Zypper has issues with validating a self signed CA, so for now disable ssl verification.
-        $repo_settings = {
-          'name'        => $repo_name,
-          'enabled'     => '1',
-          'autorefresh' => '0',
-          'baseurl'     => '',
-          'type'        => 'rpm-md',
-        }
-
-        $repo_settings.each |String $setting, String $value| {
-          pe_ini_setting { "zypper ${repo_name} ${setting}":
-            ensure  => present,
-            path    => $repo_file,
-            section => $repo_name,
-            setting => $setting,
-            value   => $value,
-            notify  => Exec['pe_zyp_update'],
-          }
-        }
-
-        # the repo should be refreshed on any change so that new artifacts
-        # will be recognized
-        exec { 'pe_zyp_update':
-          command     => "/usr/bin/zypper ref ${repo_name}",
-          logoutput   => 'on_failure',
-          refreshonly => true,
-        }
-      }
-      default: {
-        fail("Unable to cleanup package repository configuration. Platform described by facts['platform_tag'] '${facts['platform_tag']}' is not a known master platform.")
-      }
     }
   }
 }
