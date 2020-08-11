@@ -1,6 +1,6 @@
 class cd4pe::impact_analysis (
   Enum['present', 'absent'] $ensure = 'present',
-  Optional[Array[String]] $whitelisted_certnames = undef,
+  Optional[Array[String]] $allowed_certnames = undef,
 ) {
   # If earlier than 2017.3, notify the customer this has no effect
   if (versioncmp(pe_build_version(), '2017.3.0') < 0) {
@@ -8,8 +8,8 @@ class cd4pe::impact_analysis (
   } elsif (versioncmp(pe_build_version(), '2019.1.0') < 0) {
     # If between 2017.3 and 2019.1, use the legacy
     class { 'cd4pe::impact_analysis::legacy':
-      ensure                => $ensure,
-      whitelisted_certnames => $whitelisted_certnames
+      ensure            => $ensure,
+      allowed_certnames => $allowed_certnames
     }
   } else {
     # If > 2019.1, we have our new catalog endpoint built in, no need for our legacy code
