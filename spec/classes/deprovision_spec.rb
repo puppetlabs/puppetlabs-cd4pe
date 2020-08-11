@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-RSpec.describe('cd4pe') do
+RSpec.describe('cd4pe::deprovision') do
   let(:pre_condition) do
     <<-PRE_COND
       class {'puppet_enterprise':
@@ -27,10 +27,6 @@ RSpec.describe('cd4pe') do
         end
         let(:params) do
           {
-            db_host: 'cd4pe.example',
-            db_name: 'cd4pe',
-            db_port: 3306,
-            db_user: 'cd4pe',
             db_provider: 'mysql',
           }
         end
@@ -52,10 +48,6 @@ RSpec.describe('cd4pe') do
         end
         let(:params) do
           {
-            db_host: 'cd4pe.example',
-            db_name: 'cd4pe',
-            db_port: 3306,
-            db_user: 'cd4pe',
             db_provider: 'postgres',
           }
         end
