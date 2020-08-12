@@ -3,7 +3,9 @@ fixtures:
     yumrepo_core: "puppetlabs-yumrepo_core"
     augeas_core: "puppetlabs-augeas_core"
     stdlib: "puppetlabs-stdlib"
-    docker: "puppetlabs-docker"
+    docker:
+        repo: "puppetlabs/docker"
+        ref: "3.10.2"
     cron_core: "puppetlabs-cron_core"
     translate: "puppetlabs-translate"
     puppet_authorization: "puppetlabs-puppet_authorization"
