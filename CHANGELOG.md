@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 No unreleased changes.
 
+## [3.0.0](https://github.com/puppetlabs/puppetlabs-cd4pe/tree/3.0.0)
+### Changed
+- Removed all docker installation and database management code. This module will not install CD4PE >= 4.0.0.
+
 ## [2.0.1](https://github.com/puppetlabs/puppetlabs-cd4pe/tree/2.0.1)
 ### Changed
 - Added missing resolvable_hostname and web_ui_endpoint parameters from task metadata
