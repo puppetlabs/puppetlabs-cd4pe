@@ -1,10 +1,10 @@
 class cd4pe::impact_analysis::legacy (
   Enum['present', 'absent'] $ensure = 'present',
-  Optional[Array[String]] $whitelisted_certnames = undef,
+  Optional[Array[String]] $allowed_certnames = undef,
 ) {
 
-  if ($ensure == 'present' and empty($whitelisted_certnames)) {
-    fail('cd4pe::impact_analysis::legacy::whitelisted_certnames must be a non empty array')
+  if ($ensure == 'present' and empty($allowed_certnames)) {
+    fail('cd4pe::impact_analysis::legacy::allowed_certnames must be a non empty array')
   }
 
 
@@ -44,7 +44,7 @@ class cd4pe::impact_analysis::legacy (
     match_request_path   => '/puppet/v3/cd4pe/compile',
     match_request_type   => 'path',
     match_request_method => 'get',
-    allow                => $whitelisted_certnames,
+    allow                => $allowed_certnames,
     sort_order           => 601,
     path                 => '/etc/puppetlabs/puppetserver/conf.d/auth.conf',
     notify               => $_puppetserver_service,
@@ -53,7 +53,7 @@ class cd4pe::impact_analysis::legacy (
 
   if ($ensure == 'present') {
     Pe_puppet_authorization::Rule <| title == 'puppetlabs environment' |> {
-      allow +> $whitelisted_certnames,
+      allow +> $allowed_certnames,
     }
   }
 }

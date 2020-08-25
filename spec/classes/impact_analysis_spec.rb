@@ -20,7 +20,7 @@ RSpec.describe 'cd4pe::impact_analysis' do
     context 'valid params' do
       let(:params) do
         {
-          'whitelisted_certnames' => ['test'],
+          'allowed_certnames' => ['test'],
         }
       end
 
@@ -29,7 +29,7 @@ RSpec.describe 'cd4pe::impact_analysis' do
       context 'ensure => absent' do
         let(:params) do
           {
-            'whitelisted_certnames' => ['test'],
+            'allowed_certnames' => ['test'],
             'ensure' => 'absent',
           }
         end

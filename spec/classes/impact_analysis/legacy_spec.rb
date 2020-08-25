@@ -12,7 +12,7 @@ RSpec.describe 'cd4pe::impact_analysis::legacy' do
 
   let(:params) do
     {
-      'whitelisted_certnames' => ['test'],
+      'allowed_certnames' => ['test'],
     }
   end
 
@@ -33,7 +33,7 @@ RSpec.describe 'cd4pe::impact_analysis::legacy' do
       context 'ensure => absent' do
         let(:params) do
           {
-            'whitelisted_certnames' => ['test'],
+            'allowed_certnames' => ['test'],
             'ensure' => 'absent',
           }
         end

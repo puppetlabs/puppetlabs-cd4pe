@@ -1,8 +1,0 @@
-<%- | 
-      String $db_name,
-      String $db_user,
-
-| -%>
-MYSQL_DATABASE=<%= $db_name %>
-MYSQL_USER=<%= $db_user %>
-

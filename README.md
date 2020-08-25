@@ -3,8 +3,7 @@
 This module is for use with Puppet's Continuous Delivery for Puppet Enterprise.
 Documentation is at https://puppet.com/docs/continuous-delivery/latest/cd_user_guide.html
 
-Use version 1.1.0 or later of this module to rapidly install and configure
-Continuous Delivery for PE. For instructions, see https://puppet.com/docs/continuous-delivery/latest/install_module.html.
+Use version <=2.0.1 of this module to rapidly install and configure Continuous Delivery for PE version < 4.0.0.
+For instructions, see https://puppet.com/docs/continuous-delivery/latest/install_module.html.
 
-#### DEPRECATED: Support for MySQL and DynamoDB db_providers
-Beginning with Continous Delivery for PE version 3.1.0, support for MySQL and DynamoDB is deprecated in favor of PostgreSQL.
+Version 3.0.0 and later of this module can still be used to configure Impact Analysis permissions on your PE master but no longer supports installation via Docker.
