@@ -8,6 +8,8 @@ $LOAD_PATH.unshift(Puppet[:plugindest])
 
 params = JSON.parse(STDIN.read)
 hostname                 = params['resolvable_hostname'] || Puppet[:certname]
+base64_cacert            = params['base64_cacert']
+insecure_https           = params['insecure_https'] || false
 username                 = params['root_email']
 password                 = params['root_password']
 client_id                = params['client_id']
@@ -23,7 +25,7 @@ web_ui_endpoint = params['web_ui_endpoint'] || "#{hostname}:8080"
 
 exitcode = 0
 begin
-  client = PuppetX::Puppetlabs::CD4PEClient.new(web_ui_endpoint, username, password)
+  client = PuppetX::Puppetlabs::CD4PEClient.new(web_ui_endpoint, username, password, base64_cacert, insecure_https)
   res = client.add_oauth_integration(provider, client_id, client_secret)
   if res.code != '200'
     raise "Error while adding VCS integration: #{res.body}"

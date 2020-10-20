@@ -7,11 +7,13 @@ Puppet.initialize_settings
 $LOAD_PATH.unshift(Puppet[:plugindest])
 
 params = JSON.parse(STDIN.read)
-hostname  = params['resolvable_hostname'] || Puppet[:certname]
-email     = params['email']
-password  = params['password']
-provider  = params['provider']
-workspace = params['workspace']
+hostname          = params['resolvable_hostname'] || Puppet[:certname]
+base64_cacert     = params['base64_cacert']
+insecure_https    = params['insecure_https'] || false
+email             = params['email']
+password          = params['password']
+provider          = params['provider']
+workspace         = params['workspace']
 provider_specific = params['provider_specific']
 
 require_relative File.join(params['_installdir'], 'cd4pe', 'lib', 'puppet_x', 'puppetlabs', 'cd4pe_client')
@@ -25,7 +27,7 @@ exitcode = 0
 result = {}
 
 begin
-  client = PuppetX::Puppetlabs::CD4PEClient.new(web_ui_endpoint, email, password)
+  client = PuppetX::Puppetlabs::CD4PEClient.new(web_ui_endpoint, email, password, base64_cacert, insecure_https)
   result = client.add_vcs_integration(provider, workspace, provider_specific)
 
   if result.code != '200'

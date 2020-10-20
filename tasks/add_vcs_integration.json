@@ -10,6 +10,14 @@
       "sensitive": true,
       "description": "The password associated with the account."
     },
+    "base64_cacert": {
+      "type": "Optional[String[1]]",
+      "description": "The CA cert of the CD4PE instance, base64 encoded"
+    },
+    "insecure_https": {
+      "type": "Optional[Boolean]",
+      "description": "Whether or not to make the https calls without verifying the CA cert. Only use this on test systems."
+    },
     "provider": {
       "type": "String[1]",
       "description": "The name of the provider to configure."

@@ -8,6 +8,8 @@ $LOAD_PATH.unshift(Puppet[:plugindest])
 
 params = JSON.parse(STDIN.read)
 hostname                 = params['resolvable_hostname'] || Puppet[:certname]
+base64_cacert            = params['base64_cacert']
+insecure_https           = params['insecure_https'] || false
 username                 = params['email']
 password                 = params['password']
 repo_branch              = params['repo_branch']
@@ -23,7 +25,7 @@ web_ui_endpoint = params['web_ui_endpoint'] || "#{hostname}:8080"
 exitcode = 0
 result = {}
 begin
-  client = PuppetX::Puppetlabs::CD4PEClient.new(web_ui_endpoint, username, password)
+  client = PuppetX::Puppetlabs::CD4PEClient.new(web_ui_endpoint, username, password, base64_cacert, insecure_https)
   pipeline_res = client.create_pipeline(workspace, repo_name, repo_branch, pipeline_type)
   if pipeline_res.code != '200'
     raise "Error while adding pipeline: #{pipeline_res.body}"

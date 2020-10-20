@@ -10,6 +10,8 @@ params = JSON.parse(STDIN.read)
 hostname                 = params['resolvable_hostname'] || Puppet[:certname]
 username                 = params['email']
 password                 = params['password']
+base64_cacert            = params['base64_cacert']
+insecure_https           = params['insecure_https'] || false
 workspace                = params['workspace']
 repo_name                = params['repo_name']
 repo_type                = params['repo_type']
@@ -32,7 +34,7 @@ exitcode = 0
 result = {}
 
 begin
-  client = PuppetX::Puppetlabs::CD4PEClient.new(web_ui_endpoint, username, password)
+  client = PuppetX::Puppetlabs::CD4PEClient.new(web_ui_endpoint, username, password, base64_cacert, insecure_https)
   result = client.add_deployment_to_stage(workspace,
                                           repo_name,
                                           repo_type,
