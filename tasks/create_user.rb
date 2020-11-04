@@ -8,6 +8,8 @@ $LOAD_PATH.unshift(Puppet[:plugindest])
 
 params = JSON.parse(STDIN.read)
 hostname              = params['resolvable_hostname'] || Puppet[:certname]
+base64_cacert         = params['base64_cacert']
+insecure_https        = params['insecure_https'] || false
 email                 = params['email']
 username              = params['username']
 password              = params['password']
@@ -23,7 +25,7 @@ hostname = "http://#{hostname}" if uri.scheme.nil?
 web_ui_endpoint = params['web_ui_endpoint'] || "#{hostname}:8080"
 exitcode = 0
 begin
-  client = PuppetX::Puppetlabs::CD4PEClient.new(web_ui_endpoint)
+  client = PuppetX::Puppetlabs::CD4PEClient.new(web_ui_endpoint, nil, nil, base64_cacert, insecure_https)
   res = client.create_user(email, username, password, first_name, last_name, company_name)
   if res.code != '200'
     raise "Error while creating user: #{res.body}"

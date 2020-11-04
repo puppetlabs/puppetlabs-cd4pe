@@ -10,6 +10,14 @@
       "sensitive": true,
       "description": "The password associated with the account."
     },
+    "base64_cacert": {
+      "type": "Optional[String[1]]",
+      "description": "The CA cert of the CD4PE instance, base64 encoded"
+    },
+    "insecure_https": {
+      "type": "Optional[Boolean]",
+      "description": "Whether or not to make the https calls without verifying the CA cert. Only use this on test systems."
+    },
     "workspace": {
       "type": "String[1]",
       "description": "Designates the workspace that the repo and pipeline are associated with"

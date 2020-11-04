@@ -8,6 +8,8 @@ $LOAD_PATH.unshift(Puppet[:plugindest])
 
 params = JSON.parse(STDIN.read)
 hostname  = params['resolvable_hostname'] || Puppet[:certname]
+base64_cacert            = params['base64_cacert']
+insecure_https           = params['insecure_https'] || false
 email     = params['email']
 password  = params['password']
 username  = params['username']
@@ -24,7 +26,7 @@ exitcode = 0
 result = {}
 
 begin
-  client = PuppetX::Puppetlabs::CD4PEClient.new(web_ui_endpoint, email, password)
+  client = PuppetX::Puppetlabs::CD4PEClient.new(web_ui_endpoint, email, password, base64_cacert, insecure_https)
   result = client.create_workspace(workspace, username)
 
   if result.code != '200'

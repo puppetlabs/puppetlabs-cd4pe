@@ -2,6 +2,7 @@ require 'puppet_x'
 require 'net/http'
 require 'uri'
 require 'json'
+require 'base64'
 
 module PuppetX::Puppetlabs
   # Provides a class for interacting with CD4PE's API
@@ -15,13 +16,15 @@ module PuppetX::Puppetlabs
     SIGNUP_ENDPOINT = '/signup'.freeze
     HW_CONFIG_ENDPOINT = '/root/hw-config'.freeze
 
-    def initialize(hostname, email = nil, password = nil)
+    def initialize(hostname, email = nil, password = nil, base64_cacert = nil, insecure_https = false)
       uri = URI.parse(hostname)
 
       @config = {
         server: uri.host,
-        port: uri.port || '8080',
-        scheme: uri.scheme || 'http',
+        port: uri.port,
+        scheme: uri.scheme || 'https',
+        base64_cacert: base64_cacert,
+        insecure_https: insecure_https,
         email: email,
         password: password,
       }
@@ -611,6 +614,23 @@ module PuppetX::Puppetlabs
         'Content-Type' => 'application/json',
         'Cookie' => @cookie,
       }
+
+      connection.use_ssl = true
+
+      if @config[:insecure_https]
+        connection.verify_mode = OpenSSL::SSL::VERIFY_NONE
+      else
+        connection.verify_mode = OpenSSL::SSL::VERIFY_PEER
+      end
+
+      unless @config[:base64_cacert].nil?
+        store = OpenSSL::X509::Store.new
+        store.set_default_paths
+        decoded_cert = Base64.decode64(@config[:base64_cacert])
+        certificate = OpenSSL::X509::Certificate.new(decoded_cert)
+        store.add_cert(certificate)
+        connection.cert_store = store
+      end
 
       max_attempts = 5
       attempts = 0

@@ -8,6 +8,8 @@ $LOAD_PATH.unshift(Puppet[:plugindest])
 
 params = JSON.parse(STDIN.read)
 hostname                 = params['resolvable_hostname'] || Puppet[:certname]
+base64_cacert            = params['base64_cacert']
+insecure_https           = params['insecure_https'] || false
 username                 = params['email']
 password                 = params['password']
 workspace                = params['workspace']
@@ -30,7 +32,7 @@ repo_name ||= source_repo_name
 exitcode = 0
 result = {}
 begin
-  client = PuppetX::Puppetlabs::CD4PEClient.new(web_ui_endpoint, username, password)
+  client = PuppetX::Puppetlabs::CD4PEClient.new(web_ui_endpoint, username, password, base64_cacert, insecure_https)
   repo_res = client.add_repo(workspace, source_control, repo_org, source_repo_name, repo_name, repo_type)
   if repo_res.code != '200'
     raise "Error while adding #{repo_type} repository: #{repo_res.body}"
