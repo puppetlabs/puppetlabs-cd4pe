@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 No unreleased changes.
 
+## [2.0.2](https://github.com/puppetlabs/puppetlabs-cd4pe/tree/2.0.2)
+### Fixed
+- Use new `puppet_enterprise::pg::cert_allowlist_entry` instead of `puppet_enterprise::pg::cert_whitelist_entry` because the latter is deprecated and uses harmful language
+
 ## [2.0.1](https://github.com/puppetlabs/puppetlabs-cd4pe/tree/2.0.1)
 ### Changed
 - Added missing resolvable_hostname and web_ui_endpoint parameters from task metadata
