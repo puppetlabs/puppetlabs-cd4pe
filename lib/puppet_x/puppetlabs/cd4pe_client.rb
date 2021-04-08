@@ -595,6 +595,23 @@ module PuppetX::Puppetlabs
       make_request(:get, endpoint)
     end
 
+    def promote_pipeline(workspace, pipeline, stage_name)
+      stages = pipeline[:stages]
+      stage_index = CD4PEPipelineUtils.get_stage_index_by_name(stages, stage_name)
+      payload = {
+        op: 'PipelinePromote',
+        content: {
+          pipelineId: pipeline[:id],
+          controlRepoName: pipeline[:buildStage][:imageEvent][:repoName],
+          branch: pipeline[:name],
+          sha: pipeline[:buildStage][:imageEvent][:commitId],
+          stageNumber: stage_index + 1, # (stage_index starts with 0)
+          commitMsg: pipeline[:buildStage][:imageEvent][:commitMsg],
+        }
+      }
+      make_request(:post, get_ajax_endpoint(workspace), payload.to_json)
+    end
+
     private
 
     def get_repo_payload_key(repo_type)
@@ -607,7 +624,7 @@ module PuppetX::Puppetlabs
         raise Puppet::Error "repo_type does not match one of: 'control', 'module'"
       end
     end
-
+    
     def make_request(type, api_url, payload = '')
       connection = Net::HTTP.new(@config[:server], @config[:port])
       headers = {
