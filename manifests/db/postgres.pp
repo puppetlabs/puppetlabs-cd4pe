@@ -201,7 +201,7 @@ class cd4pe::db::postgres(
     value => "${postgres_cert_dir}/${certname}.private_key.pem",
   }
 
-  puppet_enterprise::pg::cert_whitelist_entry { 'cd4pe_whitelist':
+  puppet_enterprise::pg::cert_allowlist_entry { 'cd4pe_whitelist':
     user                          => $db_user,
     database                      => $db_name,
     allowed_client_certname       => $certname,
