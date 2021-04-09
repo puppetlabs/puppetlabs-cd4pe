@@ -624,7 +624,7 @@ module PuppetX::Puppetlabs
         raise Puppet::Error "repo_type does not match one of: 'control', 'module'"
       end
     end
-    
+
     def make_request(type, api_url, payload = '')
       connection = Net::HTTP.new(@config[:server], @config[:port])
       headers = {
