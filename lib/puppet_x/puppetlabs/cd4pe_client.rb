@@ -595,20 +595,30 @@ module PuppetX::Puppetlabs
       make_request(:get, endpoint)
     end
 
-    def promote_pipeline(workspace, pipeline, stage_name)
-      stages = pipeline[:stages]
-      stage_index = CD4PEPipelineUtils.get_stage_index_by_name(stages, stage_name)
+    def promote_pipeline_to_stage(workspace, repo_name, repo_type, branch_name, stage_name, commit_message)
+      pipeline = get_pipeline_for_branch(workspace, repo_name, repo_type, branch_name)
+      stage_index = CD4PEPipelineUtils.get_stage_index_by_name(pipeline[:stages], stage_name)
+      unless pipeline[:buildStage] && pipeline[:buildStage][:imageEvent] 
+        raise Puppet::Error "It looks like pipeline has not run before. Please run the pipeline and try promoting again."
+      end
+      
+      commitMsg = commit_message ? commit_message : pipeline[:buildStage][:imageEvent][:commitMsg]
       payload = {
         op: 'PipelinePromote',
         content: {
           pipelineId: pipeline[:id],
-          controlRepoName: pipeline[:buildStage][:imageEvent][:repoName],
-          branch: pipeline[:name],
+          branch: branch_name,
           sha: pipeline[:buildStage][:imageEvent][:commitId],
           stageNumber: stage_index + 1, # (stage_index starts with 0)
-          commitMsg: pipeline[:buildStage][:imageEvent][:commitMsg],
+          commitMsg: commitMsg,
         }
       }
+      if repo_type == 'control'
+        payload[:content][:controlRepoName] = repo_name
+      else
+        payload[:content][:moduleName] = repo_name
+      end
+
       make_request(:post, get_ajax_endpoint(workspace), payload.to_json)
     end
 
