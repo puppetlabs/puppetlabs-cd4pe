@@ -24,13 +24,13 @@ fixtures:
         ref: origin/2016.2.x
     enterprise_tasks:
         repo: "git@github.com:puppetlabs/enterprise_tasks.git"
-        ref: origin/master
+        ref: origin/main
     pe_xl:
         repo: "git@github.com:reidmv/reidmv-pe_xl.git"
         ref: origin/main
     provision:
         repo: "git@github.com:puppetlabs/provision.git"
-        ref: origin/master
+        ref: origin/main
 
   symlinks:
      puppet_enterprise: "#{source_dir}/spec/fixtures/puppet-enterprise-modules/modules/puppet_enterprise"
