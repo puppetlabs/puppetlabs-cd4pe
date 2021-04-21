@@ -23,6 +23,7 @@ module PuppetX::Puppetlabs
         server: uri.host,
         port: uri.port,
         scheme: uri.scheme || 'https',
+        path: uri.path || '',
         base64_cacert: base64_cacert,
         insecure_https: insecure_https,
         email: email,
@@ -609,6 +610,7 @@ module PuppetX::Puppetlabs
     end
 
     def make_request(type, api_url, payload = '')
+      api_url = "#{@config[:path]}#{api_url}"
       connection = Net::HTTP.new(@config[:server], @config[:port])
       headers = {
         'Content-Type' => 'application/json',
