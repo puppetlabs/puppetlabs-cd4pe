@@ -15,13 +15,15 @@ module PuppetX::Puppetlabs
     SIGNUP_ENDPOINT = '/signup'.freeze
     HW_CONFIG_ENDPOINT = '/root/hw-config'.freeze
 
-    def initialize(hostname, email = nil, password = nil)
+    def initialize(hostname, email = nil, password = nil, base64_cacert = nil, insecure_https = false)
       uri = URI.parse(hostname)
 
       @config = {
         server: uri.host,
         port: uri.port || '8080',
         scheme: uri.scheme || 'http',
+        base64_cacert: base64_cacert,
+        insecure_https: insecure_https,
         email: email,
         password: password,
       }
@@ -592,6 +594,32 @@ module PuppetX::Puppetlabs
       make_request(:get, endpoint)
     end
 
+    def promote_pipeline_to_stage(workspace, repo_name, repo_type, branch_name, stage_name, commit_sha, commit_message)
+      pipeline = get_pipeline_for_branch(workspace, repo_name, repo_type, branch_name)
+      stage_index = CD4PEPipelineUtils.get_stage_index_by_name(pipeline[:stages], stage_name)
+      unless pipeline[:buildStage] && pipeline[:buildStage][:imageEvent] 
+        raise Puppet::Error "It looks like pipeline has not run before. Please run the pipeline and try promoting again."
+      end
+      
+      payload = {
+        op: 'PipelinePromote',
+        content: {
+          pipelineId: pipeline[:id],
+          branch: branch_name,
+          sha: commit_sha ? commit_sha : pipeline[:buildStage][:imageEvent][:commitId],
+          stageNumber: stage_index + 1, # (stage_index starts with 0)
+          commitMsg: commit_message ? commit_message : pipeline[:buildStage][:imageEvent][:commitMsg],
+        }
+      }
+      if repo_type == 'control'
+        payload[:content][:controlRepoName] = repo_name
+      else
+        payload[:content][:moduleName] = repo_name
+      end
+
+      make_request(:post, get_ajax_endpoint(workspace), payload.to_json)
+    end
+
     private
 
     def get_repo_payload_key(repo_type)
@@ -606,7 +634,26 @@ module PuppetX::Puppetlabs
     end
 
     def make_request(type, api_url, payload = '')
+      api_url = "#{@config[:path]}#{api_url}"
       connection = Net::HTTP.new(@config[:server], @config[:port])
+
+      if @config[:scheme] == 'https'
+        connection.use_ssl = true
+        if @config[:insecure_https]
+          connection.verify_mode = OpenSSL::SSL::VERIFY_NONE
+        else
+          connection.verify_mode = OpenSSL::SSL::VERIFY_PEER
+        end
+        unless @config[:base64_cacert].nil?
+          store = OpenSSL::X509::Store.new
+          store.set_default_paths
+          decoded_cert = Base64.decode64(@config[:base64_cacert])
+          certificate = OpenSSL::X509::Certificate.new(decoded_cert)
+          store.add_cert(certificate)
+          connection.cert_store = store
+        end
+      end
+
       headers = {
         'Content-Type' => 'application/json',
         'Cookie' => @cookie,
