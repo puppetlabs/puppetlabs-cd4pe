@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 No unreleased changes.
 
+## [3.2.0](https://github.com/puppetlabs/puppetlabs-cd4pe/tree/3.2.0)
+- Added promote_repo_to_stage task
+
 ## [3.1.0](https://github.com/puppetlabs/puppetlabs-cd4pe/tree/3.1.0)
 - Updated cd4pe_client to account for path changes in CD4PE 4.5.0
 
