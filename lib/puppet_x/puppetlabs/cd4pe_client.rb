@@ -596,22 +596,21 @@ module PuppetX::Puppetlabs
       make_request(:get, endpoint)
     end
 
-    def promote_pipeline_to_stage(workspace, repo_name, repo_type, branch_name, stage_name, commit_message)
+    def promote_pipeline_to_stage(workspace, repo_name, repo_type, branch_name, stage_name, commit_sha, commit_message)
       pipeline = get_pipeline_for_branch(workspace, repo_name, repo_type, branch_name)
       stage_index = CD4PEPipelineUtils.get_stage_index_by_name(pipeline[:stages], stage_name)
       unless pipeline[:buildStage] && pipeline[:buildStage][:imageEvent] 
         raise Puppet::Error "It looks like pipeline has not run before. Please run the pipeline and try promoting again."
       end
       
-      commitMsg = commit_message ? commit_message : pipeline[:buildStage][:imageEvent][:commitMsg]
       payload = {
         op: 'PipelinePromote',
         content: {
           pipelineId: pipeline[:id],
           branch: branch_name,
-          sha: pipeline[:buildStage][:imageEvent][:commitId],
+          sha: commit_sha ? commit_sha : pipeline[:buildStage][:imageEvent][:commitId],
           stageNumber: stage_index + 1, # (stage_index starts with 0)
-          commitMsg: commitMsg,
+          commitMsg: commit_message ? commit_message : pipeline[:buildStage][:imageEvent][:commitMsg],
         }
       }
       if repo_type == 'control'

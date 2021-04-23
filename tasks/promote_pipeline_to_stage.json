@@ -38,6 +38,10 @@
       "type": "String[1]",
       "description": "The name of the pipeline stage that the pipeline should be promoted to."
     },
+    "commit_sha": {
+      "type": "Optional[String[1]]",
+      "description": "The commit to promote. If not specified, takes the commit from the latest pipeline run."
+    },
     "commit_message": {
       "type": "Optional[String[1]]",
       "description": "The commit message to use for the promotion. If not specified, the original commit message of the promoted commit will be used."
