@@ -43,5 +43,5 @@ rescue => e
   exitcode = 1
 end
 
-puts result.to_json
+puts result
 exit exitcode
