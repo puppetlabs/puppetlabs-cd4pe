@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 No unreleased changes.
 
+## [3.2.1](https://github.com/puppetlabs/puppetlabs-cd4pe/tree/3.2.1)
+- Correct name of promote_repo_to_stage task and add commit_sha parameter
+
 ## [3.2.0](https://github.com/puppetlabs/puppetlabs-cd4pe/tree/3.2.0)
 - Added promote_repo_to_stage task
 
