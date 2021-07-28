@@ -9,12 +9,12 @@ module PuppetX::Puppetlabs
   class CD4PEClient < Object
     attr_reader :config
 
-    LOGIN_ENDPOINT = '/login'.freeze
-    ROOT_AJAX_ENDPOINT = '/root/ajax'.freeze
-    ROOT_ENDPOINT_SETTINGS = '/root/endpoint-settings'.freeze
-    ROOT_STORAGE_SETTINGS = '/root/storage-settings'.freeze
-    SIGNUP_ENDPOINT = '/signup'.freeze
-    HW_CONFIG_ENDPOINT = '/root/hw-config'.freeze
+    LOGIN_ENDPOINT = '/cd4pe/login'.freeze
+    ROOT_AJAX_ENDPOINT = '/cd4pe/root/ajax'.freeze
+    ROOT_ENDPOINT_SETTINGS = '/cd4pe/root/endpoint-settings'.freeze
+    ROOT_STORAGE_SETTINGS = '/cd4pe/root/storage-settings'.freeze
+    SIGNUP_ENDPOINT = '/cd4pe/signup'.freeze
+    HW_CONFIG_ENDPOINT = '/cd4pe/root/hw-config'.freeze
 
     def initialize(hostname, email = nil, password = nil, base64_cacert = nil, insecure_https = false)
       uri = URI.parse(hostname)
