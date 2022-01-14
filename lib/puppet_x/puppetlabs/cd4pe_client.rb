@@ -643,9 +643,9 @@ module PuppetX::Puppetlabs
         'Cookie' => @cookie,
       }
 
-      connection.use_ssl = true
+      connection.use_ssl = true if @config[:scheme] == 'https'
 
-      if @config[:insecure_https]
+      if @config[:insecure_https] && @config[:scheme] == 'https'
         connection.verify_mode = OpenSSL::SSL::VERIFY_NONE
       else
         connection.verify_mode = OpenSSL::SSL::VERIFY_PEER
