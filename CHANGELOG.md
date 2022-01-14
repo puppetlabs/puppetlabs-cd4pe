@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
-No unreleased changes.
+- Prevent enforcement of SSL on connections to non-SSL endpoints
 
 ## [3.2.1](https://github.com/puppetlabs/puppetlabs-cd4pe/tree/3.2.1)
 - Correct name of promote_repo_to_stage task and add commit_sha parameter
