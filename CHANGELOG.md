@@ -6,19 +6,26 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+- No unreleased changes
 
+## [3.2.2](https://github.com/puppetlabs/puppetlabs-cd4pe/tree/3.2.2)
+### Fixed
 - Prevent enforcement of SSL on connections to non-SSL endpoints
 
 ## [3.2.1](https://github.com/puppetlabs/puppetlabs-cd4pe/tree/3.2.1)
+### Fixed
 - Correct name of promote_repo_to_stage task and add commit_sha parameter
 
 ## [3.2.0](https://github.com/puppetlabs/puppetlabs-cd4pe/tree/3.2.0)
+### Added
 - Added promote_repo_to_stage task
 
 ## [3.1.0](https://github.com/puppetlabs/puppetlabs-cd4pe/tree/3.1.0)
+### Fixed
 - Updated cd4pe_client to account for path changes in CD4PE 4.5.0
 
 ## [3.0.2](https://github.com/puppetlabs/puppetlabs-cd4pe/tree/3.0.2)
+### Fixed
 - Updated the module's supported OS list to include el 8
 
 ## [3.0.1](https://github.com/puppetlabs/puppetlabs-cd4pe/tree/3.0.1)
