@@ -6,7 +6,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
-- No unreleased changes
+- Update default web_ui_endpoint handling in tasks to account for /cd4pe prefix in url.
 
 ## [3.2.2](https://github.com/puppetlabs/puppetlabs-cd4pe/tree/3.2.2)
 ### Fixed

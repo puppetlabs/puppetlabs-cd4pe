@@ -22,7 +22,7 @@ require_relative File.join(params['_installdir'], 'cd4pe', 'lib', 'puppet_x', 'p
 uri = URI.parse(hostname)
 hostname = "http://#{hostname}" if uri.scheme.nil?
 
-web_ui_endpoint = params['web_ui_endpoint'] || "#{hostname}:8080"
+web_ui_endpoint = params['web_ui_endpoint'] || "#{hostname}:8080/cd4pe"
 exitcode = 0
 begin
   client = PuppetX::Puppetlabs::CD4PEClient.new(web_ui_endpoint, nil, nil, base64_cacert, insecure_https)
