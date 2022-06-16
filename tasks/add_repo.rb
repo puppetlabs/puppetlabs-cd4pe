@@ -27,7 +27,7 @@ require_relative File.join(params['_installdir'], 'cd4pe', 'lib', 'puppet_x', 'p
 uri = URI.parse(hostname)
 hostname = "http://#{hostname}" if uri.scheme.nil?
 logger = CD4PETaskLogger.new
-web_ui_endpoint = params['web_ui_endpoint'] || "#{hostname}:8080"
+web_ui_endpoint = params['web_ui_endpoint'] || "#{hostname}:8080/cd4pe"
 repo_name ||= source_repo_name
 exitcode = 0
 result = {}
