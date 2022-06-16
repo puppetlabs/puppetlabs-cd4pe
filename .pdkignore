@@ -31,3 +31,4 @@
 /dev/
 .vendor
 project.clj
+RELEASE.md
