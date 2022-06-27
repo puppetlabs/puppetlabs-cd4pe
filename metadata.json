@@ -10,19 +10,11 @@
   "dependencies": [
     {
       "name": "puppetlabs-stdlib",
-      "version_requirement": ">= 4.19.0 < 7.0.0"
-    },
-    {
-      "name": "puppetlabs-puppet_authorization",
-      "version_requirement": ">= 0.5.0 < 1.0.0"
+      "version_requirement": "8.2.0"
     },
     {
       "name": "puppetlabs-docker",
-      "version_requirement": ">= 3.0.0 < 4.0.0"
-    },
-    {
-      "name": "puppetlabs-hocon",
-      "version_requirement": ">= 1.0.1 < 2.0.0"
+      "version_requirement": "4.4.0"
     }
   ],
   "operatingsystem_support": [
@@ -54,7 +46,7 @@
       "version_requirement": ">= 4.10.0 < 7.0.0"
     }
   ],
-  "pdk-version": "2.5.0",
-  "template-url": "pdk-default#2.5.0",
-  "template-ref": "tags/2.5.0-0-g369d483"
+  "pdk-version": "1.8.0",
+  "template-url": "file:///opt/puppetlabs/pdk/share/cache/pdk-templates.git",
+  "template-ref": "1.8.0-0-g0d9da00"
 }

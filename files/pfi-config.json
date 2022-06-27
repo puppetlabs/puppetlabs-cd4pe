@@ -1,0 +1,8 @@
+{
+    "dbEndpoint": "postgres://postgres:5432/cd4pe",
+    "dbUser": "cd4pe",
+    "dbPass": "puppetlabs",
+    "dumpURI": "dump://localhost:7000",
+    "stage": "beta",
+    "secretKey": "YWJjZGVmZ2hpamtsbW9weg=="
+}

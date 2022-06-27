@@ -1,0 +1,4 @@
+{
+    "description": "Downloads all CD4PE docker containers",
+    "input_method": "stdin"
+}
