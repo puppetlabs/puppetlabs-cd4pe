@@ -1,4 +1,7 @@
 ---
+.github/workflows/release.yml:
+  unmanaged: false
+
 Gemfile:
   optional:
     ':development':
