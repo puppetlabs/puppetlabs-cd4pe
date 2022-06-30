@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 - No unreleased changes
 
-## [3.2.3](https://github.com/puppetlabs/puppetlabs-cd4pe/tree/3.2.3)
+## [v3.2.3](https://github.com/puppetlabs/puppetlabs-cd4pe/tree/v3.2.3)
 ### Fixed
 - Update default web_ui_endpoint handling in tasks to account for /cd4pe prefix in url.
 
