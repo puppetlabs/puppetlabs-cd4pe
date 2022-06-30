@@ -13,5 +13,4 @@ git tag -a 3.1.0 -m "3.1.0"
 ```shell
 git push origin 3.1.0-release --follow-tags
 ```   
-6. Run `pdk build` in the root of the module to get the new tarball
-7. Log into https://forge.puppet.com as 'puppetlabs' and publish the new module version (credentials in CD4PE 1Password vault)
+6. Run the "Publish module" GitHub Action to publish the new version to the forge.
