@@ -13,7 +13,7 @@ plan cd4pe::install (
 
   $save_result = run_task('cd4pe::save_containers', 'localhost').first
   out::message($save_result)
-  $containers_file = $save_result['value']['_output']['containers_file']
+  $containers_file = $save_result['value']['containers_file']
   out::message($containers_file)
   upload_file($containers_file, '/etc/cd4pe/', $targets, _run_as => 'root')
 
