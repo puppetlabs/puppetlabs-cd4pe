@@ -70,7 +70,7 @@ module PuppetX::Puppetlabs
           raise Puppet::Error, "Invalid login credentials to CD4PE host: #{@config[:server]}"
         end
       else
-        raise Puppet::Error, "Invalid login credentials to CD4PE host: #{@config[:server]}"
+        raise Puppet::Error, "Received failed response logging in to CD4PE host at #{@config[:server]}: #{response.code} #{response.body}"
       end
     end
 
