@@ -41,7 +41,7 @@ begin
   created_repo = JSON.parse(repo_res.body, symbolize_names: true)
   result[:repository] = created_repo
   # Create the base pipeline & webhook to mimic the front-end workflow if a PaC branch isn't specified
-  if pipelines_as_code_branch.empty?
+  if pipelines_as_code_branch == nil
     pipeline_res = client.create_pipeline(workspace, repo_name, source_repo_branch, repo_type)
     if pipeline_res.code != '200'
       raise "Error while adding pipeline:\n #{pipeline_res.body}"
