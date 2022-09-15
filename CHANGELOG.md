@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 - No unreleased changes
 
+## [v3.2.5](https://github.com/puppetlabs/puppetlabs-cd4pe/tree/v3.2.5)
+### Fixed
+- Fixed an issue where the add_repo task would fail if pipelines_as_code_branch was unset
+
 ## [v3.2.4](https://github.com/puppetlabs/puppetlabs-cd4pe/tree/v3.2.4)
 ### Fixed
 - Fixed issue when errors received logging in to the CD4PE host would be swallowed by a catch-all exception.
