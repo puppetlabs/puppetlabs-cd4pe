@@ -47,6 +47,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [3.0.0](https://github.com/puppetlabs/puppetlabs-cd4pe/tree/3.0.0)
 ### Changed
 - Removed all docker installation and database management code. This module will not install CD4PE >= 4.0.0.
+- Changed the `cd4pe::impact_analysis::legacy::whitelisted_certnames` parameter to `allowed_certnames`. If you are using PE 2017.3.0 to 2019.1.0, update the parameter name wherever it is in use. If you are using PE 2019.2.0 and newer, remove the parameter because it is no longer required. 
 
 ## [2.0.1](https://github.com/puppetlabs/puppetlabs-cd4pe/tree/2.0.1)
 ### Changed
