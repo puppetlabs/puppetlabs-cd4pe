@@ -1,3 +1,0 @@
-[submodule "checkouts/puppetserver"]
-	path = checkouts/puppetserver
-	url = https://github.com/puppetlabs/puppetserver
