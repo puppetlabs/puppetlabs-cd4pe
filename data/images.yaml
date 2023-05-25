@@ -1,0 +1,6 @@
+---
+cd4pe::images:
+  teams_ui: gcr.io/platform-services-297419/teams-ui:1.20.0-58-g43a3ef9b
+  pipelinesinfra: gcr.io/platform-services-297419/cd4pe-dev/continuous-delivery-for-puppet-enterprise:4.22.1-148-gd7d2c0c16
+  query: gcr.io/estate-reporting/query-service:b1af2a2
+  postgres: bitnami/postgresql:14.7.0

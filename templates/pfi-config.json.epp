@@ -1,0 +1,12 @@
+<%- |
+String $db_username,
+String $db_password,
+| -%>
+{
+    "dbEndpoint": "postgres://postgres:5432/cd4pe",
+    "dbUser": "<%= $db_username %>",
+    "dbPass": "<%= $db_password %>",
+    "dbMaxPoolSize": "2",
+    "backendPort": 8000,
+    "secretKey": "YWJjZGVmZ2hpamtsbW9weg=="
+}

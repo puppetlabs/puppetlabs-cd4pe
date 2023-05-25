@@ -1,0 +1,11 @@
+<%- |
+String $log_directory,
+| -%>
+#!/bin/bash
+# Deletes the link to stdout created by the bitnami postgres container
+# for logging
+LOG_FILE="<%= $log_directory %>/postgresql.log"
+
+if [ -L ${LOG_FILE} ]; then
+  rm ${LOG_FILE}
+fi 

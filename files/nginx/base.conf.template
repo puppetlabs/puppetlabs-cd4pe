@@ -1,0 +1,155 @@
+events {
+    worker_connections 1024;
+}
+
+http {
+    include            /etc/nginx/mime.types;
+    sendfile           on;
+    keepalive_timeout  70;
+
+    # Non-GET requests made to an endpoint starting with /cd4pe should always be
+    # routed to the CD4PE backend. Teams UI only handles GET requests.
+    map $request_method $verb_check {
+        default @cd4pebackend;
+        GET @reactui;
+    }
+
+    # Requests for a legacy page made by teams UI has the X-NODE-PROXY header
+    # set to enabled. Requests with this header should be proxied to the CD4PE
+    # backend
+    map $http_x_node_proxy $legacy_page_check {
+        default $verb_check;
+        enable @cd4pebackend;
+    }
+
+    # Server config
+    server {
+        listen  *:3000 ssl;
+        # TODO only add the IPv6 address if IPv6 is enabled
+        listen  [::]:3000 ssl;
+
+        ssl_certificate /etc/nginx/certs/cert_chain.pem;
+        ssl_certificate_key /etc/nginx/certs/private_key.pem;
+        ssl_crl /etc/nginx/certs/crl.pem;
+
+        # Set default server
+        server_name _;
+
+        # max upload size
+        client_max_body_size 75M;
+
+        # Logging
+        access_log /app/logs/access.log;
+        error_log /app/logs/error.log;
+
+        # Migrated pages redirects
+        rewrite ^/cd4pe/([^/]+)/jobs/(\d+)$ /$1/code-delivery/jobs/$2 redirect;
+        rewrite ^/cd4pe/([^/]+)/jobs$ /$1/code-delivery/jobs/templates redirect;
+        rewrite ^/cd4pe/([^/]+)/settings/groups$ /$1/settings/groups redirect;
+        rewrite ^/cd4pe/([^/]+)/settings/users$ /$1/settings/users redirect;
+        rewrite ^/cd4pe/([^/]+)/settings/ssh$ /$1/settings/ssh redirect;
+        rewrite ^/cd4pe/([^/]+)/settings/add-users$ /$1/settings/users/add redirect;
+        rewrite ^/cd4pe/(?!root\/)([^/]+)/settings/puppet-enterprise$ /$1/settings/puppet-enterprise redirect;
+        rewrite ^/cd4pe/(?!root\/)([^/]+)/settings$ /$1/settings/workspace redirect;
+        rewrite ^/cd4pe/([^/]+)/settings/workspaces$ /$1/settings/workspace redirect;
+        rewrite ^/cd4pe/([^/]+)/settings/integrations$ /$1/settings/source-control redirect;
+        rewrite ^/cd4pe/(?!root\/)([^/]+)/job-hardware$ /$1/code-delivery/job-hardware redirect;
+        rewrite ^/cd4pe/(?!root\/)([^/]+)/job-hardware-capability$ /$1/code-delivery/job-hardware/new? redirect;
+
+        # Internal API should not be accessible
+        location ~ ^/cd4pe/api/(v[0-9]+)/internal/ {
+            return 403;
+        }
+
+        # CD4PE API and public assets served by CD4PE
+        location ~ ^/cd4pe/(api|public)/ {
+            rewrite /cd4pe/(.+) /$1 break;
+            proxy_pass ${CD4PE_SERVICE};
+            proxy_set_header Host $host;
+        }
+
+        location ~ ^/cd4pe/([^/]+)/getJobScriptAndControlRepo$ {
+            rewrite /cd4pe/(.+) /$1 break;
+            proxy_pass ${CD4PE_SERVICE};
+            proxy_set_header Host $host;
+        }
+
+        # Health check endpoints used by k8s
+        location = /cd4pe/status {
+            proxy_pass ${CD4PE_SERVICE}/status;
+            proxy_set_header Host $host;
+        }
+
+        location = /status {
+            proxy_pass ${CD4PE_SERVICE};
+            proxy_set_header Host $host;
+        }
+
+        # SAML auth endpoint
+        location = /cd4pe/saml-auth {
+            proxy_pass ${CD4PE_SERVICE}/saml-auth;
+            proxy_set_header Host $host;
+        }
+
+        # Ajax endpoints
+        location ~ ^/cd4pe/([^/]+)/ajax {
+            rewrite /cd4pe/([^/]+)/ajax /$1/ajax break;
+            proxy_pass ${CD4PE_SERVICE};
+            proxy_set_header Host $host;
+        }
+
+        location ~ ^/([^/]+)/ajax {
+            proxy_pass ${CD4PE_SERVICE};
+            proxy_set_header Host $host;
+        }
+
+        # All other URL's under /cd4pe need to be redirected to the react UI or
+        # the cd4pe backend depending on the X-NODE-PROXY header and the verb
+        # used. Since the config for this location is different for dev and prod
+        # we use try files to redirect to a named location (@cd4pebackend or
+        # @reactui). @reactui is defined in an overrides file since that config
+        # is different between dev and prod. try_files requires 2 args so the
+        # first arg is just a path does does not exist so that it fallsback to
+        # the named location.
+        location ~ ^/cd4pe {
+            try_files /THISDOESNOTEXIST $legacy_page_check;
+        }
+
+        # Named location used by the /cd4pe location
+        location @cd4pebackend {
+            rewrite /cd4pe$ / break;
+            rewrite /cd4pe/(.+) /$1 break;
+            proxy_pass ${CD4PE_SERVICE};
+            proxy_set_header Host $host;
+        }
+
+        root /www/static/;
+
+        # Fallback to static files
+        location / {
+            try_files $uri /index.html =404;
+        }
+
+        # Named location used by the /cd4pe
+        # Can't cache static pages that share the same URL as pages served directly by
+        # the CD4PE backend.
+        location @reactui {
+            try_files $uri /index.html =404;
+            add_header Last-Modified $date_gmt;
+            add_header Cache-Control 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0';
+            if_modified_since off;
+            expires off;
+            etag off;
+        }
+
+        location = /query {
+          proxy_pass ${QUERY_SERVICE};
+          proxy_set_header Host $host;
+        }
+
+        location = /export {
+          proxy_pass ${QUERY_SERVICE};
+          proxy_set_header Host $host;
+        }
+    }
+}

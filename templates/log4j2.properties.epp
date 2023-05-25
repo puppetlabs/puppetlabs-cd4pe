@@ -1,0 +1,41 @@
+<%- | 
+String[1]  $log_dir,
+String[1]  $log_file_size,
+Enum['info', 'debug', 'trace']  $log_level,
+Integer[0] $keep_files,
+| -%>
+status = error
+dest = err
+name = PropertiesConfig
+monitorInterval = 60
+
+appender.rolling.type = RollingFile
+appender.rolling.name = RollingFile
+appender.rolling.layout.type = PatternLayout
+appender.rolling.layout.pattern = %d{yyyy-MM-dd HH:mm:ss.S z}:[%p]:[%t]:%c:%m%n
+appender.rolling.fileName = <%= $log_dir %>/application.log
+appender.rolling.filePattern = <%= $log_dir %>/application.%i.log.gz
+appender.rolling.policies.type = Policies
+appender.rolling.policies.size.type = SizeBasedTriggeringPolicy
+appender.rolling.policies.size.size = <%= $log_file_size %>
+appender.rolling.strategy.type = DefaultRolloverStrategy
+appender.rolling.strategy.max = <%= $keep_files %>
+
+
+rootLogger.level = <%= $log_level %>
+rootLogger.appenderRef.rolling.ref = RollingFile
+
+logger.apache.name = org.apache
+logger.apache.level = warn
+logger.apache.additivity = false
+logger.apache.appenderRef.console.ref = RollingFile
+
+logger.jetty.name = org.eclipse.jetty
+logger.jetty.level = info
+logger.jetty.additivity = false
+logger.jetty.appenderRef.console.ref = RollingFile
+
+logger.hibernate.name = org.hibernate
+logger.hibernate.level = info
+logger.hibernate.additivity = false
+logger.hibernate.appenderRef.console.ref = RollingFile

@@ -1,0 +1,31 @@
+{
+    "description": "Back up the target system's CD4PE installation",
+    "input_method": "stdin",
+    "private": true,
+    "parameters": {
+      "runtime": {
+        "description": "CD4PE container runtime",
+        "type": "Cd4pe::Runtime"
+      },
+      "backup_dir": {
+        "description": "The directory on the target where the backups are stored",
+        "type": "String[1]"
+      },
+      "database_info": {
+        "description": "Information on the database to back up.",
+        "type": "Cd4pe::Support_bundle::Database_info"
+      },
+      "image": {
+        "description": "The pipelinesinfra image on the target system. Used to determine the version of CD4PE, and run volume tar backups.",
+        "type": "String[1]"
+      },
+      "version": {
+        "description": "The version of the cd4pe module used to create the backup.",
+        "type": "String[1]"
+      },
+      "volumes": {
+        "description": "The docker volumes on the target that should be included in the backup",
+        "type": "Array[Hash[String[1], String[1]]]"
+      }
+    }
+  }

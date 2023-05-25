@@ -1,0 +1,19 @@
+{
+    "description": "Run an SQL statement against the supplied bitnami/postgresql database container",
+    "input_method": "stdin",
+    "private": true,
+    "parameters": {
+      "runtime": {
+        "description": "CD4PE container runtime",
+        "type": "Cd4pe::Runtime"
+      },
+      "database_info": {
+        "description": "If provided, will collect data from the database which is assumed to be running.",
+        "type": "Cd4pe::Support_bundle::Database_info"
+      },
+      "sql": {
+        "description": "The SQL to run to update the database configuration",
+        "type": "String[1]"
+      }
+    }
+  }

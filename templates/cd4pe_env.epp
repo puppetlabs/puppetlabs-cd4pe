@@ -1,0 +1,39 @@
+<%- |
+Boolean $analytics,
+String $root_username,
+String $root_password,
+String $jvm_args,
+String $web_ui_endpoint,
+String $log4j_path,
+Hash $env_vars,
+| -%>
+ANALYTICS=<%= $analytics %>
+CD4PE_ROOT_EMAIL=<%= $root_username %>
+CD4PE_ROOT_PASSWORD=<%= $root_password %>
+CD4PE_BACKEND_SERVICE_ENDPOINT=http://localhost:8000
+PUPPET_TEAMS_WEB_UI_ENDPOINT=<%= $web_ui_endpoint %>
+CD4PE_WEB_UI_ENDPOINT=<%= $web_ui_endpoint %>
+JVM_ARGS=<%= $jvm_args %>
+LOG4J_PATH=<%= $log4j_path %>
+
+<% $env_vars.each |$var_name, $value| { -%>
+<% unless $value =~ Undef { -%>
+<%= $var_name %>=<%= $value %>
+<% } -%>
+<% } -%>
+
+
+# The following env-vars are to be removed over time as we modify the product
+# for the new installer, or re-evaluated for even being needed
+CD4PE_STAGE=beta
+CD4PE_STORAGE_PROVIDER=DISK
+CD4PE_STORAGE_BUCKET=cd4pe
+CD4PE_ROUTE_PREFIX=/cd4pe
+CD4PE_SECURE_COOKIE=false
+CD4PE_EULA_ACCEPTED=true
+OTEL_TRACES_EXPORTER=none
+OTEL_METRICS_EXPORTER=none
+OTEL_EXPORTER_JAEGER_ENDPOINT=http://jaeger-aio:14250
+OTEL_EXPORTER_JAEGER_SERVICE_NAME=cd4pe
+OTEL_RESOURCE_ATTRIBUTES=service.name=cd4pe,service.version=dev
+CD4PE_QUERY_SERVICE_TOKEN_PATH=/etc/puppetlabs/cd4pe/cd4pe-query-service-token

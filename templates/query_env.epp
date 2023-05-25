@@ -1,0 +1,23 @@
+<%- |
+  String $log_level,
+  String $db_username,
+  Sensitive[String] $db_password,
+  String $db_endpoint,
+  String $resolvable_hostname,
+  Hash $env_vars
+| -%>
+
+DB_USER=<%= $db_username %>
+DB_PASS=<%= $db_password %>
+DB_ENDPOINT=<%= $db_endpoint %>
+LOG_LEVEL=<%= $log_level %>
+WORKSPACE_URL=http://<%= $resolvable_hostname %>/cd4pe/api/v1
+DB_SCHEMA=estate_reporting
+CD4PE_QUERY_SERVICE_TOKEN_SECRET_NAME=/etc/puppetlabs/cd4pe/cd4pe-query-service-token
+LOG_TO_FILE=true
+
+<% $env_vars.each |$var_name, $value| { -%>
+<% unless $value =~ Undef { -%>
+<%= $var_name %>=<%= $value %>
+<% } -%>
+<% } -%>

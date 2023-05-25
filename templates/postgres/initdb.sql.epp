@@ -1,0 +1,15 @@
+<%- |
+String $cd4pe_db_username,
+String $cd4pe_db_password,
+String $query_db_username,
+String $query_db_password,
+| -%>
+CREATE ROLE <%= $cd4pe_db_username %> LOGIN PASSWORD '<%= $cd4pe_db_password %>';
+CREATE DATABASE cd4pe OWNER <%= $cd4pe_db_username %>;
+CREATE ROLE <%= $query_db_username %> LOGIN PASSWORD '<%= $query_db_password %>';
+CREATE DATABASE query OWNER <%= $query_db_username %>;
+REVOKE CONNECT ON DATABASE cd4pe FROM <%= $query_db_username %>;
+REVOKE CONNECT ON DATABASE query FROM <%= $cd4pe_db_username %>;
+\connect "cd4pe"
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+CREATE EXTENSION IF NOT EXISTS lo;

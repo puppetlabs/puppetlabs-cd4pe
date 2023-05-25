@@ -1,0 +1,28 @@
+<%- |
+String $log_directory,
+String[1] $log_level,
+| -%>
+listen_addresses = '*'
+wal_level = 'hot_standby'
+max_wal_senders = '16'
+wal_keep_size = '12'
+client_min_messages = 'error'
+password_encryption = scram-sha-256             # md5 or scram-sha-256
+shared_buffers = 128MB                  # min 128kB
+max_wal_size = 1GB
+min_wal_size = 80MB
+timezone = 'Etc/UTC'
+lc_messages = 'en_US.utf8'                      # locale for system error message
+lc_monetary = 'en_US.utf8'                      # locale for monetary formatting
+lc_numeric = 'en_US.utf8'                       # locale for number formatting
+lc_time = 'en_US.utf8'                          # locale for time formatting
+default_text_search_config = 'pg_catalog.english'
+shared_preload_libraries = 'pgaudit'
+
+# logging
+log_min_error_statement=<%= $log_level %>
+log_destination=stderr
+logging_collector=on
+log_directory='<%= $log_directory %>'
+log_filename='postgresql.log'
+log_timezone = 'Etc/UTC'

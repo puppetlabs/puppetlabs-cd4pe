@@ -1,0 +1,17 @@
+<%- | 
+String[1]  $path,
+Integer[1]  $size_mb,
+String[1]  $post_rotate_cmd,
+Integer[0] $keep_files,
+| -%>
+<%= $path %> {
+  	missingok
+	size <%= $size_mb %>M
+	notifempty
+	compress
+  	su root root
+  	rotate <%= $keep_files %>
+	postrotate    
+		<%= $post_rotate_cmd %>
+	endscript
+}

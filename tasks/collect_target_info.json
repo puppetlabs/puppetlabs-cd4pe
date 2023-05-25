@@ -1,0 +1,20 @@
+{
+    "description": "Collect troubleshooting info from a CD4PE target",
+    "input_method": "stdin",
+    "private": true,
+    "parameters": {
+      "runtime": {
+        "description": "CD4PE container runtime",
+        "type": "Cd4pe::Runtime"
+      },
+      "journald_services": {
+        "description": "Collect Journald logs for services grouped by the role name.",
+        "type": "Array[Cd4pe::Support_bundle::Journald_services]"
+      },
+      "database_info": {
+        "description": "If provided, will collect data from the database which is assumed to be running.",
+        "type": "Optional[Cd4pe::Support_bundle::Database_info]"
+      }
+    },
+    "files": ["cd4pe/files/support_bundle/"]
+  }

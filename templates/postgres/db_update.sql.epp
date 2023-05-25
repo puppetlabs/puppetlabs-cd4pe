@@ -1,0 +1,8 @@
+<%- |
+String $cd4pe_db_username,
+String $cd4pe_db_password,
+String $query_db_username,
+String $query_db_password,
+| -%>
+ALTER ROLE <%= $cd4pe_db_username %> WITH PASSWORD '<%= $cd4pe_db_password %>';
+ALTER ROLE <%= $query_db_username %> WITH PASSWORD '<%= $query_db_password %>';

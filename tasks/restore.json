@@ -1,0 +1,27 @@
+{
+    "description": "Restore the target system's CD4PE installation using the given backup",
+    "input_method": "stdin",
+    "private": true,
+    "parameters": {
+      "runtime": {
+        "description": "CD4PE container runtime",
+        "type": "Cd4pe::Runtime"
+      },
+      "backup_dir": {
+        "description": "The directory on the target where the backups are stored",
+        "type": "String[1]"
+      },
+      "backup_archive": {
+        "description": "The backup archive file to use for the restore",
+        "type": "String[1]"
+      },
+      "database_info": {
+        "description": "Details on the CD4PE database",
+        "type": "Cd4pe::Support_bundle::Database_info"
+      },
+      "image": {
+        "description": "The pipelinesinfra image on the target system. Used to restore volume tar backups.",
+        "type": "String[1]"
+      }
+    }
+  }
