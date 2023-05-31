@@ -35,7 +35,7 @@ class cd4pe::component::query (
     image            => $container['image'],
     extra_parameters => $container['extra_parameters'],
     net              => 'cd4pe',
-    ports            => ['8888:8000'],
+    ports            => ['8888:8080'],
     pull_on_start    => false,
     env_file         => ['/etc/puppetlabs/cd4pe/query_env'],
     volumes          => [
