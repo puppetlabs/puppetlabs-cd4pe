@@ -17,7 +17,7 @@
 # @param [String] resolvable_hostname The hostname users will be able to access
 #   the CD4PE console at
 # @param [String] admin_username The first CD4PE user of the installation. It is also sometimes referred to as the root user.
-# @param [Boolean] if analytics should be enabled. Analytics are not yet implemented.
+# @param [Boolean] analytics if analytics should be enabled. Analytics are not yet implemented.
 # @param [Sensitive[String]] admin_db_password Used by the admin/superuser of the Postgres instance. It's only used in setup.
 # @param [Optional[String]] cd4pe_db_username Overrides the default database user which is used by the backend service.
 # @param [Sensitive[String]] cd4pe_db_password Password of the database used by the backend service.
