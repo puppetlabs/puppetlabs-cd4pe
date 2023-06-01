@@ -51,7 +51,7 @@ function cd4pe::config() >> Cd4pe::Config {
       max_log_size_mb   => $containers['teams_ui']['max_log_size_mb'],
       keep_log_files    => $containers['teams_ui']['keep_log_files'],
       runtime           => $runtime,
-      teams_ui_version  => '4.14.0',
+      teams_ui_version  => cd4pe::module_version(),
   })
 
   $pipelinesinfra_service = Cd4pe::Config::Pipelinesinfra.new({
