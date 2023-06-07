@@ -41,6 +41,9 @@ http {
         # Logging
         access_log /app/logs/access.log;
         error_log /app/logs/error.log;
+        
+        # all redirects should be relative
+        absolute_redirect off;
 
         # Migrated pages redirects
         rewrite ^/cd4pe/([^/]+)/jobs/(\d+)$ /$1/code-delivery/jobs/$2 redirect;
