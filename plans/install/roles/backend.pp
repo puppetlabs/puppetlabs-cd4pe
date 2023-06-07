@@ -23,7 +23,8 @@ plan cd4pe::install::roles::backend(
     }
 
     class { 'cd4pe::component::query':
-      config => $config['roles']['backend']['services']['query'],
+      config             => $config['roles']['backend']['services']['query'],
+      api_container_name => $config['roles']['backend']['services']['pipelinesinfra']['container']['name'],
     }
   }
 }

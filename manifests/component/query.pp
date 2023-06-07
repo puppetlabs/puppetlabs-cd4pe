@@ -2,8 +2,10 @@
 #   which is used by the estate reporting feature.
 #
 # @param config subset of Cd4pe::Config specific to the query service.
+# @param api_container_name name of container the query service relies on for PE information
 class cd4pe::component::query (
-  Cd4pe::Config::Query $config
+  Cd4pe::Config::Query $config,
+  String $api_container_name
 ) {
   include 'cd4pe::interservice_auth'
   include cd4pe::log_rotation
@@ -14,7 +16,7 @@ class cd4pe::component::query (
   }
 
   $env_data = {
-    resolvable_hostname => $config['resolvable_hostname'],
+    api_container_name => $api_container_name,
     log_level => $config['log_level'],
     db_username => $config['db_username'],
     db_password => $config['db_password'],
@@ -35,7 +37,6 @@ class cd4pe::component::query (
     image            => $container['image'],
     extra_parameters => $container['extra_parameters'],
     net              => 'cd4pe',
-    ports            => ['8888:8080'],
     pull_on_start    => false,
     env_file         => ['/etc/puppetlabs/cd4pe/query_env'],
     volumes          => [

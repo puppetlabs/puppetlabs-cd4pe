@@ -33,7 +33,7 @@ class cd4pe::component::teams_ui (
       ],
       env              => [
         'CD4PE_SERVICE=http://pipelinesinfra:8080',
-        'QUERY_SERVICE=http://query:8888',
+        'QUERY_SERVICE=http://query:8080',
         "LOGGING=${config['console_log_level']}",
         "TEAMS_UI_VERSION=${config['teams_ui_version']}"
       ],
