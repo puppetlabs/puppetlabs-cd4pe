@@ -1,6 +1,6 @@
 {
   "name": "puppetlabs-cd4pe",
-  "version": "5.0.0-beta.1",
+  "version": "5001.0.0",
   "author": "CD4PE",
   "summary": "Install and manage Continuous Delivery For Puppet Enterprise",
   "license": "Apache-2.0",
