@@ -19,7 +19,7 @@ plan cd4pe::install::upload_images(
     $targets_by_role = $role_info['targets']
     $role_info['services'].each |$name, $service| {
       $image_name = $service['container']['image']
-      $filename = "${regsubst($image_name, '\/', '_', 'G')}.tar.gz"
+      $filename = "${regsubst($image_name, '[\/:]', '_', 'G')}.tar.gz"
       $local_cached_image_tar_path = file::join($images_cache_dir, $filename)
 
       $remote_image_inspect_results = cd4pe::images::inspect($image_name, $targets_by_role)
