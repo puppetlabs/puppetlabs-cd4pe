@@ -29,9 +29,8 @@ plan cd4pe::preflight(
       fail_plan($arch_result['failed'][0], 'cd4pe/error')
     }
 
-    $configured_runtime = $config['runtime']
-    $local_runtime_result = run_plan('cd4pe::preflight::runtime::local', config => $config)
-    out::message(cd4pe::checks::format_results("runtime: checking for local ${$configured_runtime} install", $local_runtime_result))
+    $local_runtime_result = run_plan('cd4pe::preflight::runtime::local')
+    out::message(cd4pe::checks::format_results('runtime: checking for local container runtime', $local_runtime_result))
 
     if(length($local_runtime_result['failed']) > 0) {
       out::message(cd4pe::checks::format_summary([$bolt_result, $arch_result, $local_runtime_result]))
