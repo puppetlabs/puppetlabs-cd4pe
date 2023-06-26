@@ -8,7 +8,7 @@
 #
 # @returns Hash returns pass/fail object for display
 plan cd4pe::preflight::runtime::conflict(
-  Cd4pe::Config $config = cd4pe::config
+  Cd4pe::Config $config = cd4pe::config()
 ) {
   $desired_runtime = $config['runtime']
   $conflicting_runtime = $desired_runtime ? {
