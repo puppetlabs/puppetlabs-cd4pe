@@ -18,12 +18,17 @@ plan cd4pe::install::runtime(
     '_description' => "install ${runtime}",
   }
 
-  $runtime_manifest = $runtime ? {
-    'docker' => 'docker',
-    default  => fail_plan("${runtime} is not yet implemented", 'cd4pe/error')
-  }
-
-  return apply($config['all_targets'], $apply_options) {
-    include $runtime_manifest
+  if($runtime == 'docker') {
+    return apply($config['all_targets'], $apply_options) {
+      include docker
+    }
+  } elsif($runtime == 'podman') {
+    return apply($config['all_targets'], $apply_options) {
+      package { ['podman', 'podman-plugins']:
+        ensure => present,
+      }
+    }
+  } else {
+    fail_plan("${runtime} is not supported. Please update the configuration to be either docker or podman", 'cd4pe/error')
   }
 }
