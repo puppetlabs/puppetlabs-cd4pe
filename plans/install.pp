@@ -22,6 +22,10 @@ plan cd4pe::install() {
     config => $config,
   )
 
+  run_plan('cd4pe::install::update_root_credentials',
+    config => $config,
+  )
+
   run_plan('cd4pe::install::overview',
     config => $config
   )
