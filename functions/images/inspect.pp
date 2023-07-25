@@ -13,6 +13,7 @@ function cd4pe::images::inspect(
   String[1] $image_name,
   TargetSpec $targets,
   Optional[Hash] $opts = undef,
+  Optional[Cd4pe::Runtime] $runtime = 'docker',
 ) >> ResultSet {
   $cmd_opts = $opts ? {
     undef   => { '_run_as' => 'root', '_catch_errors' => true, },
@@ -21,7 +22,7 @@ function cd4pe::images::inspect(
 
   without_default_logging() || {
     $image_inspect_results = run_command(
-      "docker image inspect ${image_name} --format '{{ json . }}' 2> /dev/null",
+      "${runtime} image inspect ${image_name} --format '{{ json . }}' 2> /dev/null",
       $targets,
       $cmd_opts,
     )

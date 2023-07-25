@@ -10,6 +10,7 @@
 plan cd4pe::install::upload_images(
   Cd4pe::Config $config,
 ) {
+  $runtime = $config['runtime']
   $images_cache_dir = file::join(cd4pe::download_dir(), 'images')
   without_default_logging() || {
     run_command("mkdir -p ${images_cache_dir}", 'localhost')
@@ -22,7 +23,7 @@ plan cd4pe::install::upload_images(
       $filename = "${regsubst($image_name, '[\/:]', '_', 'G')}.tar.gz"
       $local_cached_image_tar_path = file::join($images_cache_dir, $filename)
 
-      $remote_image_inspect_results = cd4pe::images::inspect($image_name, $targets_by_role)
+      $remote_image_inspect_results = cd4pe::images::inspect($image_name, $targets_by_role, undef, $runtime)
 
       $remote_image_inspect_results.each |$target_run_result| {
         if !$target_run_result.ok {
@@ -49,7 +50,7 @@ plan cd4pe::install::upload_images(
           without_default_logging() || {
             out::message("Image '${image_name}' for '${role}' role does not exist on '${target_run_result.target.name}', uploading.")
             upload_file($local_cached_image_tar_path, '/tmp', $targets_by_role, '_run_as' => 'root')
-            run_command("docker load -i /tmp/${$filename}", $targets_by_role, '_run_as' => 'root')
+            run_command("${runtime} load -i /tmp/${$filename}", $targets_by_role, '_run_as' => 'root')
           }
         }
       }

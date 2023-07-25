@@ -8,37 +8,40 @@ class cd4pe::component::teams_ui (
 
   $nginx_conf_path = '/etc/puppetlabs/cd4pe/base.conf.template'
   file { $nginx_conf_path:
-    ensure => 'file',
-    source => 'puppet:///modules/cd4pe/nginx/base.conf.template',
-    owner  => 'root',
-    group  => 'root',
+    ensure  => 'file',
+    source  => 'puppet:///modules/cd4pe/nginx/base.conf.template',
+    owner   => 'root',
+    group   => 'root',
+    seltype => 'container_file_t',
+  }
+
+  $container = $config['container']
+  cd4pe::runtime::volume { $container['log_volume_name']:
+    ensure  => present,
+    runtime => $config['runtime'],
+  }
+
+  cd4pe::runtime::run { $container['name']:
+    runtime          => $config['runtime'],
+    image            => $container['image'],
+    net              => 'cd4pe',
+    extra_parameters => $container['extra_parameters'],
+    ports            => ['443:3000'],
+    pull_on_start    => false,
+    volumes          => [
+      "${container['log_volume_name']}:/app/logs",
+      "${nginx_conf_path}:/etc/nginx/templates/base.conf.template",
+      '/etc/puppetlabs/cd4pe/browser_certs:/etc/nginx/certs',
+    ],
+    env              => [
+      'CD4PE_SERVICE=http://pipelinesinfra:8080',
+      'QUERY_SERVICE=http://query:8080',
+      "LOGGING=${config['console_log_level']}",
+      "TEAMS_UI_VERSION=${config['teams_ui_version']}"
+    ],
   }
 
   if $config['runtime'] == 'docker' {
-    $container = $config['container']
-    docker_volume { $container['log_volume_name']:
-      ensure => present,
-    }
-
-    docker::run { $container['name']:
-      image            => $container['image'],
-      net              => 'cd4pe',
-      extra_parameters => $container['extra_parameters'],
-      ports            => ['443:3000'],
-      pull_on_start    => false,
-      volumes          => [
-        "${container['log_volume_name']}:/app/logs",
-        "${nginx_conf_path}:/etc/nginx/templates/base.conf.template",
-        '/etc/puppetlabs/cd4pe/browser_certs:/etc/nginx/certs',
-      ],
-      env              => [
-        'CD4PE_SERVICE=http://pipelinesinfra:8080',
-        'QUERY_SERVICE=http://query:8080',
-        "LOGGING=${config['console_log_level']}",
-        "TEAMS_UI_VERSION=${config['teams_ui_version']}"
-      ],
-    }
-
     cd4pe::logrotate_config { 'ui':
       path            => "/var/lib/docker/volumes/${container['log_volume_name']}/_data/*.log",
       size_mb         => $config['max_log_size_mb'],

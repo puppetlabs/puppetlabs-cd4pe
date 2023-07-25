@@ -1,0 +1,18 @@
+<%- |
+String[1] $title,
+Variant[String,Boolean] $before_stop = '',
+| -%>
+#!/usr/bin/env bash
+# This file is managed by Puppet and local changes
+# may be overwritten
+
+# Store the IP address so we can re-use it
+podman inspect <%= $title %> --format "{{.NetworkSettings.Networks.cd4pe.IPAddress}}" > /etc/puppetlabs/cd4pe/<%= $title %>.ip.txt
+
+<% if $before_stop { -%>
+<%= $before_stop %>
+<% } -%>
+/usr/bin/podman stop <%= $title %>
+/usr/bin/podman rm <%= $title %>
+
+exit $?

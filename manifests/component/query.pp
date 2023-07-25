@@ -7,12 +7,12 @@ class cd4pe::component::query (
   Cd4pe::Config::Query $config,
   String $api_container_name
 ) {
-  include 'cd4pe::interservice_auth'
   include cd4pe::log_rotation
 
   $container = $config['container']
-  docker_volume { $container['log_volume_name']:
-    ensure => present,
+  cd4pe::runtime::volume { $container['log_volume_name']:
+    ensure  => present,
+    runtime => $config['runtime'],
   }
 
   $env_data = {
@@ -28,12 +28,14 @@ class cd4pe::component::query (
     ensure    => file,
     owner     => 'root',
     group     => 'root',
+    seltype   => 'container_file_t',
     show_diff => false,
     content   => epp('cd4pe/query_env.epp', $env_data),
-    notify    => Docker::Run[$container['name']],
+    notify    => Cd4pe::Runtime::Run[$container['name']],
   }
 
-  docker::run { $container['name']:
+  cd4pe::runtime::run { $container['name']:
+    runtime          => $config['runtime'],
     image            => $container['image'],
     extra_parameters => $container['extra_parameters'],
     net              => 'cd4pe',
@@ -44,10 +46,13 @@ class cd4pe::component::query (
       'cd4pe-query-service-token:/etc/puppetlabs/cd4pe',
     ],
   }
-  cd4pe::logrotate_config { 'query':
-    path            => "/var/lib/docker/volumes/${container['log_volume_name']}/_data/*.log",
-    size_mb         => $config['max_log_size_mb'],
-    post_rotate_cmd => "docker kill ${container['name']} -s SIGUSR1",
-    keep_files      => $config['keep_log_files'],
+
+  if $config['runtime'] == 'docker' {
+    cd4pe::logrotate_config { 'query':
+      path            => "/var/lib/docker/volumes/${container['log_volume_name']}/_data/*.log",
+      size_mb         => $config['max_log_size_mb'],
+      post_rotate_cmd => "docker kill ${container['name']} -s SIGUSR1",
+      keep_files      => $config['keep_log_files'],
+    }
   }
 }
