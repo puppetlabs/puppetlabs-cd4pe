@@ -58,6 +58,13 @@ http {
         rewrite ^/cd4pe/([^/]+)/settings/integrations$ /$1/settings/source-control redirect;
         rewrite ^/cd4pe/(?!root\/)([^/]+)/job-hardware$ /$1/code-delivery/job-hardware redirect;
         rewrite ^/cd4pe/(?!root\/)([^/]+)/job-hardware-capability$ /$1/code-delivery/job-hardware/new? redirect;
+        rewrite ^/cd4pe/403 /403 redirect;
+        rewrite ^/cd4pe/404 /404 redirect;
+        rewrite ^/cd4pe/forgot-password /forgot-password redirect;
+        rewrite ^/cd4pe/reset-password /reset-password redirect;
+        rewrite ^/cd4pe/([^/]+)/choose-workspace$ /$1/choose-workspace redirect;
+        rewrite ^/cd4pe/([^/]+)/repositories$ /$1/code-delivery/repositories redirect;
+        rewrite ^/cd4pe/([^/]+)/modules$ /$1/code-delivery/modules redirect;
 
         # Internal API should not be accessible
         location ~ ^/cd4pe/api/(v[0-9]+)/internal/ {
