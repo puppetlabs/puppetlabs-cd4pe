@@ -5,12 +5,9 @@ Puppet::Functions.create_function(:'cd4pe::generate_cert_chain') do
 
   dispatch :generate do
     param 'String', :hostname
-    param 'String', :cert_file_dest
-    param 'String', :key_file_dest
-    param 'String', :crl_file_dest
   end
 
-  def generate(hostname, cert_file_dest, key_file_dest, crl_file_dest)
+  def generate(hostname)
     ca_key = create_private_key
     ca_cert = create_self_signed_ca(ca_key, "/CN=CD4PE CA: #{hostname}")
     ca_crl = create_crl_for(ca_cert, ca_key)
@@ -19,21 +16,11 @@ Puppet::Functions.create_function(:'cd4pe::generate_cert_chain') do
     host_csr = create_csr(host_key, "/CN=#{hostname}")
     host_cert = sign(hostname, ca_key, ca_cert, host_csr)
 
-    File.open(cert_file_dest, 'w') do |f|
-      f.puts(host_cert)
-      f.puts(ca_cert)
-    end
-
-    File.open(crl_file_dest, 'w') do |f|
-      f.puts(ca_crl)
-    end
-
-    # Ensure this file at least has minimum perms, and we may eventually
-    # want to store this key encrypted instead
-    File.open(key_file_dest, 'w') do |f|
-      f.puts(host_key)
-      File.chmod(0400, key_file_dest)
-    end
+    { 
+      "crl" => "#{ca_crl}", 
+      "private_key" => "#{host_key}", 
+      "cert_chain" => "#{host_cert}#{ca_cert}" 
+    }
   end
 
   PRIVATE_KEY_LENGTH = 4096

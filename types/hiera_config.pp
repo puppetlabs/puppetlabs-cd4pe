@@ -63,4 +63,9 @@ type Cd4pe::Hiera_config = Struct[{
     # query service advanced config
     enable_report_templates           => Optional[Boolean],
     query_complexity_limit            => Optional[Integer[1]],
+
+    # browser tls config
+    ssl_cert_chain                    => Optional[String[1]],
+    ssl_crl                           => Optional[String[1]],
+    ssl_private_key                   => Optional[String[1]]
 }]
