@@ -32,6 +32,7 @@ plan cd4pe::bootstrap(
   $admin_pword =  prompt('Console admin password', 'sensitive' => true)
 
   $collect_analytics =  Boolean(prompt('Permission to send analytic data to puppet.com', 'default' => 'true'))
+  $runtime = prompt::menu('Which container runtime should be installed on the target?', ['docker', 'podman'])
   $auto_config_db = Boolean(prompt('Would you like to auto-configure the database users and passwords?', 'default' => 'true'))
   if $auto_config_db {
     $admin_db_password = Sensitive(cd4pe::secure_random(32))
@@ -58,5 +59,6 @@ plan cd4pe::bootstrap(
       query_db_username    => $query_db_username,
       inventory_aio_target => $inventory_aio_target.name,
       resolvable_hostname  => $hostname,
+      runtime              => $runtime,
   })
 }
