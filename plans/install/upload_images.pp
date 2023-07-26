@@ -16,6 +16,12 @@ plan cd4pe::install::upload_images(
     run_command("mkdir -p ${images_cache_dir}", 'localhost')
   }
 
+  # Check if podman is installed locally, if so use it instead of docker
+  $local_runtime = cd4pe::runtime::version('localhost', 'podman', false)[0].ok ? {
+    true => 'podman',
+    default => 'docker',
+  }
+
   $config['roles'].each |$role, $role_info| {
     $targets_by_role = $role_info['targets']
     $role_info['services'].each |$name, $service| {
@@ -32,7 +38,7 @@ plan cd4pe::install::upload_images(
               if !cd4pe::images::inspect($image_name, 'localhost', { '_catch_errors' => true }).ok {
                 out::message("Image '${image_name}' for role '${role}' does not exist locally, pulling latest version.")
                 run_command(
-                  "docker pull ${image_name}",
+                  "${local_runtime} pull ${image_name}",
                   'localhost',
                 )
               } else {
@@ -41,7 +47,7 @@ plan cd4pe::install::upload_images(
 
               out::message("Saving '${image_name}' to '${local_cached_image_tar_path}'")
               run_command(
-                "docker save ${image_name} | gzip > ${local_cached_image_tar_path}",
+                "${local_runtime} save ${image_name} | gzip > ${local_cached_image_tar_path}",
                 'localhost',
               )
             }
