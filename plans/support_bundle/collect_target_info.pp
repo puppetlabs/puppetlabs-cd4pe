@@ -71,10 +71,7 @@ plan cd4pe::support_bundle::collect_target_info(
     $roles_for_targets.each |$target, $roles| {
       $roles.each |$role_name, $role_value| {
         $role_value['services'].each |$service_name, $service_value| {
-          $volume_src = $config['runtime'] ? {
-            'docker' => file::join('/var/lib/docker/volumes', $service_value['container']['log_volume_name'], '_data'),
-            default => fail_plan("Can't collect log volumes for unsupported runtime: ${config['runtime']}")
-          }
+          $volume_src = file::join(cd4pe::runtime::volume_dir(), $service_value['container']['log_volume_name'], '_data')
           $service_dest = file::join($target_data_dest, $target.name, 'logs', $role_name, $service_name)
           cd4pe::download_file($volume_src, $service_dest, $target, { '_run_as' => 'root', '_catch_errors' => true }, true)
         }

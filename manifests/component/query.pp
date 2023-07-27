@@ -47,12 +47,10 @@ class cd4pe::component::query (
     ],
   }
 
-  if $config['runtime'] == 'docker' {
-    cd4pe::logrotate_config { 'query':
-      path            => "/var/lib/docker/volumes/${container['log_volume_name']}/_data/*.log",
-      size_mb         => $config['max_log_size_mb'],
-      post_rotate_cmd => "docker kill ${container['name']} -s SIGUSR1",
-      keep_files      => $config['keep_log_files'],
-    }
+  cd4pe::logrotate_config { 'query':
+    path            => "${cd4pe::runtime::volume_dir()}/${container['log_volume_name']}/_data/*.log",
+    size_mb         => $config['max_log_size_mb'],
+    post_rotate_cmd => "${config['runtime']} kill ${container['name']} -s SIGUSR1",
+    keep_files      => $config['keep_log_files'],
   }
 }

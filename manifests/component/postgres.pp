@@ -93,12 +93,10 @@ class cd4pe::component::postgres (
     before_stop      => "${config['runtime']} exec ${container['name']} pg_ctl stop --mode=fast --pgdata=${pgdata}",
   }
 
-  if $config['runtime'] == 'docker' {
-    cd4pe::logrotate_config { 'postgres':
-      path            => "/var/lib/docker/volumes/${container['log_volume_name']}/_data/*.log",
-      size_mb         => $config['max_log_size_mb'],
-      post_rotate_cmd => "docker exec ${container['name']} pg_ctl logrotate --pgdata=${pgdata}",
-      keep_files      => $config['keep_log_files'],
-    }
+  cd4pe::logrotate_config { 'postgres':
+    path            => "${cd4pe::runtime::volume_dir()}/${container['log_volume_name']}/_data/*.log",
+    size_mb         => $config['max_log_size_mb'],
+    post_rotate_cmd => "${config['runtime']} exec ${container['name']} pg_ctl logrotate --pgdata=${pgdata}",
+    keep_files      => $config['keep_log_files'],
   }
 }

@@ -41,13 +41,11 @@ class cd4pe::component::teams_ui (
     ],
   }
 
-  if $config['runtime'] == 'docker' {
-    cd4pe::logrotate_config { 'ui':
-      path            => "/var/lib/docker/volumes/${container['log_volume_name']}/_data/*.log",
-      size_mb         => $config['max_log_size_mb'],
-      # SIGUSR1 re-opens the log file. See https://docs.nginx.com/nginx/admin-guide/basic-functionality/runtime-control/
-      post_rotate_cmd => "docker kill ${container['name']} -s SIGUSR1",
-      keep_files      => $config['keep_log_files'],
-    }
+  cd4pe::logrotate_config { 'ui':
+    path            => "${cd4pe::runtime::volume_dir()}/${container['log_volume_name']}/_data/*.log",
+    size_mb         => $config['max_log_size_mb'],
+    # SIGUSR1 re-opens the log file. See https://docs.nginx.com/nginx/admin-guide/basic-functionality/runtime-control/
+    post_rotate_cmd => "${config['runtime']} kill ${container['name']} -s SIGUSR1",
+    keep_files      => $config['keep_log_files'],
   }
 }
