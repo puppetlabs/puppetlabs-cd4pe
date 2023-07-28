@@ -16,45 +16,48 @@ plan cd4pe::install::configure_ssl_termination(
   # updating if this changes.
   $ui_host = $config['roles']['ui']['targets'][0]
 
-  $cert_dir = file::join(cd4pe::bolt_project_files_dir(), 'cd4pe', 'browser_certs')
-  run_command("mkdir -p ${cert_dir}", 'localhost')
+  $upload_dir = '/etc/puppetlabs/cd4pe/browser_certs'
 
-  $cert_file_path = "${cert_dir}/cert_chain.pem"
-  $key_file_path = "${cert_dir}/private_key.pem"
-  $crl_file_path = "${cert_dir}/crl.pem"
+  if(!empty($config['ssl']['cert_chain']) and !empty($config['ssl']['private_key'])) {
+    $cert_chain = $config['ssl']['cert_chain']
+    $private_key = $config['ssl']['private_key']
+    $crl = $config['ssl']['crl']
 
-  if file::exists($cert_file_path) and file::exists($key_file_path) and file::exists($crl_file_path) {
-    $valid = cd4pe::verify_certs($cert_file_path, $key_file_path)
+    out::message("Validating user-provided certificate from hiera data. ${cert_chain} ${private_key} ${crl}")
+    $valid = cd4pe::verify_certs($cert_chain, $private_key.unwrap)
     if $valid {
       out::message('Valid browser certificates found.')
     } else {
       fail_plan('Invalid browser certificates or key provided. Aborting.', 'cd4pe/error')
     }
-  } elsif file::exists($cert_file_path) or file::exists($key_file_path) or file::exists($crl_file_path) {
-    $error_msg = @("EOT"/L)
-      Incomplete browser certs found in ${cert_dir}. Please supply a cert chain, private key, and CRL, \
-      or none of these to cause them to be generated.
-      |EOT
+    run_command("mkdir -p ${upload_dir}", $ui_host, { '_run_as' => 'root' })
 
-    fail_plan($error_msg, 'cd4pe/error')
+    out::message('Uploading browser certficate chain.')
+    write_file($cert_chain, "${upload_dir}/cert_chain.pem", $ui_host, { '_run_as' => 'root' })
+
+    out::message('Uploading browser private key.')
+    write_file($private_key.unwrap, "${upload_dir}/private_key.pem", $ui_host, { '_run_as' => 'root' })
+    run_command("chmod 0400 ${upload_dir}/private_key.pem", $ui_host, { '_run_as' => 'root' })
+
+    out::message('Uploading browser crl.')
+    write_file($crl, "${upload_dir}/crl.pem", $ui_host, { '_run_as' => 'root' })
   } else {
-    out::message('No browser certificates found, generating self-signed certificate chain.')
+    out::message('No user-provided browser certificates found, generating self-signed certificate chain.')
 
     $hostname = $config['roles']['backend']['services']['pipelinesinfra']['resolvable_hostname']
-    cd4pe::generate_cert_chain($hostname, $cert_file_path, $key_file_path, $crl_file_path)
+    $generated = cd4pe::generate_cert_chain($hostname)
     out::message('Using generated browser certificates for SSL termination')
+
+    run_command("mkdir -p ${upload_dir}", $ui_host, { '_run_as' => 'root' })
+
+    out::message('Uploading browser certficate chain.')
+    write_file($generated['cert_chain'], "${upload_dir}/cert_chain.pem", $ui_host, { '_run_as' => 'root' })
+
+    out::message('Uploading browser private key.')
+    write_file($generated['private_key'], "${upload_dir}/private_key.pem", $ui_host, { '_run_as' => 'root' })
+    run_command("chmod 0400 ${upload_dir}/private_key.pem", $ui_host, { '_run_as' => 'root' })
+
+    out::message('Uploading browser crl.')
+    write_file($generated['crl'], "${upload_dir}/crl.pem", $ui_host, { '_run_as' => 'root' })
   }
-
-  $upload_dir = '/etc/puppetlabs/cd4pe/browser_certs'
-  run_command("mkdir -p ${upload_dir}", $ui_host, { '_run_as' => 'root' })
-
-  out::message('Uploading browser certficate chain.')
-  upload_file($cert_file_path, "${upload_dir}/cert_chain.pem", $ui_host, { '_run_as' => 'root' })
-
-  out::message('Uploading browser private key.')
-  upload_file($key_file_path, "${upload_dir}/private_key.pem", $ui_host, { '_run_as' => 'root' })
-  run_command("chmod 0400 ${upload_dir}/private_key.pem", $ui_host, { '_run_as' => 'root' })
-
-  out::message('Uploading browser crl.')
-  upload_file($crl_file_path, "${upload_dir}/crl.pem", $ui_host, { '_run_as' => 'root' })
 }

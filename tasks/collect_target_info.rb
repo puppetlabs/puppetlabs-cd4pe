@@ -80,7 +80,9 @@ def collect_runtime_info(tmpdir, runtime)
   network_ls_output.split("\n").each do |volume_id|
     combined_output, _ = Open3.capture2e("#{runtime} network inspect #{volume_id};")
     network_info = JSON.parse(combined_output)
-    name = network_info[0]['Name']
+    # Podman and docker have different capitalization for the name field
+    # specifically in the network inspect output, so we need to check for both
+    name = network_info[0].key?('name') ? network_info[0]['name'] : network_info[0]['Name']
     File.write(File.join(networks_dir, "#{name}.json"), JSON.pretty_generate(network_info))
   end
 

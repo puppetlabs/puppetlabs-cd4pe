@@ -1,0 +1,55 @@
+<%- |
+String[1] $title,
+Variant[String,Array[String[1],1],Undef] $net,
+Variant[String,Array] $envs,
+Variant[String,Array] $env_files,
+Variant[String,Array,Undef] $ports,
+Variant[String,Array,Undef] $volumes,
+Variant[String,Array[String],Undef] $extra_parameters,
+String $image,
+| -%>
+#!/usr/bin/env bash
+# This file is managed by Puppet and local changes
+# may be overwritten
+
+# If we have stored the IP, pull it in to re-use it
+if [ -s /etc/puppetlabs/cd4pe/<%= $title %>.ip.txt ]; then
+  IP=$(cat /etc/puppetlabs/cd4pe/<%= $title %>.ip.txt)
+  SET_IP="--ip ${IP}"
+fi
+
+/usr/bin/podman rm <%= $title %> >/dev/null 2>&1
+
+/usr/bin/podman create \
+--net <%= $net %> \
+${SET_IP} \
+--memory 0b \
+<% if $envs =~ Array[String,1] { -%>
+<% $envs.each |$env| { -%>
+--env "<%= $env %>" \
+<% } -%>
+<% } -%>
+<% if $env_files =~ Array[String,1] { -%>
+<% $env_files.each |$env_file| { -%>
+--env-file "<%= $env_file %>" \
+<% } -%>
+<% } -%>
+<% if $ports =~ Array[String,1] { -%>
+<% $ports.each |$port| { -%>
+--publish "<%= $port %>" \
+<% } -%>
+<% } -%>
+<% if $volumes =~ Array[String,1] { -%>
+<% $volumes.each |$volume| { -%>
+--volume "<%= $volume %>:z" \
+<% } -%>
+<% } -%>
+<% if $extra_parameters { -%>
+<%= $extra_parameters %> \
+<% } -%>
+--name <%= $title %> \
+<%= $image %>
+
+/usr/bin/podman start -a <%= $title %>
+
+exit $?

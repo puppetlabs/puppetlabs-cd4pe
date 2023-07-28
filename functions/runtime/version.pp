@@ -4,8 +4,10 @@ function cd4pe::runtime::version(
   Boolean $run_as_root = true,
 ) >> ResultSet {
   $command = $runtime ? {
-    'docker' => "docker version -f '{{ json . }}'",
-    'podman' => 'podman version -f json',
+    # Check for Docker in the output to ensure it is not the podman-docker shim
+    'docker' => 'docker version |grep --ignore-case docker',
+    # In case a docker-podman shim exists somewhere, doublecheck it is actually podman
+    'podman' => 'podman version |grep --ignore-case podman',
     default  => fail_plan("${runtime} is not yet implemented", 'cd4pe/error')
   }
 

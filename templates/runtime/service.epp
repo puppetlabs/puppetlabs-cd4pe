@@ -1,0 +1,25 @@
+<%- | 
+String[1]  $title,
+| -%>
+# This file is managed by Puppet and local changes
+# may be overwritten
+
+[Unit]
+Description=Daemon for <%= $title %>
+After=
+Wants=
+Requires=
+
+[Service]
+Restart=on-failure
+StartLimitInterval=20
+StartLimitBurst=3
+TimeoutStartSec=0
+RestartSec=5
+Environment="HOME=/root"
+SyslogIdentifier=podman-<%= $title %>
+ExecStart=/usr/local/bin/podman-run-<%= $title %>-start.sh
+ExecStop=-/usr/local/bin/podman-run-<%= $title %>-stop.sh
+
+[Install]
+WantedBy=multi-user.target

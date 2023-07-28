@@ -12,7 +12,6 @@ function cd4pe::config() >> Cd4pe::Config {
   $runtime = cd4pe::default_for_value($hiera_config['runtime'], 'docker')
   $backup_dir = cd4pe::default_for_value($hiera_config['backup_dir'], '/var/lib/puppetlabs/cd4pe/backups')
 
-
   $container_defaults = {
     teams_ui => {
       max_log_size_mb => 100,
@@ -160,5 +159,11 @@ function cd4pe::config() >> Cd4pe::Config {
       runtime       => $runtime,
       backup_dir    => $backup_dir,
       dump_filename => "cd4pe-postgres-${Timestamp.new.strftime('%Y-%m-%d')}.dump",
+      ssl => {
+        cert_chain => $hiera_config['ssl_cert_chain'],
+        crl => $hiera_config['ssl_crl'],
+        private_key => Sensitive($hiera_config['ssl_private_key']),
+      },
+      # }),
   })
 }

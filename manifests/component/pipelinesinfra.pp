@@ -4,7 +4,10 @@
 class cd4pe::component::pipelinesinfra (
   Cd4pe::Config::Pipelinesinfra $config,
 ) {
-  include 'cd4pe::interservice_auth'
+  cd4pe::runtime::volume { 'cd4pe-query-service-token':
+    ensure  => present,
+    runtime => $config['runtime'],
+  }
 
   $log_target_path = '/app/logs'
   $log4j_src_path = '/etc/puppetlabs/cd4pe/log4j2.properties'
@@ -21,6 +24,7 @@ class cd4pe::component::pipelinesinfra (
     group   => 'root',
     content => Sensitive("PFI_SECRET_KEY=${config['secret_key'].unwrap}\n"),
     replace => false,
+    seltype => 'container_file_t',
   }
 
   $container = $config['container']
@@ -41,9 +45,10 @@ class cd4pe::component::pipelinesinfra (
     ensure    => file,
     owner     => 'root',
     group     => 'root',
+    seltype   => 'container_file_t',
     show_diff => false,
     content   => epp('cd4pe/cd4pe_env.epp', $app_data),
-    notify    => Docker::Run[$container['name']],
+    notify    => Cd4pe::Runtime::Run[$container['name']],
   }
 
   file { [
@@ -54,6 +59,7 @@ class cd4pe::component::pipelinesinfra (
       ensure    => directory,
       owner     => 'root',
       group     => 'root',
+      seltype   => 'container_file_t',
       show_diff => false,
   }
 
@@ -61,13 +67,14 @@ class cd4pe::component::pipelinesinfra (
     ensure    => file,
     owner     => 'root',
     group     => 'root',
+    seltype   => 'container_file_t',
     show_diff => false,
     content   => epp('cd4pe/pfi-config.json.epp',
     {
       'db_username' => $config['db_username'],
       'db_password' => $config['db_password'].unwrap,
     }),
-    notify    => Docker::Run[$container['name']],
+    notify    => Cd4pe::Runtime::Run[$container['name']],
   }
 
   $log4j_config = {
@@ -81,19 +88,23 @@ class cd4pe::component::pipelinesinfra (
     ensure    => file,
     owner     => 'root',
     group     => 'root',
+    seltype   => 'container_file_t',
     show_diff => false,
     content   => epp('cd4pe/log4j2.properties.epp', $log4j_config),
   }
 
-  docker_volume { 'cd4pe-disk-storage':
-    ensure => present,
+  cd4pe::runtime::volume { 'cd4pe-disk-storage':
+    ensure  => present,
+    runtime => $config['runtime'],
   }
 
-  docker_volume { $container['log_volume_name']:
-    ensure => present,
+  cd4pe::runtime::volume { $container['log_volume_name']:
+    ensure  => present,
+    runtime => $config['runtime'],
   }
 
-  docker::run { $container['name']:
+  cd4pe::runtime::run { $container['name']:
+    runtime          => $config['runtime'],
     image            => $container['image'],
     net              => 'cd4pe',
     extra_parameters => $container['extra_parameters'],
@@ -113,6 +124,6 @@ class cd4pe::component::pipelinesinfra (
       '/etc/puppetlabs/cd4pe/env',
       '/etc/puppetlabs/cd4pe/secret_key',
     ],
-    require          => Class['cd4pe::interservice_auth'],
+    require          => Cd4pe::Runtime::Volume['cd4pe-query-service-token'],
   }
 }

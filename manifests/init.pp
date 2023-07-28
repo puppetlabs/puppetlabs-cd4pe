@@ -16,5 +16,10 @@ class cd4pe (
     docker_network { 'cd4pe':
       ensure  => present,
     }
+  } elsif($runtime == 'podman') {
+    exec { "podman network create ${name}":
+      path   => '/usr/bin',
+      unless => "podman network inspect ${name}",
+    }
   }
 }

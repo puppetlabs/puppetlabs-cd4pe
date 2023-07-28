@@ -21,4 +21,9 @@ type Cd4pe::Config = Struct[{
     runtime             => Cd4pe::Runtime,
     backup_dir          => String[1],
     dump_filename       => String[1],
+    ssl => Optional[Struct[{
+          cert_chain  => Optional[String[1]],
+          crl         => Optional[String[1]],
+          private_key => Variant[Sensitive[String[1]], Sensitive[Undef]],
+    }]]
 }]
