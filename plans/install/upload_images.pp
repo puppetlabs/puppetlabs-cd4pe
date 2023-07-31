@@ -35,7 +35,7 @@ plan cd4pe::install::upload_images(
         if !$target_run_result.ok {
           if !file::exists($local_cached_image_tar_path) {
             without_default_logging() || {
-              if !cd4pe::images::inspect($image_name, 'localhost', { '_catch_errors' => true }).ok {
+              if !cd4pe::images::inspect($image_name, 'localhost', { '_catch_errors' => true }, $local_runtime).ok {
                 out::message("Image '${image_name}' for role '${role}' does not exist locally, pulling latest version.")
                 run_command(
                   "${local_runtime} pull ${image_name}",

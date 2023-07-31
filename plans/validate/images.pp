@@ -15,7 +15,7 @@ plan cd4pe::validate::images (
     $images_validation_results = $services.reduce($memo) |$memo, $service_hash| {
       $service_name = $service_hash[0]
       $image = $service_hash[1]['container']['image']
-      $inspect_result = cd4pe::images::inspect($image, $targets)
+      $inspect_result = cd4pe::images::inspect($image, $targets, undef, $config['runtime'])
       $failed_targets = $inspect_result.error_set.map() |$result| {
         "${result.target.name} : could not find image for container ${service_name}"
       } + $memo['failed']

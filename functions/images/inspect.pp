@@ -1,4 +1,4 @@
-# runs an runtime appropriate image inspect command on the
+# runs a runtime appropriate image inspect command on the
 # specified targets.
 
 # @param image_name The image name to inspect
