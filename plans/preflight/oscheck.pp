@@ -18,22 +18,29 @@ plan cd4pe::preflight::oscheck(
     ],
     'centos' => [
       '7',
-      '8',
     ],
     'oraclelinux' => [
       '7',
-      '8',
     ],
     'scientificlinux' => [
       '7',
-      '8',
     ],
     'sles' => [
       '12',
+      '15',
     ],
     'redhat' => [
       '7',
       '8',
+    ],
+    'rocky' => [
+      '8',
+    ],
+    'almalinux' => [
+      '8',
+    ],
+    'amazon' => [
+      '2',
     ],
   }
 
