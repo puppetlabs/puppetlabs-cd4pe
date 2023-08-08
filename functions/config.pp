@@ -39,7 +39,6 @@ function cd4pe::config() >> Cd4pe::Config {
   }
   $containers = $container_defaults + cd4pe::default_for_value($hiera_config['containers'], {})
   $ui_service = Cd4pe::Config::Teams_ui.new({
-      analytics         => $hiera_config['analytics'],
       container         => Cd4pe::Container.new({
           name             => 'ui',
           image            => $images['teams_ui'],
@@ -54,7 +53,6 @@ function cd4pe::config() >> Cd4pe::Config {
   })
 
   $pipelinesinfra_service = Cd4pe::Config::Pipelinesinfra.new({
-      analytics           => $hiera_config['analytics'],
       backup_dir          => $backup_dir,
       container           => Cd4pe::Container.new({
           name             => 'pipelinesinfra',
@@ -93,7 +91,6 @@ function cd4pe::config() >> Cd4pe::Config {
   })
 
   $query_service = Cd4pe::Config::Query.new({
-      analytics               => $hiera_config['analytics'],
       container               => Cd4pe::Container.new({
           name             => 'query',
           image            => $images['query'],
@@ -115,7 +112,6 @@ function cd4pe::config() >> Cd4pe::Config {
   })
 
   $postgres_service = Cd4pe::Config::Postgres.new({
-      analytics   => $hiera_config['analytics'],
       container   => Cd4pe::Container.new({
           name             => 'postgres',
           image            => $images['postgres'],

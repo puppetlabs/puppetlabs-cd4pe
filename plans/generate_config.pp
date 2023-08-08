@@ -17,7 +17,6 @@
 # @param [String] resolvable_hostname The hostname users will be able to access
 #   the CD4PE console at
 # @param [String] admin_username The first CD4PE user of the installation. It is also sometimes referred to as the root user.
-# @param [Boolean] analytics if analytics should be enabled. Analytics are not yet implemented.
 # @param [Sensitive[String]] admin_db_password Used by the admin/superuser of the Postgres instance. It's only used in setup.
 # @param [Optional[String]] cd4pe_db_username Overrides the default database user which is used by the backend service.
 # @param [Sensitive[String]] cd4pe_db_password Password of the database used by the backend service.
@@ -34,7 +33,6 @@ plan cd4pe::generate_config(
   String $inventory_aio_target,
   String $resolvable_hostname,
   String $admin_username = 'admin',
-  Boolean $analytics = true,
   Sensitive[String] $admin_db_password = Sensitive(cd4pe::secure_random(32)),
   Optional[String] $cd4pe_db_username = undef,
   Sensitive[String] $cd4pe_db_password = Sensitive(cd4pe::secure_random(32)),
@@ -65,7 +63,6 @@ plan cd4pe::generate_config(
           database => [$inventory_aio_target],
           ui       => [$inventory_aio_target],
         },
-        analytics           => $analytics,
         admin_db_password   => regsubst(cd4pe::encrypt($admin_db_password, $pkcs7_public_key_path), '\n', ' ', 'MG'),
         cd4pe_db_password   => regsubst(cd4pe::encrypt($cd4pe_db_password, $pkcs7_public_key_path), '\n', ' ', 'MG'),
         cd4pe_db_username   => $cd4pe_db_username,

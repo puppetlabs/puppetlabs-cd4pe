@@ -30,7 +30,6 @@ class cd4pe::component::pipelinesinfra (
   $container = $config['container']
 
   $app_data = {
-    'analytics'       => $config['analytics'],
     'root_username'   => $config['root_username'],
     # Hardcode password to puppetlabs instead of reading from config
     # Need to solve bcrypt from puppet, or change backend - CDPE-5616

@@ -1,5 +1,4 @@
 <%- |
-Boolean $analytics,
 String $root_username,
 String $root_password,
 String $jvm_args,
@@ -7,7 +6,6 @@ String $web_ui_endpoint,
 String $log4j_path,
 Hash $env_vars,
 | -%>
-ANALYTICS=<%= $analytics %>
 CD4PE_BACKEND_SERVICE_ENDPOINT=http://localhost:8000
 PUPPET_TEAMS_WEB_UI_ENDPOINT=<%= $web_ui_endpoint %>
 CD4PE_WEB_UI_ENDPOINT=<%= $web_ui_endpoint %>

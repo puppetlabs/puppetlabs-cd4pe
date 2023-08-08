@@ -5,7 +5,6 @@ type Cd4pe::Hiera_config = Struct[{
         database => Array[String[1]],
         ui       => Array[String[1]],
     }],
-    analytics           => Boolean,
     admin_db_password   => String[1],
     cd4pe_db_password   => String[1],
     cd4pe_db_username   => Optional[String[1]],

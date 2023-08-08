@@ -4,7 +4,6 @@
 # Important: DataTypes used here must be serializable, or come
 # from puppet modules since they are passed to target nodes.
 type Cd4pe::Config::Postgres = Struct[{
-    analytics         => Boolean,
     container         => Cd4pe::Container,
     admin_db_password => Sensitive[String[1]],
     admin_db_username => String[1],

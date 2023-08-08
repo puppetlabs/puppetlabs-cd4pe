@@ -4,7 +4,6 @@
 # Important: DataTypes used here must be serializable, or come
 # from puppet modules since they are passed to target nodes.
 type Cd4pe::Config::Pipelinesinfra = Struct[{
-    analytics           => Boolean,
     backup_dir          => String[1],
     container           => Cd4pe::Container,
     db_password         => Sensitive[String[1]],

@@ -31,7 +31,6 @@ plan cd4pe::bootstrap(
   $admin_uname = prompt('Console admin username', 'default' => 'admin')
   $admin_pword =  prompt('Console admin password', 'sensitive' => true)
 
-  $collect_analytics =  Boolean(prompt('Permission to send analytic data to puppet.com', 'default' => 'true'))
   $runtime = prompt::menu('Which container runtime should be installed on the target?', ['docker', 'podman'])
   $auto_config_db = Boolean(prompt('Would you like to auto-configure the database users and passwords?', 'default' => 'true'))
   if $auto_config_db {
@@ -51,7 +50,6 @@ plan cd4pe::bootstrap(
   run_plan('cd4pe::generate_config', {
       admin_password       => $admin_pword,
       admin_username       => $admin_uname,
-      analytics            => $collect_analytics,
       admin_db_password    => $admin_db_password,
       cd4pe_db_password    => $cd4pe_db_password,
       cd4pe_db_username    => $cd4pe_db_username,
