@@ -95,11 +95,17 @@ http {
             proxy_set_header Host $host;
         }
 
-        # SAML auth endpoint
-        location = /cd4pe/saml-auth {
-            proxy_pass ${CD4PE_SERVICE}/saml-auth;
-            proxy_set_header Host $host;
-        }
+        # old SAML auth endpoint (v4.21.0->v4.21.1)
+       location = /cd4pe/saml-auth {
+           proxy_pass ${CD4PE_SERVICE}/saml-auth;
+           proxy_set_header Host $host;
+       }
+
+       # SAML auth endpoint (v4.22.0 +)
+       location = /saml-auth {
+           proxy_pass ${CD4PE_SERVICE}/saml-auth;
+           proxy_set_header Host $host;
+       }
 
         # Ajax endpoints
         location ~ ^/cd4pe/([^/]+)/ajax {
