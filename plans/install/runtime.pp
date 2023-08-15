@@ -1,6 +1,6 @@
 # @api private
 #
-# Installs the desired runtime on all infrastucture targets.
+# Installs the desired runtime on all infrastructure targets.
 # 
 # For a list of supported runtimes, @see Cd4pe::Runtime
 #

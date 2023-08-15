@@ -72,8 +72,8 @@ function cd4pe::config() >> Cd4pe::Config {
       secret_key          => Sensitive($hiera_config['secret_key']),
       secret_key_path     => '/etc/puppetlabs/cd4pe/secret_key',
       env_vars => {
-        'CD4PE_JOB_HTTP_READ_TIMEOUT'                => $hiera_config['job_http_read_timeout_mins'],
-        'CD4PE_JOB_GLOBAL_TIMEOUT'                   => $hiera_config['job_global_timeout_mins'],
+        'CD4PE_JOB_HTTP_READ_TIMEOUT_MINUTES'        => $hiera_config['job_http_read_timeout_mins'],
+        'CD4PE_JOB_GLOBAL_TIMEOUT_MINUTES'           => $hiera_config['job_global_timeout_mins'],
         'CD4PE_LDAP_GROUP_SEARCH_SIZE_LIMIT'         => $hiera_config['ldap_group_search_size_limit'],
         'CD4PE_REPO_CACHING'                         => $hiera_config['repo_caching'],
         'CD4PE_REPO_CACHE_RETRIEVAL_TIMEOUT_MINUTES' => $hiera_config['repo_cache_retrieval_timeout_mins'],

@@ -40,6 +40,7 @@ plan cd4pe::generate_config(
   Sensitive[String] $query_db_password = Sensitive(cd4pe::secure_random(32)),
   Sensitive[String] $secret_key = Sensitive(cd4pe::secure_random(16)),
   Optional[Cd4pe::Runtime] $runtime = undef,
+  Hash[String, Any] $optional_settings = {},
   String $hiera_config_file_path = 'hiera.yaml',
   String $hiera_data_file_path = 'data/common.yaml',
   String $pkcs7_private_key_path = 'keys/private_key.pkcs7.pem',
@@ -56,8 +57,7 @@ plan cd4pe::generate_config(
     })
   }
 
-  $hiera_data = {
-    'cd4pe::config' => Cd4pe::Hiera_config.new({
+  $basic_config = {
         targets             => {
           backend  => [$inventory_aio_target],
           database => [$inventory_aio_target],
@@ -73,7 +73,12 @@ plan cd4pe::generate_config(
         root_username       => $admin_username,
         runtime             => $runtime,
         secret_key          => regsubst(cd4pe::encrypt($secret_key, $pkcs7_public_key_path), '\n', ' ', 'MG'),
-    }),
+    }
+
+  $full_config = $basic_config + $optional_settings
+
+  $hiera_data = {
+    'cd4pe::config' => Cd4pe::Hiera_config.new($full_config)
   }
 
   $hiera_data_path = cd4pe::save_yaml_file($hiera_data, $hiera_data_file_path)
