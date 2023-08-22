@@ -1,6 +1,9 @@
 # @api private
 #
 # Ensures that this version of CD4PE's application images are on all infra targets.
+# Archived versions of the images are curled down from a public GCS bucket and then
+# uploaded to the infra targets. The images are then loaded into the local docker
+# or podman image cache.
 #
 # Will locally cache the images to {boltproject}/downloads/ to speed up plan re-runs
 #
@@ -16,12 +19,6 @@ plan cd4pe::install::upload_images(
     run_command("mkdir -p ${images_cache_dir}", 'localhost')
   }
 
-  # Check if podman is installed locally, if so use it instead of docker
-  $local_runtime = cd4pe::runtime::version('localhost', 'podman', false)[0].ok ? {
-    true => 'podman',
-    default => 'docker',
-  }
-
   $config['roles'].each |$role, $role_info| {
     $targets_by_role = $role_info['targets']
     $role_info['services'].each |$name, $service| {
@@ -35,26 +32,18 @@ plan cd4pe::install::upload_images(
         if !$target_run_result.ok {
           if !file::exists($local_cached_image_tar_path) {
             without_default_logging() || {
-              if !cd4pe::images::inspect($image_name, 'localhost', { '_catch_errors' => true }, $local_runtime).ok {
-                out::message("Image '${image_name}' for role '${role}' does not exist locally, pulling latest version.")
-                run_command(
-                  "${local_runtime} pull ${image_name}",
-                  'localhost',
-                )
-              } else {
-                out::message("Image '${image_name}' for role '${role}' exists in local cache, not updating.")
-              }
-
-              out::message("Saving '${image_name}' to '${local_cached_image_tar_path}'")
+              out::message("Downloading '${filename}' to '${images_cache_dir}'")
               run_command(
-                "${local_runtime} save ${image_name} | gzip > ${local_cached_image_tar_path}",
+                "curl --location --remote-name https://storage.googleapis.com/cd4pe-images/${filename} --output-dir ${images_cache_dir}",
                 'localhost',
               )
             }
+          } else {
+            out::message("Archive '${filename}' for role '${role}' exists in local cache, not updating.")
           }
 
           without_default_logging() || {
-            out::message("Image '${image_name}' for '${role}' role does not exist on '${target_run_result.target.name}', uploading.")
+            out::message("Archive '${filename}' for '${role}' role does not exist on '${target_run_result.target.name}', uploading.")
             upload_file($local_cached_image_tar_path, '/tmp', $targets_by_role, '_run_as' => 'root')
             run_command("${runtime} load -i /tmp/${$filename}", $targets_by_role, '_run_as' => 'root')
           }
