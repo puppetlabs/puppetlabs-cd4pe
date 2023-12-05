@@ -4,7 +4,7 @@
   "author": "puppetlabs",
   "summary": "Module for CD4PE",
   "license": "Apache-2.0",
-  "source": "https://forge.puppetlabs.com/puppetlabs/cd4pe",
+  "source": "https://github.com/puppetlabs/puppetlabs-cd4pe",
   "project_page": "https://github.com/puppetlabs/puppetlabs-cd4pe",
   "issues_url": "https://tickets.puppetlabs.com/browse/ENTERPRISE",
   "dependencies": [
