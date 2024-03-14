@@ -16,12 +16,12 @@ RSpec.describe('cd4pe::deprovision') do
       context 'mysql' do
         let(:facts) do
             {
-            os: { 
+            os: {
                 'family' => 'RedHat',
-                'name' => 'CentOS',
-                release: { 
-                    'major' => '7'
-                    } 
+                'name' => 'RedHat',
+                release: {
+                    'major' => '8'
+                    }
                 }
             }
         end
@@ -36,13 +36,13 @@ RSpec.describe('cd4pe::deprovision') do
 
       context 'postgres' do
         let(:facts) do
-          { cd4pe_multimodule_packaging: true, 
-            os: { 
+          { cd4pe_multimodule_packaging: true,
+            os: {
                 'family' => 'RedHat',
-                'name' => 'CentOS',
-                release: { 
+                'name' => 'RedHat',
+                release: {
                     'major' => '7'
-                    } 
+                    }
                 }
           }
         end

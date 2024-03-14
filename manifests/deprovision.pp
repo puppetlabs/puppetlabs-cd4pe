@@ -2,12 +2,15 @@
 # @param db_provider
 #   Which database provider your existing installation is using: mysql or postgres
 #
+# @param db_host Optional string for the database host
+# @param cd4pe_image Required String for the CD4PE image
+# @param cd4pe_version Required String for the version.
 class cd4pe::deprovision (
   Enum['mysql', 'postgres'] $db_provider = 'postgres',
   Optional[String] $db_host              = undef,
   String $cd4pe_image                    = 'puppet/continuous-delivery-for-puppet-enterprise',
   String $cd4pe_version                  = '3.x'
-){
+) {
   include docker
 
   warning('Beginning with version 3.0.0 of this module, we no longer support the installation of CD4PE or management of databases.')
@@ -34,22 +37,23 @@ class cd4pe::deprovision (
   debug('Doing cleanup of CD4PE resources.')
 
   file { [$data_root_dir,
-          "${data_root_dir}/secret_key",
-          "${data_root_dir}/env",
-          "${data_root_dir}/cd4pe_db_password",
-          "${data_root_dir}/db_env"] :
-    ensure => absent,
+      "${data_root_dir}/secret_key",
+      "${data_root_dir}/env",
+      "${data_root_dir}/cd4pe_db_password",
+      "${data_root_dir}/db_env" #lint:ignore_trailing_comma
+    ]:
+      ensure => absent,
   }
-  if($effective_db_provider == 'mysql'){
+  if($effective_db_provider == 'mysql') {
     docker_network { 'cd4pe':
       ensure  => absent,
     }
 
-    file{["${data_root_dir}/mysql_password", "${data_root_dir}/mysql_env"]:
+    file {["${data_root_dir}/mysql_password", "${data_root_dir}/mysql_env"]:
       ensure => absent,
     }
 
-    if($db_host == undef){
+    if($db_host == undef) {
       $host = 'cd4pe_mysql'
     } else {
       $host = $db_host
@@ -57,9 +61,9 @@ class cd4pe::deprovision (
 
     docker::run { $host:
       ensure => absent,
-      image  => 'mysql:5.7'
+      image  => 'mysql:5.7',
     }
-  } elsif($effective_db_provider == 'postgres'){
+  } elsif($effective_db_provider == 'postgres') {
     $pgsqldir    = '/opt/puppetlabs/server/data/postgresql'
     $pg_version   = '9.6'
     $pgsql_data_dir = "${pgsqldir}/${pg_version}/data"
@@ -78,21 +82,17 @@ class cd4pe::deprovision (
       }
     }
 
-    file {[$pgsqldir, "${pgsqldir}/${pg_version}" ]:
+    file {[$pgsqldir, "${pgsqldir}/${pg_version}"]:
       ensure  => absent,
     }
 
-    file { [$cert_dir,
-            $target_ca_cert,
-            $target_client_cert,
-            $pk8_file, $ssl_db_env,
-            $postgres_cert_dir]:
+    file { [$cert_dir,$target_ca_cert,$target_client_cert,$pk8_file,$ssl_db_env,$postgres_cert_dir]:
       ensure => absent,
     }
   }
 
-  docker::run {'cd4pe':
+  docker::run { 'cd4pe':
     ensure => absent,
-    image  => "${cd4pe_image}:${cd4pe_version}"
+    image  => "${cd4pe_image}:${cd4pe_version}",
   }
 }
