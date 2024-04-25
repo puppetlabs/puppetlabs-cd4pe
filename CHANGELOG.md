@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 - No unreleased changes
 
+## [v3.3.0](https://github.com/puppetlabs/puppetlabs-cd4pe/tree/v3.3.0)
+### Added
+- Expand module dependencies to allow versions that are compatible with Puppet 8.
+- Add Puppet 8 to the Puppet version requirements.
+
 ## [v3.2.5](https://github.com/puppetlabs/puppetlabs-cd4pe/tree/v3.2.5)
 ### Fixed
 - Fixed an issue where the add_repo task would fail if pipelines_as_code_branch was unset
