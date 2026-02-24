@@ -6,6 +6,7 @@ end
 
 require 'puppetlabs_spec_helper/module_spec_helper'
 require 'rspec-puppet-facts'
+require 'shared/contexts'
 
 require 'spec_helper_local' if File.file?(File.join(File.dirname(__FILE__), 'spec_helper_local.rb'))
 
@@ -14,6 +15,19 @@ include RspecPuppetFacts
 default_facts = {
   puppetversion: Puppet.version,
   facterversion: Facter.version,
+  platform_symlink_writable: true,
+  path: '/usr/local/sbin:/sbin:/bin:/usr/sbin:/usr/bin:/root/bin:/usr/local/bin',
+  os: {
+    'family' => 'RedHat',
+    'name'                   => 'CentOS',
+    'release'                => {
+      'major' => '6',
+    },
+  },
+  pe_build: '2018.1.0',
+  platform_tag: 'el-7-x86_64',
+  memory: { 'system' => { 'total_bytes' => 4_294_967_296 } },
+  processors: { 'count' => 1 }
 }
 
 default_fact_files = [

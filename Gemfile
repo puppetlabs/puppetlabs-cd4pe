@@ -61,6 +61,7 @@ group :development do
   gem "rb-readline", '= 0.5.5',                  require: false, platforms: [:mswin, :mingw, :x64_mingw]
   gem "bigdecimal", '< 3.2.2',                   require: false, platforms: [:mswin, :mingw, :x64_mingw]
   gem "puppet-resource_api",                     require: false
+  gem 'webmock', '~> 3.0',                       require: false
 end
 group :development, :release_prep do
   gem "puppet-strings", '~> 4.0',         require: false
