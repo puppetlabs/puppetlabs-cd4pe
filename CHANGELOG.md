@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 - No unreleased changes
 
+## [v3.4.0](https://github.com/puppetlabs/puppetlabs-cd4pe/tree/v3.4.0)
+### Added
+- Updated puppetlabs-docker and puppetlabs-hocon dependencies to allow usage of newer versions
+- Updated module with PDK 3.6.1
+
 ## [v3.3.0](https://github.com/puppetlabs/puppetlabs-cd4pe/tree/v3.3.0)
 ### Added
 - Expand module dependencies to allow versions that are compatible with Puppet 8.
