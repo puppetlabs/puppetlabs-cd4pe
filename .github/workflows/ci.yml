@@ -1,0 +1,32 @@
+name: ci.yml
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  spec:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3
+          bundler-cache: true
+      - name: application authentication
+        uses: actions/create-github-app-token@v1
+        id: app-token
+        with:
+          app-id: ${{ vars.PUPPET_CD4PE_TOKEN_APP_ID }}
+          private-key: ${{ secrets.PUPPET_CD4PE_TOKEN }}
+          repositories: puppet-enterprise-modules,puppetlabs-pe_r10k, enterprise_tasks, provision
+          owner: puppetlabs
+      - name: Run tests
+        env:
+          ACCESS_TOKEN: ${{ steps.app-token.outputs.token }}
+          FIXTURES_YML: .fixtures.ci.yml
+        run: |
+          bundle exec rake spec
