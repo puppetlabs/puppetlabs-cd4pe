@@ -74,11 +74,6 @@ module PuppetX::Puppetlabs
       end
     end
 
-    def root_config
-      endpoint = "#{ROOT_AJAX_ENDPOINT}?op=GetRootConfiguration"
-      make_request(:get, endpoint)
-    end
-
     attr_reader :cookie
 
     def create_root_account
@@ -90,27 +85,6 @@ module PuppetX::Puppetlabs
         },
       }
       make_request(:post, '/root-account', payload.to_json)
-    end
-
-    def save_license(license)
-      payload = {
-        op: 'RootSavePfiLicense',
-        content: license,
-      }
-      make_request(:post, ROOT_AJAX_ENDPOINT, payload.to_json)
-    end
-
-    def generate_trial_license
-      # generate the trial license
-      response = make_request(:get, '/generate-trial-license?op=GenerateTrialLicense')
-      license = JSON.parse(response.body)
-
-      # save the trial license
-      payload = {
-        op: 'SavePfiLicense', # Note: endpoint is different from the save_license endpoint
-        content: license,
-      }
-      make_request(:post, '/root/license', payload.to_json)
     end
 
     def create_workspace(workspace, for_user)
@@ -137,41 +111,6 @@ module PuppetX::Puppetlabs
       payload['content'] = provider_specific
 
       make_request(:post, "/#{workspace}/ajax", payload.to_json)
-    end
-
-    def save_endpoint_settings(webui, backend, agent)
-      payload = {
-        op: 'SaveEndpointSettings',
-        content: {
-          setting: {
-            webUIEndpoint: webui,
-            backendServiceEndpoint: backend,
-            agentServiceEndpoint: agent,
-          },
-        },
-      }
-      make_request(:post, ROOT_ENDPOINT_SETTINGS, payload.to_json)
-    end
-
-    def save_storage_settings(provider, endpoint, bucket, prefix, access_key = nil, secret_key = '')
-      # CDPE-1195 - CD4PE attempts to encrypt the secret even if using DISK storage. Send an
-      # empty string for now if the caller passed in nil
-      secret_key = '' if secret_key.nil?
-      payload = {
-        op: 'SaveStorageSettings',
-        content: {
-          setting: {
-            osType: provider,
-            osEndpoint: endpoint,
-            osDiskRoot: '/disk',
-            osBucket: bucket,
-            osPrefix: prefix,
-            osCredKey: access_key,
-            osCredSecret: secret_key,
-          },
-        },
-      }
-      make_request(:post, ROOT_STORAGE_SETTINGS, payload.to_json)
     end
 
     def add_oauth_integration(provider, client_id, client_secret)
@@ -551,21 +490,6 @@ module PuppetX::Puppetlabs
       make_request(:post, get_ajax_endpoint(workspace), payload.to_json)
     end
 
-    def save_ssl_settings(ssl_authority_certificate, ssl_server_certificate, ssl_server_private_key, ssl_enabled)
-      payload = {
-        op: 'SaveSslSettings',
-        content: {
-          setting: {
-            authorityCertificate: ssl_authority_certificate,
-            serverCertificate: ssl_server_certificate,
-            serverPrivateKey: ssl_server_private_key,
-            sslEnabled: ssl_enabled,
-          },
-        },
-      }
-      make_request(:post, ROOT_AJAX_ENDPOINT, payload.to_json)
-    end
-
     def create_user(email, username, password, first_name, last_name, company_name)
       payload = {
         op: 'PfiSignup',
@@ -579,21 +503,6 @@ module PuppetX::Puppetlabs
         },
       }
       make_request(:post, SIGNUP_ENDPOINT, payload.to_json)
-    end
-
-    def create_agent_credentials
-      endpoint = "#{HW_CONFIG_ENDPOINT}?op=CreateAgentCredentials"
-      make_request(:get, endpoint)
-    end
-
-    def list_agent_credentials
-      endpoint = "#{HW_CONFIG_ENDPOINT}?op=ListAgentCredentials"
-      make_request(:get, endpoint)
-    end
-
-    def list_servers
-      endpoint = "#{HW_CONFIG_ENDPOINT}?op=ListServers"
-      make_request(:get, endpoint)
     end
 
     def promote_pipeline_to_stage(workspace, repo_name, repo_type, branch_name, stage_name, commit_sha, commit_message)
