@@ -1,3 +1,8 @@
+# @summary Configures a PE primary to allow CD4PE impact analysis requests
+# @param ensure
+#   Whether impact analysis support should be present or absent on this PE primary
+# @param allowed_certnames
+#   The certnames permitted to make impact analysis requests against this PE primary
 class cd4pe::impact_analysis (
   Enum['present', 'absent'] $ensure = 'present',
   Optional[Array[String]] $allowed_certnames = undef,
@@ -9,7 +14,7 @@ class cd4pe::impact_analysis (
     # If between 2017.3 and 2019.1, use the legacy
     class { 'cd4pe::impact_analysis::legacy':
       ensure            => $ensure,
-      allowed_certnames => $allowed_certnames
+      allowed_certnames => $allowed_certnames,
     }
   } else {
     # If > 2019.1, we have our new catalog endpoint built in, no need for our legacy code
@@ -18,13 +23,12 @@ class cd4pe::impact_analysis (
     }
 
     Pe_puppet_authorization::Rule <| title == 'puppetlabs environment' |> {
-      allow +> { 'rbac' => { 'permission' => 'puppetserver:compile_catalog:*' }}
+      allow +> { 'rbac' => { 'permission' => 'puppetserver:compile_catalog:*' } }
     }
 
     Pe_puppet_authorization::Rule <| title == 'puppetlabs v4 catalog' |> {
-      allow +> { 'rbac' => { 'permission' => 'puppetserver:compile_catalog:*' }}
+      allow +> { 'rbac' => { 'permission' => 'puppetserver:compile_catalog:*' } }
     }
-
 
     # if > 2019.2, enable hiera tracing
     if(versioncmp(pe_build_version(), '2019.2.0') >= 0) {
@@ -33,7 +37,7 @@ class cd4pe::impact_analysis (
         path    => '/etc/puppetlabs/puppetserver/conf.d/pe-puppet-server.conf',
         setting => 'jruby-puppet.track-lookups',
         value   => true,
-        notify  => Service['pe-puppetserver']
+        notify  => Service['pe-puppetserver'],
       }
     }
   }

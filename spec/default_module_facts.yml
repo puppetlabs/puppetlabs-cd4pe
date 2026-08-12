@@ -1,0 +1,18 @@
+# Module-specific default facts for cd4pe specs (PE-flavored facts the specs rely on
+# that rspec-puppet-facts/facterdb don't provide, e.g. impact_analysis specs that
+# branch on pe_build_version).
+---
+platform_symlink_writable: true
+path: '/usr/local/sbin:/sbin:/bin:/usr/sbin:/usr/bin:/root/bin:/usr/local/bin'
+os:
+  family: 'RedHat'
+  name: 'CentOS'
+  release:
+    major: '6'
+pe_build: '2018.1.0'
+platform_tag: 'el-7-x86_64'
+memory:
+  system:
+    total_bytes: 4294967296
+processors:
+  count: 1

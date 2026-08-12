@@ -14,7 +14,7 @@ class PuppetX::Puppetlabs::CD4PEApi::JRubyHandler
   include Singleton
 
   def initialize
-    route_path = %r{^#{Puppet::Network::HTTP::MASTER_URL_PREFIX}/v3/cd4pe/compile/[^/]+$}
+    route_path = %r{^#{Puppet::Network::HTTP::MASTER_URL_PREFIX}/v3/cd4pe/compile/[^/]+$}o
 
     diff_handler = Puppet::Network::HTTP::Route.path(route_path)
                                                .get(PuppetX::Puppetlabs::CD4PEApi::CompileHandler.new)

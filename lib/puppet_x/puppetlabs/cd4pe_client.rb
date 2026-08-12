@@ -30,9 +30,8 @@ module PuppetX::Puppetlabs
         password: password,
       }
       # Only set the cookie if creds are provided, otherwise, make unauthenticated requests
-      if @config[:email] && @config[:password]
-        set_cookie
-      end
+      return unless @config[:email] && @config[:password]
+      set_cookie
     end
 
     def get_ajax_endpoint(workspace)
@@ -55,17 +54,11 @@ module PuppetX::Puppetlabs
       elsif response.code == '401'
         begin
           resp = JSON.parse(response.body, symbolize_names: true)
-          if resp[:error][:code] == 'LoginFailed'
-            # Root account may not exist, try creating it
-            response = create_root_account
-            if response.code == '200'
-              @cookie = response.response['set-cookie'].split(';')[0]
-            else
-              raise Puppet::Error, "Invalid login credentials to CD4PE host: #{@config[:server]}"
-            end
-          else
-            raise Puppet::Error, "Invalid login credentials to CD4PE host: #{@config[:server]}"
-          end
+          raise Puppet::Error, "Invalid login credentials to CD4PE host: #{@config[:server]}" unless resp[:error][:code] == 'LoginFailed'
+          # Root account may not exist, try creating it
+          response = create_root_account
+          raise Puppet::Error, "Invalid login credentials to CD4PE host: #{@config[:server]}" unless response.code == '200'
+          @cookie = response.response['set-cookie'].split(';')[0]
         rescue
           raise Puppet::Error, "Invalid login credentials to CD4PE host: #{@config[:server]}"
         end
@@ -508,10 +501,10 @@ module PuppetX::Puppetlabs
     def promote_pipeline_to_stage(workspace, repo_name, repo_type, branch_name, stage_name, commit_sha, commit_message)
       pipeline = get_pipeline_for_branch(workspace, repo_name, repo_type, branch_name)
       stage_index = CD4PEPipelineUtils.get_stage_index_by_name(pipeline[:stages], stage_name)
-      unless pipeline[:buildStage] && pipeline[:buildStage][:imageEvent] 
-        raise Puppet::Error "It looks like pipeline has not run before. Please run the pipeline and try promoting again."
+      unless pipeline[:buildStage] && pipeline[:buildStage][:imageEvent]
+        raise Puppet::Error 'It looks like pipeline has not run before. Please run the pipeline and try promoting again.'
       end
-      
+
       payload = {
         op: 'PipelinePromote',
         content: {
@@ -554,11 +547,11 @@ module PuppetX::Puppetlabs
 
       connection.use_ssl = true if @config[:scheme] == 'https'
 
-      if @config[:insecure_https] && @config[:scheme] == 'https'
-        connection.verify_mode = OpenSSL::SSL::VERIFY_NONE
-      else
-        connection.verify_mode = OpenSSL::SSL::VERIFY_PEER
-      end
+      connection.verify_mode = if @config[:insecure_https] && @config[:scheme] == 'https'
+                                 OpenSSL::SSL::VERIFY_NONE
+                               else
+                                 OpenSSL::SSL::VERIFY_PEER
+                               end
 
       unless @config[:base64_cacert].nil?
         store = OpenSSL::X509::Store.new
@@ -596,12 +589,10 @@ module PuppetX::Puppetlabs
         when Net::HTTPSuccess, Net::HTTPRedirection
           return response
         when Net::HTTPInternalServerError
-          if attempts < max_attempts
-            Puppet.debug("Received #{response} error from #{service_url}, attempting to retry. (Attempt #{attempts} of #{max_attempts})")
-            Kernel.sleep(10)
-          else
-            raise Puppet::Error, "Received #{attempts} server error responses from the CD4PE service at #{service_url}: #{response.code} #{response.body}"
-          end
+          raise Puppet::Error, "Received #{attempts} server error responses from the CD4PE service at #{service_url}: #{response.code} #{response.body}" unless attempts < max_attempts
+          Puppet.debug("Received #{response} error from #{service_url}, attempting to retry. (Attempt #{attempts} of #{max_attempts})")
+          Kernel.sleep(10)
+
         when Net::HTTPBadRequest
           raise Puppet::Error, "Received failed response: #{response.code} #{response.body}"
         else

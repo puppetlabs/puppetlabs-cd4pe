@@ -62,11 +62,9 @@ class PuppetX::Puppetlabs::CD4PEApi::CompileHandler
     end
 
     options[:back_channel][:logs].each do |log|
-      begin
-        ret[:logs] << log.to_data_hash
-      rescue
-        ret[:logs] << log
-      end
+      ret[:logs] << log.to_data_hash
+    rescue
+      ret[:logs] << log
     end
 
     response.respond_with(200, 'application/json', ret.to_json)
