@@ -8,6 +8,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 - No unreleased changes
 
+## [v3.4.1](https://github.com/puppetlabs/puppetlabs-cd4pe/tree/v3.4.1)
+### Added
+- Added Puppet 9 to the Puppet version requirements.
+### Changed
+- Updated module with PDK 3.8.0.
+- Expanded the puppetlabs-stdlib dependency to allow stdlib 10.x.
+### Removed
+- Removed unused/dead methods from cd4pe_client.rb.
+
 ## [v3.4.0](https://github.com/puppetlabs/puppetlabs-cd4pe/tree/v3.4.0)
 ### Added
 - Updated puppetlabs-docker and puppetlabs-hocon dependencies to allow usage of newer versions
