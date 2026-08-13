@@ -1,6 +1,7 @@
 ---
 plugins:
 - rubocop-performance
+- rubocop-hash_inspect
 - rubocop-rspec
 - rubocop-rspec_rails
 - rubocop-factory_bot
@@ -8,7 +9,7 @@ plugins:
 AllCops:
   NewCops: enable
   DisplayCopNames: true
-  TargetRubyVersion: 3.1
+  TargetRubyVersion: 3.2
   Include:
   - "**/*.rb"
   Exclude:
@@ -22,6 +23,7 @@ AllCops:
   - "**/Puppetfile"
   - "**/Vagrantfile"
   - "**/Guardfile"
+inherit_from: ".rubocop_todo.yml"
 Layout/LineLength:
   Description: People have wide screens, use them.
   Max: 200
@@ -108,6 +110,8 @@ Performance/Squeeze:
 Performance/StringInclude:
   Enabled: true
 Performance/Sum:
+  Enabled: true
+Security/IoMethods:
   Enabled: true
 Style/CollectionMethods:
   Enabled: true
@@ -377,8 +381,6 @@ RSpec/VoidExpect:
   Enabled: false
 RSpec/Yield:
   Enabled: false
-Security/Open:
-  Enabled: false
 Style/AccessModifierDeclarations:
   Enabled: false
 Style/AccessorGrouping:
@@ -636,8 +638,6 @@ RSpecRails/MinitestAssertions:
 RSpecRails/TravelAround:
   Enabled: false
 Security/CompoundHash:
-  Enabled: false
-Security/IoMethods:
   Enabled: false
 Style/ArgumentsForwarding:
   Enabled: false

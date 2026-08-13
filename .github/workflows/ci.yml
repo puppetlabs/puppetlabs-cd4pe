@@ -1,0 +1,55 @@
+name: "ci"
+
+on:
+  push:
+    branches: [ main ]
+  # No branches filter: also cover PRs stacked on feature branches (e.g. a
+  # follow-on PR based on another open PR's branch rather than main yet).
+  pull_request: {}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: "${{ github.workflow }}-${{ github.ref }}"
+  cancel-in-progress: true
+
+jobs:
+  spec:
+    name: "Spec tests"
+    runs-on: ubuntu-latest
+    env:
+      PUPPET_GEM_VERSION: "~> 8.0"
+    steps:
+      - name: "Check out code"
+        uses: "actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10" # v6.0.3
+      - name: "Setup Ruby"
+        uses: "ruby/setup-ruby@afeafc3d1ab54a631816aba4c914a0081c12ff2f" # v1.310.0
+        with:
+          ruby-version: "3.2"
+          bundler-cache: true
+      # Fixture repos for the PE-internal modules this module tests against
+      # (puppet-enterprise-modules, etc.) are private. Fork PRs never get repo
+      # secrets for the `pull_request` event, so skip straight to a clear notice
+      # rather than let the token step fail on empty credentials.
+      - name: "Skip private-fixture spec run for fork PRs"
+        if: github.event.pull_request.head.repo.fork == true
+        run: |
+          echo "::notice::Skipping spec run: this module's fixtures include private PE-internal repos that fork PRs cannot authenticate against. Lint checks above still ran. A maintainer can push this branch directly, or re-run from a branch on this repo, to get full spec coverage."
+      - name: "application authentication"
+        if: github.event.pull_request.head.repo.fork != true
+        uses: "actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1" # v3.2.0
+        id: app-token
+        with:
+          app-id: ${{ vars.PUPPET_CD4PE_TOKEN_APP_ID }}
+          private-key: ${{ secrets.PUPPET_CD4PE_TOKEN }}
+          repositories: "puppet-enterprise-modules,puppetlabs-pe_r10k,enterprise_tasks,provision"
+          owner: puppetlabs
+      - name: "Lint"
+        run: bundle exec rake syntax lint metadata_lint rubocop
+      - name: "Spec"
+        if: github.event.pull_request.head.repo.fork != true
+        env:
+          ACCESS_TOKEN: ${{ steps.app-token.outputs.token }}
+          FIXTURES_YML: .fixtures.ci.yml
+        run: bundle exec rake spec

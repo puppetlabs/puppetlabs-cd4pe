@@ -6,5 +6,23 @@ Gemfile:
   optional:
     ':development':
       - gem: 'puppet-resource_api'
+      - gem: 'webmock'
+        version: '~> 3.0'
+    ':system_tests':
+      # Ruby 4.0 drops cgi from the default gems; docker-api (pulled in
+      # transitively by puppet_litmus) requires it without declaring it, so
+      # declare it explicitly ahead of time. Same shape as the racc/syslog
+      # workaround PipelinesInfra's cd4peadm needed for the same reason
+      # (CDPE-7373).
+      - gem: 'cgi'
+.rubocop.yml:
+  include_todos: true
+  TargetRubyVersion: 3.2
+
+.pdkignore:
+  paths:
+    - "/.fixtures.ci.yml"
+    - "/.rubocop_todo.yml"
+
 spec/spec_helper.rb:
   mock_with: ':rspec'

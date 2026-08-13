@@ -164,16 +164,14 @@ class Puppet::Resource::Catalog::CdpeCompiler < Puppet::Indirector::Code
           overrides = { current_environment: node.environment }
 
           Puppet.override(overrides, 'puppet-preview-compile') do
-            begin
-              preview_catalog = Puppet::Parser::Compiler.compile(node)
-              if node.facts.nil? || node.facts.values.nil? || node.facts.values['osfamily'].nil?
-                # Node does not have a valid factset.
-                error_msg = "Facts seems to be missing. No 'osfamily' fact found for node '#{node.name}'"
-                raise Puppet::Error, error_msg
-              end
-            rescue StandardError => e
-              raise Puppet::Error, "Error while compiling the preview catalog: #{e}"
+            preview_catalog = Puppet::Parser::Compiler.compile(node)
+            if node.facts.nil? || node.facts.values.nil? || node.facts.values['osfamily'].nil?
+              # Node does not have a valid factset.
+              error_msg = "Facts seems to be missing. No 'osfamily' fact found for node '#{node.name}'"
+              raise Puppet::Error, error_msg
             end
+          rescue StandardError => e
+            raise Puppet::Error, "Error while compiling the preview catalog: #{e}"
           end
         end
       end
@@ -211,11 +209,10 @@ class Puppet::Resource::Catalog::CdpeCompiler < Puppet::Indirector::Code
   # to find the node.
   def node_from_request(request)
     if node = request.options[:use_node]
-      if request.remote?
-        raise Puppet::Error, 'Invalid option use_node for a remote request'
-      else
-        return node
-      end
+      raise Puppet::Error, 'Invalid option use_node for a remote request' if request.remote?
+
+      return node
+
     end
 
     # We rely on our authorization system to determine whether the connected
@@ -251,13 +248,12 @@ class Puppet::Resource::Catalog::CdpeCompiler < Puppet::Indirector::Code
       end
     end
 
-    if @server_facts['servername'].nil?
-      host = Facter.value(:hostname)
-      @server_facts['servername'] = if domain = Facter.value(:domain)
-                                      [host, domain].join('.')
-                                    else
-                                      host
-                                    end
-    end
+    return unless @server_facts['servername'].nil?
+    host = Facter.value(:hostname)
+    @server_facts['servername'] = if domain = Facter.value(:domain)
+                                    [host, domain].join('.')
+                                  else
+                                    host
+                                  end
   end
 end
